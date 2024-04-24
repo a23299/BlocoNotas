@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "type": "mssql.local",
+      "connectionId": "ConnectionStrings:DefaultConnection"
+    },
+    "identityapp1": {
+      "connectionInfo": "App registration: a23299, Tenant: Instituto Politécnico de Tomar (ipt.pt - Microsoft Entra ID)",
+      "type": "identityapp.default"
+    }
+  }
+}

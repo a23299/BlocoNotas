@@ -1,2 +1,2 @@
-# BlocoNotas
-Uma aplicação Web para servir de Bloco de Notas
+# Bloco de Notas
+ Aplicação Web que serve de Bloco de Notas
