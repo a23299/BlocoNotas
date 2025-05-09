@@ -4,20 +4,34 @@ using Microsoft.AspNetCore.Identity;
 namespace BlocoNotas.Models;
 public class User
 {
-    public string Id { get; set; }
+    /// <summary>
+    /// ID do user
+    /// </summary>
+    public string UserId { get; set; }
     
+    /// <summary>
+    /// Nome do User
+    /// </summary>
     [Required]
     [StringLength(100)]
-    public string FirstName { get; set; }
+    public string UserName { get; set; }
     
+    /// <summary>
+    /// Password do User
+    /// </summary>
     [Required]
-    [StringLength(100)]
-    public string LastName { get; set; }
+    [StringLength(50, MinimumLength = 4)]
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
     
-    public bool IsAdmin { get; set; } = false;
+    /// <summary>
+    /// Quando o User foi criado
+    /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     
-    // Navigation properties
+    // Notas do User
     public ICollection<Note> Notes { get; set; }
+    
+    // Notas de outros Users partilhados com o User
     public ICollection<NoteShare> SharedWithMe { get; set; }
 }

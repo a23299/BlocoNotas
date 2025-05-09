@@ -1,20 +1,37 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlocoNotas.Models;
 public class NoteShare
 {
-    public int Id { get; set; }
+    /// <summary>
+    /// ID do partilhar da Nota
+    /// </summary>
+    public int NoteShareId { get; set; }
     
-    public int NoteId { get; set; }
-    
+    /// <summary>
+    /// Nota partilhada
+    /// </summary>
     [Required]
+    [ForeignKey(nameof(Note))]
+    public int NoteId { get; set; }
     public Note Note { get; set; }
     
-    public int SharedWithUserId { get; set; }
-    
+    /// <summary>
+    /// User que a Nota foi partilhada
+    /// </summary>
     [Required]
+    [ForeignKey(nameof(SharedWithUser))]   
+    public int SharedWithUserId { get; set; }
     public User SharedWithUser { get; set; }
     
+    /// <summary>
+    /// Quando a Nota foi partilhada
+    /// </summary>
     public DateTime SharedAt { get; set; } = DateTime.Now;
+    
+    /// <summary>
+    /// Se o User que a Nota foi partilhada pode-a modificar
+    /// </summary>
     public bool CanEdit { get; set; } = false;
 }

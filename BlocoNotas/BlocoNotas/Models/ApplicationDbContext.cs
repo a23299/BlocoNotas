@@ -13,4 +13,5 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<NoteTag> NoteTags { get; set; }
+    public DbSet<NoteShare> NoteShares { get; set; }
 }
