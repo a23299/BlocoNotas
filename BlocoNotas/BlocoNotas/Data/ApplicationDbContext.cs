@@ -1,6 +1,7 @@
+using BlocoNotas.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BlocoNotas.Models;
+namespace BlocoNotas.Data;
 
 public class ApplicationDbContext : DbContext
 {
@@ -8,7 +9,7 @@ public class ApplicationDbContext : DbContext
         : base(options)
     {
     }
-    
+
     public DbSet<Note> Notes { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Tag> Tags { get; set; }
