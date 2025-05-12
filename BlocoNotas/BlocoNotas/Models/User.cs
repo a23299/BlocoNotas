@@ -7,7 +7,7 @@ public class User
     /// <summary>
     /// ID do user
     /// </summary>
-    public string UserId { get; set; }
+    public int UserId { get; set; }
     
     /// <summary>
     /// Nome do User

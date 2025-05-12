@@ -1,0 +1,61 @@
+@model IEnumerable<BlocoNotas.Models.NoteShare>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Note)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SharedWithUser)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SharedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CanEdit)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Note.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SharedWithUser.Password)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SharedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CanEdit)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.NoteShareId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.NoteShareId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.NoteShareId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</body>
+</html>
