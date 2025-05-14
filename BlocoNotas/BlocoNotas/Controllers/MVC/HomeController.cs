@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using BlocoNotas.Models;
 
-namespace BlocoNotas.Controllers;
+namespace BlocoNotas.Controllers.MVC;
 
 public class HomeController : Controller
 {
