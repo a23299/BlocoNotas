@@ -13,7 +13,7 @@ namespace BlocoNotas.Controllers.Api;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController : Controller
+public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly TokenService _tokenService;
