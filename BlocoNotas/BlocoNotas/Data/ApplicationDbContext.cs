@@ -68,7 +68,7 @@ public class ApplicationDbContext : DbContext
         return await base.SaveChangesAsync(cancellationToken);
     }
 
-    // Atualiza os valores de CreatedAt e UpdatedAt para as notas quando farem o SaveChanges
+    // Atualiza os valores de que têm time stamps quando houver mudanças em alguma entidade do _context
     private void UpdateTimestamps()
     {
         foreach (var entry in ChangeTracker.Entries())
