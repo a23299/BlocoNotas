@@ -20,11 +20,21 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         
+        // Colocar Data e Hora na criação de User
+        modelBuilder.Entity<User>()
+            .Property(u => u.CreatedAt)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        
         // Definir restrições, índices, etc. se necessário
         modelBuilder.Entity<User>()
             .HasIndex(u => u.UserName)
             .IsUnique();
-                
+        
+        // Colocar Data e Hora de criação de Nota
+        modelBuilder.Entity<Note>()
+            .Property(n => n.CreatedAt)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        
         // Configuração da relação um-para-muitos entre User e Note
         modelBuilder.Entity<Note>()
             .HasOne(n => n.User)
@@ -45,4 +55,47 @@ public class ApplicationDbContext : DbContext
             .WithMany(t => t.NoteTags)
             .HasForeignKey(nt => nt.TagId);
     }
+    
+    public override int SaveChanges()
+    {
+        UpdateTimestamps();
+        return base.SaveChanges();
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateTimestamps();
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    // Atualiza os valores de CreatedAt e UpdatedAt para as notas quando farem o SaveChanges
+    private void UpdateTimestamps()
+    {
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            if (entry.Entity is Note)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Property("CreatedAt").CurrentValue = DateTime.Now;
+                    entry.Property("UpdatedAt").CurrentValue = DateTime.Now;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    entry.Property("UpdatedAt").CurrentValue = DateTime.Now;
+                }
+            }
+
+            if (entry.Entity is User)
+            {
+                entry.Property("CreatedAt").CurrentValue = DateTime.Now;
+            }
+
+            if (entry.Entity is NoteShare)
+            {
+                entry.Property("SharedAt").CurrentValue = DateTime.Now;
+            }
+        }
+    }
+
 }
