@@ -17,6 +17,13 @@ public class User
     public string UserName { get; set; }
     
     /// <summary>
+    /// Email do User
+    /// </summary>
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; }
+    
+    /// <summary>
     /// Password do User
     /// </summary>
     [Required]
