@@ -15,27 +15,23 @@ public class ApplicationDbContext : DbContext
     public DbSet<Tag> Tags { get; set; }
     public DbSet<NoteTag> NoteTags { get; set; }
     public DbSet<NoteShare> NoteShares { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
-        // Colocar Data e Hora na criação de User
+
         modelBuilder.Entity<User>()
             .Property(u => u.CreatedAt)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
-        
-        // Definir restrições, índices, etc. se necessário
+            .HasDefaultValueSql("GETDATE()");
+
         modelBuilder.Entity<User>()
             .HasIndex(u => u.UserName)
             .IsUnique();
-        
-        // Colocar Data e Hora de criação de Nota
+
         modelBuilder.Entity<Note>()
             .Property(n => n.CreatedAt)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
-        
-        // Configuração da relação um-para-muitos entre User e Note
+            .HasDefaultValueSql("GETDATE()");
+
         modelBuilder.Entity<Note>()
             .HasOne(n => n.User)
             .WithMany(u => u.Notes)
@@ -44,7 +40,7 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<NoteTag>()
             .HasKey(nt => new { nt.NoteId, nt.TagId });
-        
+
         modelBuilder.Entity<NoteTag>()
             .HasOne(nt => nt.Note)
             .WithMany(n => n.NoteTags)
@@ -55,7 +51,7 @@ public class ApplicationDbContext : DbContext
             .WithMany(t => t.NoteTags)
             .HasForeignKey(nt => nt.TagId);
     }
-    
+
     public override int SaveChanges()
     {
         UpdateTimestamps();
@@ -68,7 +64,6 @@ public class ApplicationDbContext : DbContext
         return await base.SaveChangesAsync(cancellationToken);
     }
 
-    // Atualiza os valores de que têm time stamps quando houver mudanças em alguma entidade do _context
     private void UpdateTimestamps()
     {
         foreach (var entry in ChangeTracker.Entries())
@@ -86,16 +81,15 @@ public class ApplicationDbContext : DbContext
                 }
             }
 
-            if (entry.Entity is User)
+            if (entry.Entity is User && entry.State == EntityState.Added)
             {
                 entry.Property("CreatedAt").CurrentValue = DateTime.Now;
             }
 
-            if (entry.Entity is NoteShare)
+            if (entry.Entity is NoteShare && entry.State == EntityState.Added)
             {
                 entry.Property("SharedAt").CurrentValue = DateTime.Now;
             }
         }
     }
-
 }
