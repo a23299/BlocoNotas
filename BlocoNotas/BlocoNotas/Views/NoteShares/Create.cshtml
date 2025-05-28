@@ -20,12 +20,12 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="NoteId" class="control-label"></label>
-                <select asp-for="NoteId" class ="form-control" asp-items="ViewBag.NoteId"></select>
+                <label asp-for="NoteShareFK" class="control-label"></label>
+                <select asp-for="NoteShareFK" class ="form-control" asp-items="ViewBag.NoteId"></select>
             </div>
             <div class="form-group">
-                <label asp-for="SharedWithUserId" class="control-label"></label>
-                <select asp-for="SharedWithUserId" class ="form-control" asp-items="ViewBag.SharedWithUserId"></select>
+                <label asp-for="UserShareFK" class="control-label"></label>
+                <select asp-for="UserShareFK" class ="form-control" asp-items="ViewBag.SharedWithUserId"></select>
             </div>
             <div class="form-group">
                 <label asp-for="SharedAt" class="control-label"></label>

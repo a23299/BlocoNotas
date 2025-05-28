@@ -37,8 +37,8 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     
     // Notas do User
-    public ICollection<Note> Notes { get; set; }
+    public ICollection<Note> Notes { get; set; } = [];
     
     // Notas de outros Users partilhados com o User
-    public ICollection<NoteShare> SharedWithMe { get; set; }
+    public ICollection<NoteShare> SharedWithMe { get; set; } = [];
 }

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace BlocoNotas.Models;
 public class NoteShare
@@ -14,15 +15,16 @@ public class NoteShare
     /// </summary>
     [Required]
     [ForeignKey(nameof(Note))]
-    public int NoteId { get; set; }
+    public int NoteShareFK { get; set; }
     public Note Note { get; set; }
     
     /// <summary>
     /// User que a Nota foi partilhada
     /// </summary>
     [Required]
-    [ForeignKey(nameof(SharedWithUser))]   
-    public int SharedWithUserId { get; set; }
+    [ForeignKey(nameof(SharedWithUser))]
+    
+    public int UserShareFK { get; set; }
     public User SharedWithUser { get; set; }
     
     /// <summary>

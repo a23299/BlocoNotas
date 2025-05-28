@@ -41,12 +41,12 @@ public class Note
     /// </summary>
     [Required]
     [ForeignKey(nameof(User))]
-    public int UserId { get; set; }
+    public int UserFK { get; set; }
     public User User { get; set; }
     
     // Tags da Nota
-    public ICollection<NoteTag> NoteTags { get; set; }
+    public ICollection<NoteTag> NoteTags { get; set; } = [];
     
     // Users que a Nota foi partilhada
-    public ICollection<NoteShare> SharedWith { get; set; }
+    public ICollection<NoteShare> SharedWith { get; set; } = [];
 }

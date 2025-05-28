@@ -35,21 +35,39 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Note>()
             .HasOne(n => n.User)
             .WithMany(u => u.Notes)
-            .HasForeignKey(n => n.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(n => n.UserFK);
+            //.OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<NoteTag>()
-            .HasKey(nt => new { nt.NoteId, nt.TagId });
+            .HasKey(nt => new { nt.NoteTagFK, nt.TagFK });
 
         modelBuilder.Entity<NoteTag>()
             .HasOne(nt => nt.Note)
             .WithMany(n => n.NoteTags)
-            .HasForeignKey(nt => nt.NoteId);
+            .HasForeignKey(nt => nt.NoteTagFK);
 
         modelBuilder.Entity<NoteTag>()
             .HasOne(nt => nt.Tag)
             .WithMany(t => t.NoteTags)
-            .HasForeignKey(nt => nt.TagId);
+            .HasForeignKey(nt => nt.TagFK);
+        
+        //modelBuilder.Entity<NoteShare>()
+        //    .HasOne(ns => ns.SharedWithUser)
+        //    .WithMany()
+        //    .HasForeignKey(ns => ns.SharedWithUserId)
+        //    .OnDelete(DeleteBehavior.Restrict); // <-- ON DELETE NO ACTION
+        
+        //modelBuilder.Entity<NoteShare>()
+        //    .HasOne(ns => ns.Note)
+        //    .WithMany()
+        //    .HasForeignKey(ns => ns.NoteId)
+        //    .OnDelete(DeleteBehavior.Restrict); // <-- ON DELETE NO ACTION
+        
+        foreach (var relationship in modelBuilder.Model.GetEntityTypes()
+                     .SelectMany(e => e.GetForeignKeys()))
+        {
+            relationship.DeleteBehavior = DeleteBehavior.NoAction; // <-- ON DELETE NO ACTION
+        }
     }
 
     public override int SaveChanges()

@@ -3,6 +3,7 @@ using System;
 using BlocoNotas.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -15,40 +16,46 @@ namespace BlocoNotas.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "9.0.5")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("BlocoNotas.Models.Note", b =>
                 {
                     b.Property<int>("NoteId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NoteId"));
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("UserFK")
+                        .HasColumnType("int");
 
                     b.HasKey("NoteId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserFK");
 
                     b.ToTable("Notes");
                 });
@@ -57,40 +64,42 @@ namespace BlocoNotas.Migrations
                 {
                     b.Property<int>("NoteShareId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NoteShareId"));
 
                     b.Property<bool>("CanEdit")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
-                    b.Property<int>("NoteId")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("NoteShareFK")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("SharedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("SharedWithUserId")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("UserShareFK")
+                        .HasColumnType("int");
 
                     b.HasKey("NoteShareId");
 
-                    b.HasIndex("NoteId");
+                    b.HasIndex("NoteShareFK");
 
-                    b.HasIndex("SharedWithUserId");
+                    b.HasIndex("UserShareFK");
 
                     b.ToTable("NoteShares");
                 });
 
             modelBuilder.Entity("BlocoNotas.Models.NoteTag", b =>
                 {
-                    b.Property<int>("NoteId")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("NoteTagFK")
+                        .HasColumnType("int");
 
-                    b.Property<int>("TagId")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("TagFK")
+                        .HasColumnType("int");
 
-                    b.HasKey("NoteId", "TagId");
+                    b.HasKey("NoteTagFK", "TagFK");
 
-                    b.HasIndex("TagId");
+                    b.HasIndex("TagFK");
 
                     b.ToTable("NoteTags");
                 });
@@ -99,12 +108,14 @@ namespace BlocoNotas.Migrations
                 {
                     b.Property<int>("TagId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TagId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("TagId");
 
@@ -115,26 +126,28 @@ namespace BlocoNotas.Migrations
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("UserId");
 
@@ -148,8 +161,8 @@ namespace BlocoNotas.Migrations
                 {
                     b.HasOne("BlocoNotas.Models.User", "User")
                         .WithMany("Notes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UserFK")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -159,14 +172,14 @@ namespace BlocoNotas.Migrations
                 {
                     b.HasOne("BlocoNotas.Models.Note", "Note")
                         .WithMany("SharedWith")
-                        .HasForeignKey("NoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("NoteShareFK")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("BlocoNotas.Models.User", "SharedWithUser")
                         .WithMany("SharedWithMe")
-                        .HasForeignKey("SharedWithUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UserShareFK")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Note");
@@ -178,14 +191,14 @@ namespace BlocoNotas.Migrations
                 {
                     b.HasOne("BlocoNotas.Models.Note", "Note")
                         .WithMany("NoteTags")
-                        .HasForeignKey("NoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("NoteTagFK")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("BlocoNotas.Models.Tag", "Tag")
                         .WithMany("NoteTags")
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("TagFK")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Note");

@@ -16,5 +16,5 @@ public class Tag
     public string Name { get; set; }
     
     // Notas que têm a Tag
-    public ICollection<NoteTag> NoteTags { get; set; }
+    public ICollection<NoteTag> NoteTags { get; set; } = [];
 }

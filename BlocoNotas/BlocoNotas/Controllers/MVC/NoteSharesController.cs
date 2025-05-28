@@ -67,8 +67,8 @@ public class NoteSharesController : Controller
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        ViewData["NoteId"] = new SelectList(_context.Notes, "NoteId", "Title", noteShare.NoteId);
-        ViewData["SharedWithUserId"] = new SelectList(_context.Users, "UserId", "Password", noteShare.SharedWithUserId);
+        ViewData["NoteId"] = new SelectList(_context.Notes, "NoteId", "Title", noteShare.NoteShareFK);
+        ViewData["SharedWithUserId"] = new SelectList(_context.Users, "UserId", "Password", noteShare.NoteShareFK);
         return View(noteShare);
     }
 
@@ -85,8 +85,8 @@ public class NoteSharesController : Controller
         {
             return NotFound();
         }
-        ViewData["NoteId"] = new SelectList(_context.Notes, "NoteId", "Title", noteShare.NoteId);
-        ViewData["SharedWithUserId"] = new SelectList(_context.Users, "UserId", "Password", noteShare.SharedWithUserId);
+        ViewData["NoteId"] = new SelectList(_context.Notes, "NoteId", "Title", noteShare.NoteShareFK);
+        ViewData["SharedWithUserId"] = new SelectList(_context.Users, "UserId", "Password", noteShare.UserShareFK);
         return View(noteShare);
     }
 
@@ -122,8 +122,8 @@ public class NoteSharesController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
-        ViewData["NoteId"] = new SelectList(_context.Notes, "NoteId", "Title", noteShare.NoteId);
-        ViewData["SharedWithUserId"] = new SelectList(_context.Users, "UserId", "Password", noteShare.SharedWithUserId);
+        ViewData["NoteId"] = new SelectList(_context.Notes, "NoteId", "Title", noteShare.NoteShareFK);
+        ViewData["SharedWithUserId"] = new SelectList(_context.Users, "UserId", "Password", noteShare.UserShareFK);
         return View(noteShare);
     }
 

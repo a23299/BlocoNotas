@@ -61,7 +61,7 @@ public class NotesController : Controller
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Password", note.UserId);
+        ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Password", note.UserFK);
         return View(note);
     }
 
@@ -78,7 +78,7 @@ public class NotesController : Controller
         {
             return NotFound();
         }
-        ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Password", note.UserId);
+        ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Password", note.UserFK);
         return View(note);
     }
 
@@ -114,7 +114,7 @@ public class NotesController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
-        ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Password", note.UserId);
+        ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Password", note.UserFK);
         return View(note);
     }
 

@@ -31,7 +31,7 @@ public class TagsApiController : ControllerBase
         
         // Busca todas as tags que estão associadas a pelo menos uma nota do usuário atual
         var tags = await _context.Tags
-            .Where(t => t.NoteTags.Any(nt => nt.Note.UserId == userId && !nt.Note.IsDeleted))
+            .Where(t => t.NoteTags.Any(nt => nt.Note.UserFK == userId && !nt.Note.IsDeleted))
             .OrderBy(t => t.Name)
             .ToListAsync();
             
@@ -83,8 +83,8 @@ public class TagsApiController : ControllerBase
         
         // Busca as notas do usuário atual que têm essa tag
         var notes = await _context.Notes
-            .Where(n => n.UserId == userId && !n.IsDeleted)
-            .Where(n => n.NoteTags.Any(nt => nt.TagId == id))
+            .Where(n => n.UserFK == userId && !n.IsDeleted)
+            .Where(n => n.NoteTags.Any(nt => nt.TagFK == id))
             .OrderByDescending(n => n.UpdatedAt)
             .ToListAsync();
             
@@ -167,7 +167,7 @@ public class TagsApiController : ControllerBase
 
         // Remover todas as associações NoteTags antes de remover a tag
         var noteTags = await _context.NoteTags
-            .Where(nt => nt.TagId == id)
+            .Where(nt => nt.TagFK == id)
             .ToListAsync();
             
         _context.NoteTags.RemoveRange(noteTags);
@@ -185,7 +185,7 @@ public class TagsApiController : ControllerBase
         
         // Verifica se a nota pertence ao usuário
         var note = await _context.Notes
-            .FirstOrDefaultAsync(n => n.NoteId == request.NoteId && n.UserId == userId && !n.IsDeleted);
+            .FirstOrDefaultAsync(n => n.NoteId == request.NoteId && n.UserFK == userId && !n.IsDeleted);
             
         if (note == null)
         {
@@ -202,7 +202,7 @@ public class TagsApiController : ControllerBase
         }
         
         // Verifica se a associação já existe
-        if (await _context.NoteTags.AnyAsync(nt => nt.NoteId == request.NoteId && nt.TagId == request.TagId))
+        if (await _context.NoteTags.AnyAsync(nt => nt.NoteTagFK == request.NoteId && nt.TagFK == request.TagId))
         {
             return BadRequest(new { message = "Esta tag já está associada à nota" });
         }
@@ -210,8 +210,8 @@ public class TagsApiController : ControllerBase
         // Cria a associação
         var noteTag = new NoteTag
         {
-            NoteId = request.NoteId,
-            TagId = request.TagId
+            NoteTagFK = request.NoteId,
+            TagFK = request.TagId
         };
         
         _context.NoteTags.Add(noteTag);
@@ -232,7 +232,7 @@ public class TagsApiController : ControllerBase
         
         // Verifica se a nota pertence ao usuário
         var note = await _context.Notes
-            .FirstOrDefaultAsync(n => n.NoteId == request.NoteId && n.UserId == userId && !n.IsDeleted);
+            .FirstOrDefaultAsync(n => n.NoteId == request.NoteId && n.UserFK == userId && !n.IsDeleted);
             
         if (note == null)
         {
@@ -241,7 +241,7 @@ public class TagsApiController : ControllerBase
         
         // Busca a associação
         var noteTag = await _context.NoteTags
-            .FirstOrDefaultAsync(nt => nt.NoteId == request.NoteId && nt.TagId == request.TagId);
+            .FirstOrDefaultAsync(nt => nt.NoteTagFK == request.NoteId && nt.TagFK == request.TagId);
             
         if (noteTag == null)
         {

@@ -10,7 +10,7 @@ public class NoteTag
     /// </summary>
     [Required]
     [ForeignKey(nameof(Note))]
-    public int NoteId { get; set; }
+    public int NoteTagFK { get; set; }
     public Note Note { get; set; }
     
     /// <summary>
@@ -18,6 +18,6 @@ public class NoteTag
     /// </summary>
     [Required]
     [ForeignKey(nameof(Tag))]
-    public int TagId { get; set; }
+    public int TagFK { get; set; }
     public Tag Tag { get; set; }
 }

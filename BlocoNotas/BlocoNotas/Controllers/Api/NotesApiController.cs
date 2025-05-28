@@ -29,7 +29,7 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
     {
         var userId = GetCurrentUserId();
         return await _context.Notes
-            .Where(n => n.UserId == userId && !n.IsDeleted)
+            .Where(n => n.UserFK == userId && !n.IsDeleted)
             .OrderByDescending(n => n.UpdatedAt)
             .ToListAsync();
     }
@@ -40,7 +40,7 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
     {
         var userId = GetCurrentUserId();
         var note = await _context.Notes
-            .FirstOrDefaultAsync(n => n.NoteId == id && n.UserId == userId && !n.IsDeleted);
+            .FirstOrDefaultAsync(n => n.NoteId == id && n.UserFK == userId && !n.IsDeleted);
 
         if (note == null)
         {
@@ -56,7 +56,7 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
     {
         var userId = GetCurrentUserId();
         
-        note.UserId = userId;
+        note.UserFK = userId;
         note.CreatedAt = DateTime.Now;
         note.UpdatedAt = DateTime.Now;
         note.IsDeleted = false;
@@ -78,7 +78,7 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
 
         var userId = GetCurrentUserId();
         var existingNote = await _context.Notes
-            .FirstOrDefaultAsync(n => n.NoteId == id && n.UserId == userId && !n.IsDeleted);
+            .FirstOrDefaultAsync(n => n.NoteId == id && n.UserFK == userId && !n.IsDeleted);
 
         if (existingNote == null)
         {
@@ -112,7 +112,7 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
     {
         var userId = GetCurrentUserId();
         var note = await _context.Notes
-            .FirstOrDefaultAsync(n => n.NoteId == id && n.UserId == userId && !n.IsDeleted);
+            .FirstOrDefaultAsync(n => n.NoteId == id && n.UserFK == userId && !n.IsDeleted);
 
         if (note == null)
         {
@@ -131,7 +131,7 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
     private bool NoteExists(int id)
     {
         var userId = GetCurrentUserId();
-        return _context.Notes.Any(e => e.NoteId == id && e.UserId == userId && !e.IsDeleted);
+        return _context.Notes.Any(e => e.NoteId == id && e.UserFK == userId && !e.IsDeleted);
     }
 
     private int GetCurrentUserId()
