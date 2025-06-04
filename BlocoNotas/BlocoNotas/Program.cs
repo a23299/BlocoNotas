@@ -56,6 +56,31 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); // Replace with your DbContext
+    try
+    {
+        Console.WriteLine("🔍 Testing Azure SQL connection...");
+        var canConnect = await context.Database.CanConnectAsync();
+        
+        if (canConnect)
+        {
+            var dbName = context.Database.GetDbConnection().Database;
+            Console.WriteLine($"✅ Connected to Azure SQL Database: {dbName}");
+        }
+        else
+        {
+            Console.WriteLine("❌ Cannot connect to Azure SQL Database");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Azure SQL connection failed: {ex.Message}");
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

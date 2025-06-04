@@ -48,7 +48,9 @@ namespace BlocoNotas.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("UserFK")
                         .HasColumnType("int");
@@ -75,7 +77,9 @@ namespace BlocoNotas.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("SharedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("UserShareFK")
                         .HasColumnType("int");
@@ -137,7 +141,7 @@ namespace BlocoNotas.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -151,6 +155,9 @@ namespace BlocoNotas.Migrations
 
                     b.HasKey("UserId");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.HasIndex("UserName")
                         .IsUnique();
 
@@ -162,7 +169,7 @@ namespace BlocoNotas.Migrations
                     b.HasOne("BlocoNotas.Models.User", "User")
                         .WithMany("Notes")
                         .HasForeignKey("UserFK")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -173,7 +180,7 @@ namespace BlocoNotas.Migrations
                     b.HasOne("BlocoNotas.Models.Note", "Note")
                         .WithMany("SharedWith")
                         .HasForeignKey("NoteShareFK")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BlocoNotas.Models.User", "SharedWithUser")
@@ -192,13 +199,13 @@ namespace BlocoNotas.Migrations
                     b.HasOne("BlocoNotas.Models.Note", "Note")
                         .WithMany("NoteTags")
                         .HasForeignKey("NoteTagFK")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BlocoNotas.Models.Tag", "Tag")
                         .WithMany("NoteTags")
                         .HasForeignKey("TagFK")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Note");
