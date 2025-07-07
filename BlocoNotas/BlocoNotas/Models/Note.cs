@@ -14,31 +14,37 @@ public class Note
     /// </summary>
     [Required]
     [StringLength(200)]
+    [Display(Name = "Título")]
     public string Title { get; set; }
     
     /// <summary>
     /// Conteúdo da Nota
     /// </summary>
+    [Display(Name = "Conteúdo")]
     public string Content { get; set; }
     
     /// <summary>
     /// Quando a nota foi criada
     /// </summary>
+    [Display(Name = "Data de Criação")]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     
     /// <summary>
     /// Quando a Nota foi modificada pela última vez
     /// </summary>
+    [Display(Name = "Última Atualização")]
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
     
     /// <summary>
     /// Se a Nota foi eliminada 
     /// </summary>
+    [Display(Name = "Eliminada")]
     public bool IsDeleted { get; set; } = false;
     
     /// <summary>
     /// User da Nota
     /// </summary>
+    [Display(Name = "Utilizador")]
     [Required]
     [ForeignKey(nameof(User))]
     public int UserFK { get; set; }
