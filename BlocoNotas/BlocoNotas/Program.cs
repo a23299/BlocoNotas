@@ -31,7 +31,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     {
-        options.SignIn.RequireConfirmedAccount = false; // ou true, conforme quiseres
+        options.SignIn.RequireConfirmedAccount = false; // ou true, depende como queremos
     })
     .AddEntityFrameworkStores<ApplicationDbContext>();
 

@@ -66,7 +66,8 @@ public class UsersController : Controller
     }
 
     // GET: Users/Edit/5
-    public async Task<IActionResult> Edit(int? id)
+    [HttpGet]
+    public async Task<IActionResult> Edit(string? id)
     {
         if (id == null)
         {
@@ -86,7 +87,7 @@ public class UsersController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string id, [Bind("UserId,UserName,Password,CreatedAt")] ApplicationUser applicationUser)
+    public async Task<IActionResult> Edit(string? id, [Bind("UserId,UserName,Password,CreatedAt")] ApplicationUser applicationUser)
     {
         if (id != applicationUser.Id)
         {
@@ -137,7 +138,7 @@ public class UsersController : Controller
     // POST: Users/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
+    public async Task<IActionResult> DeleteConfirmed(string? id)
     {
         var user = await _context.Users.FindAsync(id);
         if (user != null)

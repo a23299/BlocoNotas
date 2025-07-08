@@ -21,11 +21,20 @@ namespace BlocoNotas.Views.Home;
                     <input type="email" class="form-control" id="email" required />
                 </div>
 
-                <div class="mb-3">
-                    <label for="password" class="form-label">Senha</label>
-                    <input type="password" class="form-control" id="password" required>
+                <br/>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" required />
+                        <button type="button" class="btn btn-outline-secondary" id="togglePassword" title="Mostrar password">
+                            👁
+                        </button>
+                    </div>
                 </div>
-
+                
+                <br/>
+                
                 <div class="d-grid">
                     <button type="submit" class="btn btn-success">Registar</button>
                 </div>
@@ -37,6 +46,21 @@ namespace BlocoNotas.Views.Home;
 </div>
 
 <script>
+    const passwordInput = document.getElementById("password");
+    const togglePasswordBtn = document.getElementById("togglePassword");
+
+    togglePasswordBtn.addEventListener("mousedown", () => {
+        passwordInput.type = "text";
+    });
+
+    togglePasswordBtn.addEventListener("mouseup", () => {
+        passwordInput.type = "password";
+    });
+
+    togglePasswordBtn.addEventListener("mouseleave", () => {
+        passwordInput.type = "password";
+    });
+
     document.getElementById("registerForm").addEventListener("submit", async function (e) {
         e.preventDefault();
 

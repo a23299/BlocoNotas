@@ -16,16 +16,28 @@
             <label for="username">Nome</label>
             <input type="text" class="form-control" id="username" required />
         </div>
+        
+        <br/>
 
         <div class="form-group">
             <label for="email">Email</label>
             <input type="email" class="form-control" id="email" required />
         </div>
         
+        <br/>
+        
         <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" required />
+            <div class="input-group">
+                <input type="password" class="form-control" id="password" required />
+                <button type="button" class="btn btn-outline-secondary" id="togglePassword" title="Mostrar password">
+                    👁
+                </button>
+            </div>
         </div>
+
+        <br/>        
+        
 
         <button type="submit" class="btn btn-success">Guardar Alterações</button>
         <a href="/Users/Index" class="btn btn-secondary">Cancelar</a>
@@ -33,52 +45,66 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
-    const userId = document.getElementById("UserId").value;
-    const nameInput = document.getElementById("username");
-    const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
+    const togglePasswordBtn = document.getElementById("togglePassword");
 
-    try {
-        const response = await fetch(`/api/UsersApi/${userId}`);
-        if (!response.ok) throw new Error("Erro ao carregar dados");
+    togglePasswordBtn.addEventListener("mousedown", () => {
+        passwordInput.type = "text";
+    });
 
-        const user = await response.json();
-        nameInput.value = user.username;
-        emailInput.value = user.email;
-        passwordInput.value = user.password;
-    } catch (err) {
-        showAlert("danger", "Erro: " + err.message);
-    }
+    togglePasswordBtn.addEventListener("mouseup", () => {
+        passwordInput.type = "password";
+    });
 
-    document.getElementById("editUserForm").addEventListener("submit", async e => {
-        e.preventDefault();
+    togglePasswordBtn.addEventListener("mouseleave", () => {
+        passwordInput.type = "password";
+    });
 
-        const updatedUser = {
-            userId: userId.value,
-            userName: nameInput.value,
-            email: emailInput.value,
-            password: passwordInput.value
-        };
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const userId = document.getElementById("UserId").value;
+        const nameInput = document.getElementById("username");
+        const emailInput = document.getElementById("email");
 
         try {
-            const res = await fetch(`/api/UsersApi/${userId}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updatedUser)
-            });
+            const response = await fetch(`/api/UsersApi/${userId}`);
+            if (!response.ok) throw new Error("Erro ao carregar dados");
 
-            if (res.ok) {
-                showAlert("success", "Utilizador atualizado com sucesso.");
-            } else {
-                const errText = await res.text();
-                showAlert("danger", "Erro ao guardar: " + errText);
-            }
+            const user = await response.json();
+            nameInput.value = user.userName;
+            emailInput.value = user.email;
         } catch (err) {
             showAlert("danger", "Erro: " + err.message);
         }
+
+        document.getElementById("editUserForm").addEventListener("submit", async e => {
+            e.preventDefault();
+
+            const updatedUser = {
+                id: userId,
+                userName: nameInput.value,
+                email: emailInput.value
+            };
+
+            try {
+                const res = await fetch(`/api/UsersApi/${userId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updatedUser)
+                });
+
+                if (res.ok) {
+                    showAlert("success", "Utilizador atualizado com sucesso.");
+                } else {
+                    const errText = await res.text();
+                    showAlert("danger", "Erro ao guardar: " + errText);
+                }
+            } catch (err) {
+                showAlert("danger", "Erro: " + err.message);
+            }
+        });
     });
-});
+
 
 function showAlert(type, message) {
     const alertArea = document.getElementById("alertArea");

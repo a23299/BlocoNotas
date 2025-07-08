@@ -4,6 +4,7 @@ using BlocoNotas.Data;
 using BlocoNotas.Models;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 namespace BlocoNotas.Controllers.Api
 {
@@ -12,10 +13,12 @@ namespace BlocoNotas.Controllers.Api
     public class UsersApiController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UsersApiController(ApplicationDbContext context)
+        public UsersApiController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: api/UsersApi
@@ -83,14 +86,17 @@ namespace BlocoNotas.Controllers.Api
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest("Erro ao eliminar o utilizador.");
+            }
 
             return NoContent();
         }
