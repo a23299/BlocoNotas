@@ -4,61 +4,89 @@
     ViewData["Title"] = "Editar Utilizador";
 }
 
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="utf-8" />
-    <title>@ViewData["Title"]</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-</head>
-<body style="background: linear-gradient(to bottom right, #f8f9fa, #e9ecef); min-height: 100vh;">
+<div class="container mt-4">
+    <h2>Editar Utilizador</h2>
 
-<div class="container py-4">
-    <h2 class="text-primary mb-4">Editar Utilizador</h2>
+    <div id="alertArea"></div>
 
-    <form asp-action="Edit" method="post" class="needs-validation" novalidate>
-        <input type="hidden" asp-for="UserId" />
+    <form id="editUserForm" class="mt-3">
+        <input type="hidden" id="UserId" value="@Model.UserId" />
 
-        <div class="mb-3">
-            <label asp-for="UserName" class="form-label"></label>
-            <input asp-for="UserName" class="form-control" />
-            <div class="text-danger">
-                <span asp-validation-for="UserName"></span>
-            </div>
+        <div class="form-group">
+            <label for="UserName">Nome</label>
+            <input type="text" class="form-control" id="UserName" required />
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Email" class="form-label"></label>
-            <input asp-for="Email" class="form-control" />
-            <div class="text-danger">
-                <span asp-validation-for="Email"></span>
-            </div>
+        <div class="form-group">
+            <label for="Email">Email</label>
+            <input type="email" class="form-control" id="Email" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="Password">Password</label>
+            <input type="password" class="form-control" id="Password" required />
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Password" class="form-label"></label>
-            <input asp-for="Password" class="form-control" type="password" />
-            <div class="text-danger">
-                <span asp-validation-for="Password"></span>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="CreatedAt" class="form-label"></label>
-            <input asp-for="CreatedAt" class="form-control" readonly />
-            <div class="text-danger">
-                <span asp-validation-for="CreatedAt"></span>
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a asp-action="Index" class="btn btn-outline-secondary ms-2">Voltar à lista</a>
+        <button type="submit" class="btn btn-success">Guardar Alterações</button>
+        <a href="/Users/Index" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 
-<!-- Bootstrap JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const userId = document.getElementById("UserId").value;
+    const nameInput = document.getElementById("UserName");
+    const emailInput = document.getElementById("Email");
+    const passwordInput = document.getElementById("Password");
+
+    try {
+        const response = await fetch(`/api/UsersApi/${userId}`);
+        if (!response.ok) throw new Error("Erro ao carregar dados");
+
+        const user = await response.json();
+        nameInput.value = user.userName;
+        emailInput.value = user.email;
+        passwordInput.value = user.password;
+    } catch (err) {
+        showAlert("danger", "Erro: " + err.message);
+    }
+
+    document.getElementById("editUserForm").addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const updatedUser = {
+            userId: parseInt(userId),
+            userName: nameInput.value,
+            email: emailInput.value,
+            password: passwordInput.value
+        };
+
+        try {
+            const res = await fetch(`/api/UsersApi/${userId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedUser)
+            });
+
+            if (res.ok) {
+                showAlert("success", "Utilizador atualizado com sucesso.");
+            } else {
+                const errText = await res.text();
+                showAlert("danger", "Erro ao guardar: " + errText);
+            }
+        } catch (err) {
+            showAlert("danger", "Erro: " + err.message);
+        }
+    });
+});
+
+function showAlert(type, message) {
+    const alertArea = document.getElementById("alertArea");
+    alertArea.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    `;
+}
+</script>

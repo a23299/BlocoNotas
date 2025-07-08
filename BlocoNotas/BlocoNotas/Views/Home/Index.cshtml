@@ -21,9 +21,17 @@
     <p class="lead mb-4 text-center">
         Organize as suas ideias e tarefas com facilidade e segurança.
     </p>
+    
+    <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
+        <a class="btn btn-primary btn-lg" asp-controller="Auth" asp-action="Login">Log In</a>
+        <a class="btn btn-primary btn-lg" asp-controller="Auth" asp-action="Register">Sign In</a>
+    </div>
 
     <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
         <a class="btn btn-primary btn-lg" asp-controller="Notes" asp-action="Index">Ver Notas</a>
+    </div>
+    
+    <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
         <a class="btn btn-outline-primary btn-lg" asp-controller="Users" asp-action="Index">Gerir Utilizadores</a>
     </div>
 

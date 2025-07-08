@@ -18,60 +18,40 @@
 
 <div class="container py-4">
 
-    <div class="mb-4">
-        <h2 class="text-primary">Criar Nova Nota</h2>
-        <hr />
-    </div>
+    <h3>Criar Nota</h3>
+    <form id="noteForm">
+        <input type="text" id="title" placeholder="Título" required>
+        <textarea id="content" placeholder="Conteúdo" required></textarea>
+        <button type="submit">Criar</button>
+    </form>
 
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5 bg-white p-4 rounded shadow-sm">
-
-            <form asp-action="Create" method="post">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
-                <div class="mb-3">
-                    <label asp-for="Title" class="form-label"></label>
-                    <input asp-for="Title" class="form-control" />
-                    <span asp-validation-for="Title" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Content" class="form-label"></label>
-                    <textarea asp-for="Content" class="form-control" rows="4"></textarea>
-                    <span asp-validation-for="Content" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="CreatedAt" class="form-label"></label>
-                    <input asp-for="CreatedAt" type="datetime-local" class="form-control" />
-                    <span asp-validation-for="CreatedAt" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="UpdatedAt" class="form-label"></label>
-                    <input asp-for="UpdatedAt" type="datetime-local" class="form-control" />
-                    <span asp-validation-for="UpdatedAt" class="text-danger"></span>
-                </div>
-
-                <div class="form-check mb-3">
-                    <input asp-for="IsDeleted" class="form-check-input" />
-                    <label asp-for="IsDeleted" class="form-check-label"></label>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="UserFK" class="form-label"></label>
-                    <select asp-for="UserFK" class="form-select" asp-items="ViewBag.UserId"></select>
-                    <span asp-validation-for="UserFK" class="text-danger"></span>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar à Lista</a>
-                    <button type="submit" class="btn btn-primary">Criar</button>
-                </div>
-            </form>
-
-        </div>
-    </div>
+    <script>
+        document.getElementById('noteForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+    
+            const note = {
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value,
+                userId: 1, // <-- substitui com o ID correto do utilizador autenticado
+                
+            };
+    
+            const response = await fetch('/api/NotesApi', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(note)
+            });
+    
+            if (response.ok) {
+                document.getElementById('noteForm').reset();
+                loadNotes(); // recarrega lista
+            } else {
+                alert("Erro ao criar nota");
+            }
+        });
+    </script>
 
 </div>
 

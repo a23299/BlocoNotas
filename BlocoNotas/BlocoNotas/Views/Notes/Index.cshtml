@@ -23,41 +23,33 @@
 
         @if (Model != null && Model.Any())
         {
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle shadow-sm bg-white">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>@Html.DisplayNameFor(model => model.First().Title)</th>
-                            <th>@Html.DisplayNameFor(model => model.First().Content)</th>
-                            <th>@Html.DisplayNameFor(model => model.First().CreatedAt)</th>
-                            <th>@Html.DisplayNameFor(model => model.First().UpdatedAt)</th>
-                            <th>@Html.DisplayNameFor(model => model.First().IsDeleted)</th>
-                            <th>Utilizador</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@Html.DisplayFor(m => item.Title)</td>
-                                <td>@Html.DisplayFor(m => item.Content)</td>
-                                <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td>@item.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td>@(item.IsDeleted ? "Sim" : "Não")</td>
-                                <td>@Html.DisplayFor(m => item.User.UserName)</td>
-                                <td>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@item.NoteId">Editar</a>
-                                        <a class="btn btn-outline-info" asp-action="Details" asp-route-id="@item.NoteId">Detalhes</a>
-                                        <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@item.NoteId">Apagar</a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+            <h2>Minhas Notas</h2>
+
+            <div id="notesList">A carregar...</div>
+
+            <script>
+                async function loadNotes() {
+                const response = await fetch('/api/NotesApi');
+                const notes = await response.json();
+
+                const notesList = document.getElementById('notesList');
+                notesList.innerHTML = '';
+
+                notas.forEach(nota => {
+                        const div = document.createElement('div');
+                        div.innerHTML = `
+                            <h4>${nota.title}</h4>
+                            <p><strong>ID:</strong> ${nota.noteId}</p>
+                            <p><strong>Utilizador:</strong> ${nota.userId}</p>
+                            <p><strong>Criada em:</strong> ${new Date(nota.createdAt).toLocaleString()}</p>
+                            <hr/>
+                            `;
+                        container.appendChild(div);
+                        });
+                }
+
+                loadNotes();
+            </script>
         }
         else
         {
