@@ -1,63 +1,146 @@
 @model IEnumerable<BlocoNotas.Models.Note>
 
 @{
-    ViewData["Title"] = "Notas";
+    ViewData["Title"] = "Minhas Notas";
 }
 
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"]</title>
-    <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-</head>
-<body style="background: linear-gradient(to bottom right, #f8f9fa, #e9ecef); min-height: 100vh;">
-    <div class="container py-4">
+<h1 class="mb-4">Notas</h1>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="text-primary">Lista de Notas</h2>
-            <a class="btn btn-success" asp-action="Create">+ Criar Nova</a>
+<div class="mb-3">
+    <a class="btn btn-success" asp-controller="Notes" asp-action="Create">+ Nova Nota</a>
+</div>
+
+<div id="notesList" class="row gy-3"></div>
+
+<!-- Modal para criar/editar nota -->
+<div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="noteForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="noteModalLabel">Nova Nota</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="noteId">
+                    <div class="mb-3">
+                        <label for="noteTitle" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="noteTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="noteContent" class="form-label">Conteúdo</label>
+                        <textarea class="form-control" id="noteContent" rows="5"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
         </div>
-
-        @if (Model != null && Model.Any())
-        {
-            <h2>Minhas Notas</h2>
-
-            <div id="notesList">A carregar...</div>
-
-            <script>
-                async function loadNotes() {
-                const response = await fetch('/api/NotesApi');
-                const notes = await response.json();
-
-                const notesList = document.getElementById('notesList');
-                notesList.innerHTML = '';
-
-                notas.forEach(nota => {
-                        const div = document.createElement('div');
-                        div.innerHTML = `
-                            <h4>${nota.title}</h4>
-                            <p><strong>ID:</strong> ${nota.noteId}</p>
-                            <p><strong>Utilizador:</strong> ${nota.userId}</p>
-                            <p><strong>Criada em:</strong> ${new Date(nota.createdAt).toLocaleString()}</p>
-                            <hr/>
-                            `;
-                        container.appendChild(div);
-                        });
-                }
-
-                loadNotes();
-            </script>
-        }
-        else
-        {
-            <div class="alert alert-warning">Não existem notas registadas.</div>
-        }
-
     </div>
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+
+<script>
+    const apiUrl = "/api/NotesApi";
+    const token = localStorage.getItem("token");
+
+    function getAuthHeaders() {
+        const headers = { "Content-Type": "application/json" };
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+        return headers;
+    }
+
+    async function loadNotes() {
+        const response = await fetch(apiUrl, { headers: getAuthHeaders() });
+        const notes = await response.json();
+        const list = document.getElementById("notesList");
+
+        list.innerHTML = "";
+
+        if (notes.length === 0) {
+            list.innerHTML = "<p>Nenhuma nota encontrada.</p>";
+            return;
+        }
+
+        for (const note of notes) {
+            list.innerHTML += `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">${note.title}</h5>
+                            <p class="card-text text-muted small">Atualizada em ${new Date(note.updatedAt).toLocaleString()}</p>
+                            <p class="card-text">${note.content?.substring(0, 100) ?? ""}</p>
+                            <button class="btn btn-sm btn-primary me-2" onclick="openEditModal(${note.noteId})">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.noteId})">Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function openCreateModal() {
+        document.getElementById("noteId").value = "";
+        document.getElementById("noteTitle").value = "";
+        document.getElementById("noteContent").value = "";
+        document.getElementById("noteModalLabel").innerText = "Nova Nota";
+    }
+
+    async function openEditModal(id) {
+        const response = await fetch(`${apiUrl}/${id}`, { headers: getAuthHeaders() });
+        const note = await response.json();
+
+        document.getElementById("noteId").value = note.noteId;
+        document.getElementById("noteTitle").value = note.title;
+        document.getElementById("noteContent").value = note.content;
+        document.getElementById("noteModalLabel").innerText = "Editar Nota";
+        new bootstrap.Modal(document.getElementById('noteModal')).show();
+    }
+
+    async function deleteNote(id) {
+        if (!confirm("Tens a certeza que queres eliminar esta nota?")) return;
+        await fetch(`${apiUrl}/${id}`, {
+            method: "DELETE",
+            headers: getAuthHeaders()
+        });
+        loadNotes();
+    }
+
+    document.getElementById("noteForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const id = document.getElementById("noteId").value;
+        const title = document.getElementById("noteTitle").value;
+        const content = document.getElementById("noteContent").value;
+
+        const payload = JSON.stringify({ noteId: id, title, content });
+
+        if (id) {
+            await fetch(`${apiUrl}/${id}`, {
+                method: "PUT",
+                headers: getAuthHeaders(),
+                body: payload
+            });
+        } else {
+            await fetch(apiUrl, {
+                method: "POST",
+                headers: getAuthHeaders(),
+                body: payload
+            });
+        }
+
+        bootstrap.Modal.getInstance(document.getElementById("noteModal")).hide();
+        loadNotes();
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+    //    if (!token) {
+    //        window.location.href = "/Home/LogIn";
+    //        return;
+    //    }
+        loadNotes();
+    });
+</script>

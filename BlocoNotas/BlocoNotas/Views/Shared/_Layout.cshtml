@@ -12,32 +12,38 @@
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
         <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BlocoNotas</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">📝 BlocoNotas</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-sm-0">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Utilizadores</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Users" asp-action="Index">Utilizadores</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Notes" asp-action="Index">Notas</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Notes" asp-action="Index">Notas</a>
                     </li>
+                </ul>
+
+                <ul class="navbar-nav ms-auto" id="authLinks">
+                    <!-- Links de autenticação serão adicionados por JS -->
                 </ul>
             </div>
         </div>
     </nav>
 </header>
+
 <div class="container">
     <main role="main" class="pb-3">
         @RenderBody()
@@ -52,6 +58,60 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+
+<script>
+    function decodeTokenPayload(token) {
+        try {
+            const payloadBase64 = token.split('.')[1];
+            const payloadJson = atob(payloadBase64);
+            return JSON.parse(payloadJson);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function renderNavbarAuthLinks() {
+        const authLinks = document.getElementById("authLinks");
+        authLinks.innerHTML = "";
+
+        const token = localStorage.getItem("token");
+
+        if (token) {
+            const payload = decodeTokenPayload(token);
+            const username = payload?.unique_name || "Utilizador";
+
+            authLinks.innerHTML = `
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                        Olá, ${username}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/notes">Minhas Notas</a></li>
+                        <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+                    </ul>
+                </li>
+            `;
+
+            document.getElementById("logoutBtn").addEventListener("click", function (e) {
+                e.preventDefault();
+                localStorage.removeItem("token");
+                window.location.href = "/login";
+            });
+        } else {
+            authLinks.innerHTML = `
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/Home/LogIn">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/Home/SignIn">Registar</a>
+                </li>
+            `;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", renderNavbarAuthLinks);
+</script>
+
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

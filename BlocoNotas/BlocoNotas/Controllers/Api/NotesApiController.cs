@@ -25,13 +25,26 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
 
     // GET: api/NotesApi
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<Note>>> GetNotes()
     {
-        var userId = GetCurrentUserId();
-        return await _context.Notes
-            .Where(n => n.UserFK == userId && !n.IsDeleted)
-            .OrderByDescending(n => n.UpdatedAt)
-            .ToListAsync();
+        if (User.Identity?.IsAuthenticated ?? false)
+        {
+            var userId = GetCurrentUserId();
+            return await _context.Notes
+                .Where(n => n.UserFK == userId && !n.IsDeleted)
+                .OrderByDescending(n => n.UpdatedAt)
+                .ToListAsync();
+        }
+        else
+        {
+            // Estamos a mostrar TODAS as notas não eliminadas
+            // mesmo que pertençam a outros users
+            return await _context.Notes
+                .Where(n => !n.IsDeleted)
+                .OrderByDescending(n => n.UpdatedAt)
+                .ToListAsync();
+        }
     }
 
     // GET: api/NotesApi/5
@@ -52,15 +65,24 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
 
     // POST: api/NotesApi
     [HttpPost]
+    [AllowAnonymous]
     public async Task<ActionResult<Note>> CreateNote(Note note)
     {
-        var userId = GetCurrentUserId();
-        
-        note.UserFK = userId;
+        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (claim != null)
+        {
+            // Utilizador autenticado
+            note.UserFK = int.Parse(claim.Value);
+        }
+        else if (note.UserFK == 0)
+        {
+            return BadRequest(new { message = "UserFK é obrigatório se não estiver autenticado." });
+        }
+
         note.CreatedAt = DateTime.Now;
         note.UpdatedAt = DateTime.Now;
         note.IsDeleted = false;
-        
+
         _context.Notes.Add(note);
         await _context.SaveChangesAsync();
 
