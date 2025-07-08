@@ -39,8 +39,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     <td>${user.userName}</td>
     <td>${user.email}</td>
     <td>
-        <a href="/Users/Edit/${user.id}" class="btn btn-sm btn-primary">Editar</a>
-        <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.id}')">Eliminar</button>
+        <a href="/Users/Edit/${user.id}" class="btn btn-sm btn-outline-primary">Editar</a>
+        <a href="/Users/Details/${user.id}" class="btn btn-sm btn-outline-info ms-1">Detalhes</a>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user.id}')">Eliminar</button>
+
     </td>
             `;
 

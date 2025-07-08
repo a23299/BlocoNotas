@@ -95,7 +95,7 @@
             document.getElementById("logoutBtn").addEventListener("click", function (e) {
                 e.preventDefault();
                 localStorage.removeItem("token");
-                window.location.href = "/login";
+                window.location.href = "/Home/Index";
             });
         } else {
             authLinks.innerHTML = `
@@ -103,7 +103,7 @@
                     <a class="nav-link text-white" href="/Home/LogIn">Login</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="/Home/SignIn">Registar</a>
+                    <a class="nav-link text-white" href="/Home/Register">Registar</a>
                 </li>
             `;
         }
