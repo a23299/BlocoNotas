@@ -1,11 +1,10 @@
-using BlocoNotas.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
+using BlocoNotas.Models;
 
 namespace BlocoNotas.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -13,7 +12,6 @@ namespace BlocoNotas.Data
         }
 
         public DbSet<Note> Notes { get; set; }
-        public DbSet<User> Users { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<NoteTag> NoteTags { get; set; }
         public DbSet<NoteShare> NoteShares { get; set; }
@@ -24,16 +22,15 @@ namespace BlocoNotas.Data
 
  
     // User entity config
-    modelBuilder.Entity<User>()
+    modelBuilder.Entity<ApplicationUser>()
         .Property(u => u.CreatedAt)
         .HasDefaultValueSql("GETDATE()");
 
-    modelBuilder.Entity<User>()
+    modelBuilder.Entity<ApplicationUser>()
         .HasIndex(u => u.UserName)
         .IsUnique();
 
-    // Add unique constraint for email
-    modelBuilder.Entity<User>()
+    modelBuilder.Entity<ApplicationUser>()
         .HasIndex(u => u.Email)
         .IsUnique();
 
@@ -119,7 +116,7 @@ namespace BlocoNotas.Data
                         }
                         break;
 
-                    case User user when entry.State == EntityState.Added:
+                    case ApplicationUser user when entry.State == EntityState.Added:
                         entry.Property("CreatedAt").CurrentValue = now;
                         break;
 

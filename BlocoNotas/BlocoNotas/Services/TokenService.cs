@@ -17,7 +17,7 @@ public class TokenService
         _configuration = configuration;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(ApplicationUser applicationUser)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
@@ -26,8 +26,8 @@ public class TokenService
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName)
+                new Claim(ClaimTypes.NameIdentifier, applicationUser.Id.ToString()),
+                new Claim(ClaimTypes.Name, applicationUser.UserName)
             }),
             Expires = DateTime.UtcNow.AddHours(double.Parse(_configuration["Jwt:DurationInHours"])),
             Issuer = _configuration["Jwt:Issuer"],

@@ -34,7 +34,7 @@ namespace BlocoNotas.Views.Home;
 <script>
     document.getElementById("registerForm").addEventListener("submit", async function (e) {
         e.preventDefault();
-    
+
         const response = await fetch("/api/auth/register", {
             method: "POST",
             headers: {
@@ -45,14 +45,21 @@ namespace BlocoNotas.Views.Home;
                 password: document.getElementById("password").value
             })
         });
-    
+
         if (response.ok) {
             const data = await response.json();
             localStorage.setItem("token", data.token);
             window.location.href = "/";
         } else {
             const error = await response.json();
-            document.getElementById("registerError").innerText = error.message || "Erro ao registar";
+            console.log("Erro no registo:", error);
+
+            if (error.errors && Array.isArray(error.errors)) {
+                // Mostra todos os erros recebidos, separados por vírgula
+                document.getElementById("registerError").innerText = error.errors.join(", ");
+            } else {
+                document.getElementById("registerError").innerText = error.message || "Erro ao registar";
+            }
         }
     });
 </script>

@@ -30,9 +30,9 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
-            var userId = GetCurrentUserId();
+            var userId = GetCurrentUserId(); // agora é string
             return await _context.Notes
-                .Where(n => n.UserFK == userId && !n.IsDeleted)
+                .Where(n => n.UserFK == userId && !n.IsDeleted) // comparação string com string
                 .OrderByDescending(n => n.UpdatedAt)
                 .ToListAsync();
         }
@@ -51,7 +51,7 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
     [HttpGet("{id}")]
     public async Task<ActionResult<Note>> GetNote(int id)
     {
-        var userId = GetCurrentUserId();
+        var userId = GetCurrentUserId(); // string
         var note = await _context.Notes
             .FirstOrDefaultAsync(n => n.NoteId == id && n.UserFK == userId && !n.IsDeleted);
 
@@ -72,9 +72,9 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
         if (claim != null)
         {
             // Utilizador autenticado
-            note.UserFK = int.Parse(claim.Value);
+            note.UserFK = claim.Value;
         }
-        else if (note.UserFK == 0)
+        else if (string.IsNullOrEmpty(note.UserFK))
         {
             return BadRequest(new { message = "UserFK é obrigatório se não estiver autenticado." });
         }
@@ -98,7 +98,7 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
             return BadRequest();
         }
 
-        var userId = GetCurrentUserId();
+        var userId  = GetCurrentUserId();
         var existingNote = await _context.Notes
             .FirstOrDefaultAsync(n => n.NoteId == id && n.UserFK == userId && !n.IsDeleted);
 
@@ -156,9 +156,9 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
         return _context.Notes.Any(e => e.NoteId == id && e.UserFK == userId && !e.IsDeleted);
     }
 
-    private int GetCurrentUserId()
+    private string GetCurrentUserId()
     {
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-        return int.Parse(claim?.Value ?? "0");
+        return claim?.Value ?? string.Empty;  // Retorna string ou string vazia
     }
 }

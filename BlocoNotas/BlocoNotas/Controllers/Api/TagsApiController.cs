@@ -263,10 +263,9 @@ public class TagsApiController : ControllerBase
         return _context.Tags.Any(t => t.TagId == id);
     }
 
-    private int GetCurrentUserId()
+    private string GetCurrentUserId()
     {
-        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-        return int.Parse(claim?.Value ?? "0");
+        return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
     }
 }
 

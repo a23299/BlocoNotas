@@ -1,13 +1,12 @@
-using System;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using BlocoNotas.Data;
 using BlocoNotas.Models;
 using BlocoNotas.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using BlocoNotas.Models; // ApplicationUser
+using BlocoNotas.Services; // TokenService, que gera o JWT
 
 namespace BlocoNotas.Controllers.Api;
 
@@ -15,11 +14,19 @@ namespace BlocoNotas.Controllers.Api;
 [ApiController]
 public class AuthController : ControllerBase
 {
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ApplicationDbContext _context;
     private readonly TokenService _tokenService;
 
-    public AuthController(ApplicationDbContext context, TokenService tokenService)
+    public AuthController(
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
+        ApplicationDbContext context,
+        TokenService tokenService)
     {
+        _userManager = userManager;
+        _signInManager = signInManager;
         _context = context;
         _tokenService = tokenService;
     }
@@ -27,16 +34,13 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.UserName == request.Username);
-
+        var user = await _userManager.FindByNameAsync(request.Username);
         if (user == null)
-            return Unauthorized(new { message = "User não encontrado" });
+            return Unauthorized(new { message = "Utilizador não encontrado" });
 
-        // Aqui usamos uma verificação simples, mas você pode melhorar isso
-        // usando um algoritmo de hash como BCrypt
-        if (user.Password != HashPassword(request.Password))
-            return Unauthorized(new { message = "Senha incorreta" });
+        var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+        if (!result.Succeeded)
+            return Unauthorized(new { message = "Credenciais inválidas" });
 
         var token = _tokenService.GenerateToken(user);
 
@@ -45,7 +49,7 @@ public class AuthController : ControllerBase
             token,
             user = new
             {
-                id = user.UserId,
+                id = user.Id,
                 username = user.UserName
             }
         });
@@ -54,18 +58,19 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        if (await _context.Users.AnyAsync(u => u.UserName == request.Username))
-            return BadRequest(new { message = "Nome de user já existe" });
+        var userExists = await _userManager.FindByNameAsync(request.Username);
+        if (userExists != null)
+            return BadRequest(new { message = "Nome de utilizador já existe" });
 
-        var user = new User
+        var user = new ApplicationUser
         {
             UserName = request.Username,
-            Password = HashPassword(request.Password),
-            CreatedAt = DateTime.UtcNow
+            Email = request.Username // opcional
         };
 
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+        var result = await _userManager.CreateAsync(user, request.Password);
+        if (!result.Succeeded)
+            return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
 
         var token = _tokenService.GenerateToken(user);
 
@@ -74,21 +79,10 @@ public class AuthController : ControllerBase
             token,
             user = new
             {
-                id = user.UserId,
+                id = user.Id,
                 username = user.UserName
             }
         });
-    }
-
-    // Método simples para hash de senha
-    // Em produção, considere usar BCrypt ou outro algoritmo mais seguro
-    private string HashPassword(string password)
-    {
-        using (var sha256 = SHA256.Create())
-        {
-            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(hashedBytes);
-        }
     }
 }
 

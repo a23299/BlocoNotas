@@ -26,7 +26,7 @@ public class UsersController : Controller
     }
 
     // GET: Users/Details/5
-    public async Task<IActionResult> Details(int? id)
+    public async Task<IActionResult> Details(string? id)
     {
         if (id == null)
         {
@@ -34,7 +34,7 @@ public class UsersController : Controller
         }
 
         var user = await _context.Users
-            .FirstOrDefaultAsync(m => m.UserId == id);
+            .FirstOrDefaultAsync(m => m.Id == id);
         if (user == null)
         {
             return NotFound();
@@ -54,15 +54,15 @@ public class UsersController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("UserId,UserName,Password,CreatedAt")] User user)
+    public async Task<IActionResult> Create([Bind("UserId,UserName,Password,CreatedAt")] ApplicationUser applicationUser)
     {
         if (ModelState.IsValid)
         {
-            _context.Add(user);
+            _context.Add(applicationUser);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        return View(user);
+        return View(applicationUser);
     }
 
     // GET: Users/Edit/5
@@ -86,9 +86,9 @@ public class UsersController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("UserId,UserName,Password,CreatedAt")] User user)
+    public async Task<IActionResult> Edit(string id, [Bind("UserId,UserName,Password,CreatedAt")] ApplicationUser applicationUser)
     {
-        if (id != user.UserId)
+        if (id != applicationUser.Id)
         {
             return NotFound();
         }
@@ -97,12 +97,12 @@ public class UsersController : Controller
         {
             try
             {
-                _context.Update(user);
+                _context.Update(applicationUser);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(user.UserId))
+                if (!UserExists(applicationUser.Id))
                 {
                     return NotFound();
                 }
@@ -113,11 +113,11 @@ public class UsersController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
-        return View(user);
+        return View(applicationUser);
     }
 
     // GET: Users/Delete/5
-    public async Task<IActionResult> Delete(int? id)
+    public async Task<IActionResult> Delete(string? id)
     {
         if (id == null)
         {
@@ -125,7 +125,7 @@ public class UsersController : Controller
         }
 
         var user = await _context.Users
-            .FirstOrDefaultAsync(m => m.UserId == id);
+            .FirstOrDefaultAsync(m => m.Id == id);
         if (user == null)
         {
             return NotFound();
@@ -149,8 +149,8 @@ public class UsersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    private bool UserExists(int id)
+    private bool UserExists(string id)
     {
-        return _context.Users.Any(e => e.UserId == id);
+        return _context.Users.Any(e => e.Id == id);
     }
 }

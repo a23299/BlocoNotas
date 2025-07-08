@@ -31,7 +31,6 @@ public class NoteSharesApiController : ControllerBase
         
         var notes = await _context.Notes
             .Where(n => !n.IsDeleted)
-            .Where(n => n.SharedWith.Any(ns => ns.NoteShareFK == userId))
             .Include(n => n.User) // Incluir o usuário que compartilhou
             .OrderByDescending(n => n.UpdatedAt)
             .ToListAsync();
@@ -80,14 +79,14 @@ public class NoteSharesApiController : ControllerBase
         }
         
         // Não permite compartilhar consigo mesmo
-        if (shareWithUser.UserId == currentUserId)
+        if (shareWithUser.Id == currentUserId)
         {
             return BadRequest(new { message = "Não é possível compartilhar uma nota consigo mesmo" });
         }
         
         // Verifica se já está compartilhado com este usuário
         var existingShare = await _context.NoteShares
-            .FirstOrDefaultAsync(ns => ns.NoteShareFK == request.NoteId && ns.NoteShareFK == shareWithUser.UserId);
+            .FirstOrDefaultAsync(ns => ns.NoteShareFK == request.NoteId && ns.UserShareFK == shareWithUser.Id);
             
         if (existingShare != null)
         {
@@ -98,7 +97,7 @@ public class NoteSharesApiController : ControllerBase
         var noteShare = new NoteShare
         {
             NoteShareFK = request.NoteId,
-            UserShareFK = shareWithUser.UserId,
+            UserShareFK = shareWithUser.Id,
             SharedAt = DateTime.Now,
             CanEdit = request.CanEdit
         };
@@ -123,7 +122,7 @@ public class NoteSharesApiController : ControllerBase
             .Include(ns => ns.Note)
             .Include(ns => ns.SharedWithUser)
             .FirstOrDefaultAsync(ns => ns.NoteShareId == id && 
-                                     (ns.Note.UserFK == userId || ns.NoteShareFK == userId));
+                                       (ns.Note.UserFK == userId || ns.UserShareFK == userId));
             
         if (noteShare == null)
         {
@@ -165,7 +164,7 @@ public class NoteSharesApiController : ControllerBase
         var noteShare = await _context.NoteShares
             .Include(ns => ns.Note)
             .FirstOrDefaultAsync(ns => ns.NoteShareId == id && 
-                                     (ns.Note.UserFK == userId || ns.NoteShareFK == userId));
+                                       (ns.Note.UserFK == userId || ns.UserShareFK == userId));
             
         if (noteShare == null)
         {
@@ -178,10 +177,10 @@ public class NoteSharesApiController : ControllerBase
         return NoContent();
     }
 
-    private int GetCurrentUserId()
+    private string GetCurrentUserId()
     {
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-        return int.Parse(claim?.Value ?? "0");
+        return claim?.Value ?? string.Empty;
     }
 }
 

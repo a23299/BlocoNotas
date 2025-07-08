@@ -25,9 +25,9 @@ public class NoteShare
     [Required]
     [ForeignKey(nameof(SharedWithUser))]
     
-    public int UserShareFK { get; set; }
+    public string UserShareFK { get; set; }
     
-    public User SharedWithUser { get; set; }
+    public ApplicationUser SharedWithUser { get; set; }
     
     /// <summary>
     /// Quando a Nota foi partilhada

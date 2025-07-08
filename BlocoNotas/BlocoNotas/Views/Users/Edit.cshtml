@@ -1,4 +1,4 @@
-@model BlocoNotas.Models.User
+@model BlocoNotas.Models.ApplicationUser
 
 @{
     ViewData["Title"] = "Editar Utilizador";
@@ -10,7 +10,7 @@
     <div id="alertArea"></div>
 
     <form id="editUserForm" class="mt-3">
-        <input type="hidden" id="UserId" value="@Model.UserId" />
+        <input type="hidden" id="UserId" value="@Model.Id" />
 
         <div class="form-group">
             <label for="UserName">Nome</label>

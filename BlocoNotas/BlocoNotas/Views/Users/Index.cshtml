@@ -1,4 +1,4 @@
-@model IEnumerable<BlocoNotas.Models.User>
+@model IEnumerable<BlocoNotas.Models.ApplicationUser>
 
 @{
     ViewData["Title"] = "Lista de Utilizadores";
@@ -35,13 +35,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             const row = document.createElement("tr");
 
             row.innerHTML = `
-                <td>${user.userId}</td>
-                <td>${user.userName}</td>
-                <td>${user.email}</td>
-                <td>
-                    <a href="/Users/Edit/${user.userId}" class="btn btn-sm btn-primary">Editar</a>
-                    <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.userId})">Eliminar</button>
-                </td>
+    <td>${user.id}</td>
+    <td>${user.userName}</td>
+    <td>${user.email}</td>
+    <td>
+        <a href="/Users/Edit/${user.id}" class="btn btn-sm btn-primary">Editar</a>
+        <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.id}')">Eliminar</button>
+    </td>
             `;
 
             tableBody.appendChild(row);

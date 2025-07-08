@@ -47,12 +47,13 @@ public class Note
     [Display(Name = "Utilizador")]
     [Required]
     [ForeignKey(nameof(User))]
-    public int UserFK { get; set; }
-    public User User { get; set; }
+    public string UserFK { get; set; } 
+    
+    public ApplicationUser User { get; set; }
     
     // Tags da Nota
-    public ICollection<NoteTag> NoteTags { get; set; } = [];
+    public ICollection<NoteTag> NoteTags { get; set; } = new List<NoteTag>();
     
     // Users que a Nota foi partilhada
-    public ICollection<NoteShare> SharedWith { get; set; } = [];
+    public ICollection<NoteShare> SharedWith { get; set; } =  new List<NoteShare>();
 }

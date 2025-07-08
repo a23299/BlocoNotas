@@ -20,14 +20,14 @@ namespace BlocoNotas.Controllers.Api
 
         // GET: api/UsersApi
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
 
         // GET: api/UsersApi/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<ApplicationUser>> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
 
@@ -41,24 +41,24 @@ namespace BlocoNotas.Controllers.Api
 
         // POST: api/UsersApi
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<ApplicationUser>> PostUser(ApplicationUser applicationUser)
         {
-            _context.Users.Add(user);
+            _context.Users.Add(applicationUser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+            return CreatedAtAction("GetUser", new { id = applicationUser.Id }, applicationUser);
         }
 
         // PUT: api/UsersApi/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(string id, ApplicationUser applicationUser)
         {
-            if (id != user.UserId)
+            if (id != applicationUser.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            _context.Entry(applicationUser).State = EntityState.Modified;
 
             try
             {
@@ -95,9 +95,9 @@ namespace BlocoNotas.Controllers.Api
             return NoContent();
         }
 
-        private bool UserExists(int id)
+        private bool UserExists(string id)
         {
-            return _context.Users.Any(e => e.UserId == id);
+            return _context.Users.Any(e => e.Id == id);
         }
     }
 }
