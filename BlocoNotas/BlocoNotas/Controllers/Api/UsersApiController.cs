@@ -27,7 +27,7 @@ namespace BlocoNotas.Controllers.Api
 
         // GET: api/UsersApi/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApplicationUser>> GetUser(int id)
+        public async Task<ActionResult<ApplicationUser>> GetUser(string id)
         {
             var user = await _context.Users.FindAsync(id);
 
@@ -81,7 +81,7 @@ namespace BlocoNotas.Controllers.Api
 
         // DELETE: api/UsersApi/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)

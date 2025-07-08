@@ -50,7 +50,8 @@ public class AuthController : ControllerBase
             user = new
             {
                 id = user.Id,
-                username = user.UserName
+                username = user.UserName,
+                email = user.Email
             }
         });
     }
@@ -65,7 +66,7 @@ public class AuthController : ControllerBase
         var user = new ApplicationUser
         {
             UserName = request.Username,
-            Email = request.Username // opcional
+            Email = request.Email
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
@@ -80,7 +81,8 @@ public class AuthController : ControllerBase
             user = new
             {
                 id = user.Id,
-                username = user.UserName
+                username = user.UserName,
+                email = user.Email
             }
         });
     }
@@ -89,11 +91,13 @@ public class AuthController : ControllerBase
 public class LoginRequest
 {
     public string Username { get; set; }
+    public string Email { get; set; }
     public string Password { get; set; }
 }
 
 public class RegisterRequest
 {
     public string Username { get; set; }
+    public string Email { get; set; }
     public string Password { get; set; }
 }

@@ -35,15 +35,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             const row = document.createElement("tr");
 
             row.innerHTML = `
-    <td>${user.id}</td>
-    <td>${user.userName}</td>
-    <td>${user.email}</td>
-    <td>
-        <a href="/Users/Edit/${user.id}" class="btn btn-sm btn-outline-primary">Editar</a>
-        <a href="/Users/Details/${user.id}" class="btn btn-sm btn-outline-info ms-1">Detalhes</a>
-        <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${user.id}')">Eliminar</button>
-
-    </td>
+                <td>${user.id}</td>
+                <td>${user.userName}</td>
+                <td>${user.email}</td>
+                <td>
+                    <a href="/Users/Edit/${user.id}" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a href="/Users/Details/${user.id}" class="btn btn-sm btn-outline-info ms-1">Detalhes</a>
+                    <a href="/Users/Delete/${user.id}" class="btn btn-sm btn-outline-danger ms-1">Eliminar</a>
+            
+                </td>
             `;
 
             tableBody.appendChild(row);

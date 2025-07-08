@@ -2,8 +2,11 @@
 
 namespace BlocoNotas.Models;
 
-public class RegisterVM
+public class Register
 {
+    [Required]
+    public string UserName { get; set; }
+    
     [Required]
     [EmailAddress]
     public string Email { get; set; }

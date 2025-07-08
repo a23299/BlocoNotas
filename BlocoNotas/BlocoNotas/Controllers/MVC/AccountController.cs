@@ -24,11 +24,11 @@ public class AccountController : Controller
     // POST: /Account/Register
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterVM model)
+    public async Task<IActionResult> Register(Register model)
     {
         if (ModelState.IsValid)
         {
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+            var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
@@ -55,7 +55,7 @@ public class AccountController : Controller
     // POST: /Account/Login
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginVM model)
+    public async Task<IActionResult> Login(Login model)
     {
         if (ModelState.IsValid)
         {

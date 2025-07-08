@@ -13,18 +13,18 @@
         <input type="hidden" id="UserId" value="@Model.Id" />
 
         <div class="form-group">
-            <label for="UserName">Nome</label>
-            <input type="text" class="form-control" id="UserName" required />
+            <label for="username">Nome</label>
+            <input type="text" class="form-control" id="username" required />
         </div>
 
         <div class="form-group">
-            <label for="Email">Email</label>
-            <input type="email" class="form-control" id="Email" required />
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" required />
         </div>
         
         <div class="form-group">
-            <label for="Password">Password</label>
-            <input type="password" class="form-control" id="Password" required />
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" required />
         </div>
 
         <button type="submit" class="btn btn-success">Guardar Alterações</button>
@@ -35,16 +35,16 @@
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
     const userId = document.getElementById("UserId").value;
-    const nameInput = document.getElementById("UserName");
-    const emailInput = document.getElementById("Email");
-    const passwordInput = document.getElementById("Password");
+    const nameInput = document.getElementById("username");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
 
     try {
         const response = await fetch(`/api/UsersApi/${userId}`);
         if (!response.ok) throw new Error("Erro ao carregar dados");
 
         const user = await response.json();
-        nameInput.value = user.userName;
+        nameInput.value = user.username;
         emailInput.value = user.email;
         passwordInput.value = user.password;
     } catch (err) {
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         e.preventDefault();
 
         const updatedUser = {
-            userId: parseInt(userId),
+            userId: userId.value,
             userName: nameInput.value,
             email: emailInput.value,
             password: passwordInput.value

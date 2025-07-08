@@ -16,6 +16,11 @@ namespace BlocoNotas.Views.Home;
                     <input type="text" class="form-control" id="username" required>
                 </div>
 
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" required />
+                </div>
+                
                 <div class="mb-3">
                     <label for="password" class="form-label">Senha</label>
                     <input type="password" class="form-control" id="password" required>
@@ -42,6 +47,7 @@ namespace BlocoNotas.Views.Home;
             },
             body: JSON.stringify({
                 username: document.getElementById("username").value,
+                email: document.getElementById("email").value,
                 password: document.getElementById("password").value
             })
         });
