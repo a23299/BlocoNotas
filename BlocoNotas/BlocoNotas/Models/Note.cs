@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BlocoNotas.Models;
 public class Note
@@ -45,11 +46,12 @@ public class Note
     /// User da Nota
     /// </summary>
     [Display(Name = "Utilizador")]
-    [Required]
+    //[Required]
     [ForeignKey(nameof(User))]
-    public string UserFK { get; set; } 
+    public string? UserFK { get; set; } 
     
-    public ApplicationUser User { get; set; }
+    [JsonIgnore]
+    public ApplicationUser? User { get; set; }
     
     // Tags da Nota
     public ICollection<NoteTag> NoteTags { get; set; } = new List<NoteTag>();

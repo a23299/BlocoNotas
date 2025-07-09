@@ -25,27 +25,22 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
 
     // GET: api/NotesApi
     [HttpGet]
-    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<Note>>> GetNotes()
     {
-        if (User.Identity?.IsAuthenticated ?? false)
+        var userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
         {
-            var userId = GetCurrentUserId(); // agora é string
-            return await _context.Notes
-                .Where(n => n.UserFK == userId && !n.IsDeleted) // comparação string com string
-                .OrderByDescending(n => n.UpdatedAt)
-                .ToListAsync();
+            return Unauthorized(new { message = "Autenticação requerida." });
         }
-        else
-        {
-            // Estamos a mostrar TODAS as notas não eliminadas
-            // mesmo que pertençam a outros users
-            return await _context.Notes
-                .Where(n => !n.IsDeleted)
-                .OrderByDescending(n => n.UpdatedAt)
-                .ToListAsync();
-        }
+
+        var notes = await _context.Notes
+            .Where(n => n.UserFK == userId && !n.IsDeleted)
+            .OrderByDescending(n => n.UpdatedAt)
+            .ToListAsync();
+
+        return notes;
     }
+
 
     // GET: api/NotesApi/5
     [HttpGet("{id}")]
@@ -64,21 +59,17 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
     }
 
     // POST: api/NotesApi
+    //[Authorize]
     [HttpPost]
-    [AllowAnonymous]
-    public async Task<ActionResult<Note>> CreateNote(Note note)
+    public async Task<ActionResult<Note>> CreateNote([FromBody] Note note)
     {
-        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-        if (claim != null)
+        var userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
         {
-            // Utilizador autenticado
-            note.UserFK = claim.Value;
-        }
-        else if (string.IsNullOrEmpty(note.UserFK))
-        {
-            return BadRequest(new { message = "UserFK é obrigatório se não estiver autenticado." });
+            return Unauthorized(new { message = "Autenticação requerida." });
         }
 
+        note.UserFK = userId;
         note.CreatedAt = DateTime.Now;
         note.UpdatedAt = DateTime.Now;
         note.IsDeleted = false;
@@ -88,6 +79,8 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
 
         return CreatedAtAction(nameof(GetNote), new { id = note.NoteId }, note);
     }
+
+
 
     // PUT: api/NotesApi/5
     [HttpPut("{id}")]

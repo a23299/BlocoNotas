@@ -31,67 +31,48 @@
 </div>
 
 <script>
-let nextUserId = null;
 
-document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        const res = await fetch("/api/UsersApi");
-        if (!res.ok) throw new Error("Erro ao carregar utilizadores existentes");
-
-        const users = await res.json();
-        const numericNameIds = users
-            .map(u => parseInt(u.userId))
-            .filter(id => !isNaN(id));
-
-        const maxId = numericNameIds.length > 0 ? Math.max(...numericNameIds) : 0;
-        nextUserId = maxId + 1;
-    } catch (err) {
-        console.error("Erro ao calcular nameId:", err);
-        nextUserId = 1;
-    }
-});
-
-document.getElementById("createUserForm").addEventListener("submit", async e => {
-    e.preventDefault();
-
-    const userName = document.getElementById("username").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    const user = {
-        userName: userName,
-        email: email,
-        password: password
-    };
-
-    try {
-        const res = await fetch("/api/UsersApi", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(user)
-        });
-
-        if (res.ok) {
-            const json = await res.json();
-            showAlert("success", `Utilizador criado com sucesso (ID: ${json.userId})`);
-            document.getElementById("createUserForm").reset();
-        } else {
-            const err = await res.text();
-            showAlert("danger", "Erro ao criar: " + err);
+    document.getElementById("createUserForm").addEventListener("submit", async e => {
+        e.preventDefault();
+    
+        const userName = document.getElementById("username").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+    
+        const user = {
+            userName: userName,
+            email: email,
+            password: password
+        };
+    
+        try {
+            const res = await fetch("/api/UsersApi", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(user)
+            });
+    
+            if (res.ok) {
+                const json = await res.json();
+                showAlert("success", `Utilizador criado com sucesso (ID: ${json.userId})`);
+                document.getElementById("createUserForm").reset();
+            } else {
+                const err = await res.text();
+                showAlert("danger", "Erro ao criar: " + err);
+            }
+        } catch (err) {
+            showAlert("danger", "Erro: " + err.message);
         }
-    } catch (err) {
-        showAlert("danger", "Erro: " + err.message);
+    });
+    
+    
+    function showAlert(type, message) {
+        const alertArea = document.getElementById("alertArea");
+        alertArea.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            </div>
+        `;
     }
-});
-
-
-function showAlert(type, message) {
-    const alertArea = document.getElementById("alertArea");
-    alertArea.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-        </div>
-    `;
-}
 </script>

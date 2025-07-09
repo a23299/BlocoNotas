@@ -1,6 +1,7 @@
-@model BlocoNotas.Models.Note
+@model BlocoNotas.Models.Note;
+
 @{
-    ViewData["Title"] = "Criar Nota";
+ViewData["Title"] = "Criar Nota";
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -14,69 +15,45 @@
         <label for="content" class="form-label">Conteúdo</label>
         <textarea class="form-control" id="content" name="content" rows="5"></textarea>
     </div>
-    <div class="mb-3" id="userSelectWrapper" style="display: none;">
-        <label for="userFk" class="form-label">Utilizador</label>
-        <select class="form-select" id="userFk" name="userFk">
-            <option value="">-- Selecione --</option>
-        </select>
-    </div>
     <button type="submit" class="btn btn-primary">Criar</button>
 </form>
 
 <script>
-    const token = localStorage.getItem("jwtToken");
-
-    // Mostrar dropdown apenas se NÃO houver token
-    if (!token) {
-        document.getElementById("userSelectWrapper").style.display = "block";
-
-        fetch('/api/UsersApi')
-            .then(res => res.json())
-            .then(data => {
-                const select = document.getElementById('userFk');
-                data.forEach(user => {
-                    const option = document.createElement('option');
-                    option.value = user.userId;
-                    option.textContent = user.userName;
-                    select.appendChild(option);
-                });
-            });
-    }
-
-    // Submeter nota
-    document.getElementById('noteForm').addEventListener('submit', function (e) {
+    document.getElementById("noteForm").addEventListener("submit", async e => {
         e.preventDefault();
-
-        const note = {
-            title: document.getElementById('title').value,
-            content: document.getElementById('content').value
-        };
-
+    
+        const token = localStorage.getItem("token");
         if (!token) {
-            const userFk = document.getElementById('userFk').value;
-            if (!userFk) {
-                alert("Selecione um utilizador.");
-                return;
-            }
-            note.userFK = parseInt(userFk);
+            alert("Precisa de estar autenticado para criar notas.");
+            return;
         }
-
-        fetch('/api/NotesApi', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...(token && { 'Authorization': 'Bearer ' + token })
-            },
-            body: JSON.stringify(note)
-        })
-        .then(res => {
-            if (res.ok) {
-                window.location.href = '/Notes';
+    
+        const note = {
+            Title: document.getElementById("title").value,
+            Content: document.getElementById("content").value,
+            UserFK: "42fbf50a-c250-480f-8e94-c4695ac848d4"
+        };
+    
+        try {
+            const response = await fetch("/api/NotesApi", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify(note)
+            });
+    
+            if (response.ok) {
+                window.location.href = "/Notes"; // redirecionar após sucesso
             } else {
-                res.json().then(data => {
-                    alert(data.message || "Erro ao criar nota.");
-                });
+                const data = await response.json();
+                alert(data.message || "Erro ao criar nota.");
             }
-        });
+        } catch (error) {
+            alert("Erro ao conectar com o servidor.");
+            console.error(error);
+        }
     });
 </script>
+
