@@ -41,6 +41,37 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="shareForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shareModalLabel">Partilhar Nota</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="shareNoteId">
+                    <div class="mb-3">
+                        <label for="shareWith" class="form-label">Nome do Utilizador</label>
+                        <input type="text" class="form-control" id="shareWith" required>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="canEdit">
+                        <label class="form-check-label" for="canEdit">Pode editar?</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Partilhar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
 <script>
     const apiUrl = "/api/NotesApi";
     const token = localStorage.getItem("token");
@@ -73,8 +104,9 @@
                             <h5 class="card-title">${note.title}</h5>
                             <p class="card-text text-muted small">Atualizada em ${new Date(note.updatedAt).toLocaleString()}</p>
                             <p class="card-text">${note.content?.substring(0, 100) ?? ""}</p>
-                            <button class="btn btn-sm btn-primary me-2" onclick="openEditModal(${note.noteId})">Editar</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.noteId})">Eliminar</button>
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="openEditModal(${note.noteId})">Editar</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteNote(${note.noteId})">Eliminar</button>
+                            <button class="btn btn-sm btn-outline-info" onclick="openShareModal(${note.noteId})">Partilhar</button>
                         </div>
                     </div>
                 </div>
@@ -134,6 +166,37 @@
 
         bootstrap.Modal.getInstance(document.getElementById("noteModal")).hide();
         loadNotes();
+    });
+
+    
+    function openShareModal(noteId) {
+        document.getElementById("shareNoteId").value = noteId;
+        document.getElementById("shareWith").value = "";
+        document.getElementById("canEdit").checked = false;
+        new bootstrap.Modal(document.getElementById('shareModal')).show();
+    }
+
+    document.getElementById("shareForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const noteId = document.getElementById("shareNoteId").value;
+        const username = document.getElementById("shareWith").value;
+        const canEdit = document.getElementById("canEdit").checked;
+
+        const payload = JSON.stringify({ noteId, shareWithUsername: username, canEdit });
+
+        const response = await fetch("/api/NoteSharesApi", {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: payload
+        });
+
+        if (response.ok) {
+            alert("Nota partilhada com sucesso!");
+            bootstrap.Modal.getInstance(document.getElementById("shareModal")).hide();
+        } else {
+            const error = await response.json();
+            alert(error.message ?? "Erro ao partilhar");
+        }
     });
 
     document.addEventListener("DOMContentLoaded", () => {

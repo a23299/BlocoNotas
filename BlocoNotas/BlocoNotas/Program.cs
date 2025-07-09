@@ -1,40 +1,39 @@
 using BlocoNotas.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using BlocoNotas.Models;
 using BlocoNotas.ApiEmail.Entities;
 using BlocoNotas.ApiEmail.Services;
-using BlocoNotas.Models;
 using BlocoNotas.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MailKit
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-// Add services to the container.
-builder.Services.Configure<SmtpSettings>(builder.Configuration
-    .GetSection("SmtpSettings"));
+// Configurações do SMTP para envio de emails
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSingleton<ISendEmail, SendEmail>();
 
-// Add services to the container.
+// MVC com Views
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<ApplicationDbContext>(
-    options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
-builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+// Configurar DbContext com SQLite
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"), sqliteOptions =>
     {
-        options.SignIn.RequireConfirmedAccount = false; // ou true, depende como queremos
-    })
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+        sqliteOptions.MigrationsAssembly("BlocoNotas");
+        // Não usar UseForeignKeys() pois não existe nesse contexto
+    }));
 
+// Identity
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false; // Muda para true se quiseres confirmação de email
+})
+.AddEntityFrameworkStores<ApplicationDbContext>();
+
+// Configuração de autenticação JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -51,17 +50,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Autorização
 builder.Services.AddAuthorization();
 
+// Serviço de Tokens
 builder.Services.AddScoped<TokenService>();
 
+// Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi(); // Se estiveres a usar algum pacote OpenAPI extra
 
-
+// Build da app
 var app = builder.Build();
 
-
+// Escopo para DB (testar conexão)
 using var scope = app.Services.CreateScope();
 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
@@ -74,14 +77,14 @@ else
     Console.WriteLine("❌ Falha na conexão à base SQLite");
 }
 
-// Configure the HTTP request pipeline.
+// Pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
-}else if (app.Environment.IsDevelopment())
+}
+else
 {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -93,15 +96,13 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 app.MapStaticAssets();
 
 app.MapControllers();
 
 app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();

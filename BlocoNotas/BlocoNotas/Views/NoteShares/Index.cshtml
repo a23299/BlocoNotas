@@ -1,58 +1,56 @@
-@model IEnumerable<BlocoNotas.Models.NoteShare>
-
 @{
-    ViewData["Title"] = "Note Share";
+    ViewData["Title"] = "Notas Partilhadas Comigo";
 }
 
-<!DOCTYPE html>
+<h1 class="mb-4">Notas Partilhadas Comigo</h1>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Note)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SharedWithUser)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SharedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CanEdit)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Note.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SharedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CanEdit)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.NoteShareId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.NoteShareId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.NoteShareId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-</body>
-</html>
+<div id="sharedNotesList" class="row gy-3"></div>
+
+<script>
+    const sharedNotesApi = "/api/NoteSharesApi/shared-with-me";
+    const token = localStorage.getItem("token");
+
+    function getAuthHeaders() {
+        const headers = { "Content-Type": "application/json" };
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+        return headers;
+    }
+
+    async function loadSharedNotes() {
+        const response = await fetch(sharedNotesApi, { headers: getAuthHeaders() });
+
+        if (!response.ok) {
+            document.getElementById("sharedNotesList").innerHTML =
+                "<p class='text-danger'>Erro ao carregar notas partilhadas.</p>";
+            return;
+        }
+
+        const notes = await response.json();
+        const list = document.getElementById("sharedNotesList");
+        list.innerHTML = "";
+
+        if (notes.length === 0) {
+            list.innerHTML = "<p>Nenhuma nota foi partilhada contigo.</p>";
+            return;
+        }
+
+        for (const note of notes) {
+            list.innerHTML += `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow border-info">
+                        <div class="card-body">
+                            <h5 class="card-title">${note.title}</h5>
+                            <p class="card-text text-muted small">Atualizada em ${new Date(note.updatedAt).toLocaleString()}</p>
+                            <p class="card-text">${note.content?.substring(0, 100) ?? ""}</p>
+                            <p class="card-text"><strong>De:</strong> ${note.user?.userName ?? "Desconhecido"}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadSharedNotes);
+</script>

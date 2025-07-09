@@ -82,16 +82,48 @@ namespace BlocoNotas.Controllers.Api
             return NoContent();
         }
 
-        // DELETE: api/UsersApi/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _context.Users
+                .Include(u => u.Notes)
+                .ThenInclude(n => n.SharedWith)
+                .Include(u => u.SharedWithMe)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
             if (user == null)
             {
                 return NotFound();
             }
 
+            // Apagar partilhas feitas COM o user (onde o user é o destinatário)
+            if (user.SharedWithMe != null && user.SharedWithMe.Any())
+            {
+                _context.NoteShares.RemoveRange(user.SharedWithMe);
+            }
+
+            // Apagar partilhas feitas NAS notas do user (partilhas feitas PELO user)
+            if (user.Notes != null)
+            {
+                foreach (var note in user.Notes)
+                {
+                    if (note.SharedWith != null && note.SharedWith.Any())
+                    {
+                        _context.NoteShares.RemoveRange(note.SharedWith);
+                    }
+                }
+            }
+
+            // Apagar notas do user
+            if (user.Notes != null && user.Notes.Any())
+            {
+                _context.Notes.RemoveRange(user.Notes);
+            }
+
+            // Salvar alterações antes de apagar o user
+            await _context.SaveChangesAsync();
+
+            // Agora apagar o user
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {

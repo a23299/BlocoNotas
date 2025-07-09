@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BlocoNotas.Data;
 using BlocoNotas.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -151,7 +152,7 @@ public class NotesController : Controller
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
-
+    
     private bool NoteExists(int id)
     {
         return _context.Notes.Any(e => e.NoteId == id);

@@ -125,7 +125,6 @@ namespace BlocoNotas.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("UserFK")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("NoteId");
@@ -144,7 +143,7 @@ namespace BlocoNotas.Migrations
                     b.Property<bool>("CanEdit")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("NoteShareFK")
+                    b.Property<int>("NoteId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("SharedAt")
@@ -158,7 +157,7 @@ namespace BlocoNotas.Migrations
 
                     b.HasKey("NoteShareId");
 
-                    b.HasIndex("NoteShareFK");
+                    b.HasIndex("NoteId");
 
                     b.HasIndex("UserShareFK");
 
@@ -333,8 +332,7 @@ namespace BlocoNotas.Migrations
                     b.HasOne("BlocoNotas.Models.ApplicationUser", "User")
                         .WithMany("Notes")
                         .HasForeignKey("UserFK")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
@@ -343,14 +341,14 @@ namespace BlocoNotas.Migrations
                 {
                     b.HasOne("BlocoNotas.Models.Note", "Note")
                         .WithMany("SharedWith")
-                        .HasForeignKey("NoteShareFK")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("NoteId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BlocoNotas.Models.ApplicationUser", "SharedWithUser")
                         .WithMany("SharedWithMe")
                         .HasForeignKey("UserShareFK")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Note");

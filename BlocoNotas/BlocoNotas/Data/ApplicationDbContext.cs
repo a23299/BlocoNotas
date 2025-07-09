@@ -58,14 +58,14 @@ namespace BlocoNotas.Data
     modelBuilder.Entity<NoteShare>()
         .HasOne(ns => ns.Note)
         .WithMany(n => n.SharedWith)
-        .HasForeignKey(ns => ns.NoteShareFK)
-        .OnDelete(DeleteBehavior.Cascade); // Fixed: Allow cascade from Note
+        .HasForeignKey(ns => ns.NoteId)
+        .OnDelete(DeleteBehavior.Restrict); // Fixed: Allow cascade from Note
 
     modelBuilder.Entity<NoteShare>()
         .HasOne(ns => ns.SharedWithUser)
         .WithMany(u => u.SharedWithMe)
         .HasForeignKey(ns => ns.UserShareFK)
-        .OnDelete(DeleteBehavior.NoAction); // Keep NoAction to avoid circular cascade
+        .OnDelete(DeleteBehavior.Cascade); // Keep NoAction to avoid circular cascade
 
     // NoteTag (join table) entity config
     modelBuilder.Entity<NoteTag>()

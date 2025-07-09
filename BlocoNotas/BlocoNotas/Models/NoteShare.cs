@@ -16,7 +16,7 @@ public class NoteShare
     [Required]
     
     [ForeignKey(nameof(Note))]
-    public int NoteShareFK { get; set; }
+    public int NoteId { get; set; }
     public Note Note { get; set; }
     
     /// <summary>
@@ -26,7 +26,6 @@ public class NoteShare
     [ForeignKey(nameof(SharedWithUser))]
     
     public string UserShareFK { get; set; }
-    
     public ApplicationUser SharedWithUser { get; set; }
     
     /// <summary>

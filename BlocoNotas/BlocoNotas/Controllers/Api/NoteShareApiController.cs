@@ -29,11 +29,15 @@ public class NoteSharesApiController : ControllerBase
     {
         var userId = GetCurrentUserId();
         
-        var notes = await _context.Notes
-            .Where(n => !n.IsDeleted)
-            .Include(n => n.User) // Incluir o usuário que compartilhou
-            .OrderByDescending(n => n.UpdatedAt)
+        var notes = await _context.NoteShares
+            .Where(ns => ns.UserShareFK == userId)
+            .Include(ns => ns.Note)
+            .ThenInclude(n => n.User)  // Importante para trazer o autor da nota
+            .Where(ns => ns.Note != null && !ns.Note.IsDeleted)
+            .OrderByDescending(ns => ns.Note.UpdatedAt)
+            .Select(ns => ns.Note)
             .ToListAsync();
+
             
         return notes;
     }
@@ -59,6 +63,18 @@ public class NoteSharesApiController : ControllerBase
     public async Task<ActionResult<NoteShare>> ShareNote(ShareNoteRequest request)
     {
         var currentUserId = GetCurrentUserId();
+        // Verifica se User esta Autenticado 
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            return Unauthorized();
+        }
+    
+        // Validação do pedido
+        // Verifica se User Esta Vazio ou so tem espaços.
+        if (string.IsNullOrWhiteSpace(request.ShareWithUsername))
+        {
+            return BadRequest(new { message = "Nome de usuário é obrigatório" });
+        }
         
         // Verifica se a nota pertence ao usuário atual
         var note = await _context.Notes
@@ -86,7 +102,7 @@ public class NoteSharesApiController : ControllerBase
         
         // Verifica se já está compartilhado com este usuário
         var existingShare = await _context.NoteShares
-            .FirstOrDefaultAsync(ns => ns.NoteShareFK == request.NoteId && ns.UserShareFK == shareWithUser.Id);
+            .FirstOrDefaultAsync(ns => ns.NoteId == request.NoteId && ns.UserShareFK == shareWithUser.Id);
             
         if (existingShare != null)
         {
@@ -96,7 +112,7 @@ public class NoteSharesApiController : ControllerBase
         // Cria o compartilhamento
         var noteShare = new NoteShare
         {
-            NoteShareFK = request.NoteId,
+            NoteId = request.NoteId,
             UserShareFK = shareWithUser.Id,
             SharedAt = DateTime.Now,
             CanEdit = request.CanEdit

@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 namespace BlocoNotas.Models;
 public class Note
 {
+
     /// <summary>
     /// ID da Nota
     /// </summary>
@@ -58,4 +59,10 @@ public class Note
     
     // Users que a Nota foi partilhada
     public ICollection<NoteShare> SharedWith { get; set; } =  new List<NoteShare>();
+}
+
+public class UserDto
+{
+    public string Id { get; set; }
+    public string UserName { get; set; }
 }
