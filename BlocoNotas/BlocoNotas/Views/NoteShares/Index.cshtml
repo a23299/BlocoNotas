@@ -6,6 +6,35 @@
 
 <div id="sharedNotesList" class="row gy-3"></div>
 
+<!-- Modal de Edição -->
+<div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editNoteModalLabel">Editar Nota</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editNoteForm">
+                    <input type="hidden" id="editNoteId" />
+                    <div class="mb-3">
+                        <label for="editNoteTitle" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="editNoteTitle" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editNoteContent" class="form-label">Conteúdo</label>
+                        <textarea class="form-control" id="editNoteContent" rows="6"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="submitEditNote()">Guardar Alterações</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     const sharedNotesApi = "/api/NoteSharesApi/shared-with-me";
     const token = localStorage.getItem("token");
@@ -21,15 +50,15 @@
     async function loadSharedNotes() {
         const response = await fetch(sharedNotesApi, { headers: getAuthHeaders() });
 
+        const list = document.getElementById("sharedNotesList");
+        list.innerHTML = "";
+
         if (!response.ok) {
-            document.getElementById("sharedNotesList").innerHTML =
-                "<p class='text-danger'>Erro ao carregar notas partilhadas.</p>";
+            list.innerHTML = "<p class='text-danger'>Erro ao carregar notas partilhadas.</p>";
             return;
         }
 
         const notes = await response.json();
-        const list = document.getElementById("sharedNotesList");
-        list.innerHTML = "";
 
         if (notes.length === 0) {
             list.innerHTML = "<p>Nenhuma nota foi partilhada contigo.</p>";
@@ -45,12 +74,45 @@
                             <p class="card-text text-muted small">Atualizada em ${new Date(note.updatedAt).toLocaleString()}</p>
                             <p class="card-text">${note.content?.substring(0, 100) ?? ""}</p>
                             <p class="card-text"><strong>De:</strong> ${note.user?.userName ?? "Desconhecido"}</p>
+                            ${note.canEdit ? `
+                                <button class="btn btn-sm btn-outline-warning mt-2" onclick="openEditModal(${note.noteId}, \`${note.title}\`, \`${note.content ?? ""}\`)">Editar</button>
+                            ` : ""}
                         </div>
                     </div>
                 </div>
             `;
         }
     }
+
+    function openEditModal(noteId, title, content) {
+        document.getElementById("editNoteId").value = noteId;
+        document.getElementById("editNoteTitle").value = title;
+        document.getElementById("editNoteContent").value = content;
+        const modal = new bootstrap.Modal(document.getElementById('editNoteModal'));
+        modal.show();
+    }
+
+    async function submitEditNote() {
+        const noteId = document.getElementById("editNoteId").value;
+        const title = document.getElementById("editNoteTitle").value;
+        const content = document.getElementById("editNoteContent").value;
+
+        const response = await fetch(`/api/NoteSharesApi/shared-note-edit/${noteId}`, {
+            method: "PUT",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ title, content })
+        });
+
+        if (response.ok) {
+            alert("Nota atualizada com sucesso!");
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
+            modal.hide();
+            loadSharedNotes();
+        } else {
+            alert("Erro ao atualizar a nota.");
+        }
+    }
+
 
     document.addEventListener("DOMContentLoaded", loadSharedNotes);
 </script>
