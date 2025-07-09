@@ -34,9 +34,9 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await _userManager.FindByNameAsync(request.Username);
+        var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
-            return Unauthorized(new { message = "Utilizador não encontrado" });
+            return Unauthorized(new { message = "Email não encontrado" });
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
         if (!result.Succeeded)
@@ -90,7 +90,6 @@ public class AuthController : ControllerBase
 
 public class LoginRequest
 {
-    public string Username { get; set; }
     public string Email { get; set; }
     public string Password { get; set; }
 }
