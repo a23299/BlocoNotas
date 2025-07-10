@@ -30,26 +30,49 @@ namespace BlocoNotas.Controllers.Api
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetUsers()
         {
-            if (!User.IsInRole("Admin"))
-                return Forbid();
-
-            var users = await _context.Users.ToListAsync();
-
-            var usersWithRoles = new List<object>();
-
-            foreach(var user in users)
+            if (User.IsInRole("Admin"))
             {
-                var roles = await _userManager.GetRolesAsync(user);
-                usersWithRoles.Add(new {
-                    id = user.Id,
-                    userName = user.UserName,
-                    email = user.Email,
-                    roles = roles
-                });
-            }
+                var users = await _context.Users.ToListAsync();
 
-            return Ok(usersWithRoles);
+                var usersWithRoles = new List<object>();
+
+                foreach(var user in users)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    usersWithRoles.Add(new {
+                        id = user.Id,
+                        userName = user.UserName,
+                        email = user.Email,
+                        roles = roles
+                    });
+                }
+
+                return Ok(usersWithRoles);
+            }
+            else
+            {
+                // User normal: só o próprio
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _context.Users.FindAsync(currentUserId);
+                if (user == null)
+                    return NotFound();
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                var userWithRoles = new List<object> {
+                    new {
+                        id = user.Id,
+                        userName = user.UserName,
+                        email = user.Email,
+                        roles = roles
+                    }
+                };
+
+                return Ok(userWithRoles);
+            }
         }
+
+
 
         // GET: api/UsersApi/5
         [HttpGet("{id}")]
