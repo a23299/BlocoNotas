@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BlocoNotas.Models;
 public class Tag
@@ -16,5 +17,6 @@ public class Tag
     public string Name { get; set; }
     
     // Notas que têm a Tag
+    [JsonIgnore]
     public ICollection<NoteTag> NoteTags { get; set; } = [];
 }

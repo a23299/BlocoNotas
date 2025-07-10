@@ -21,6 +21,5 @@ public class NoteTag
     [Required]
     [ForeignKey(nameof(Tag))]
     public int TagFK { get; set; }
-    [JsonIgnore]
     public Tag Tag { get; set; }
 }
