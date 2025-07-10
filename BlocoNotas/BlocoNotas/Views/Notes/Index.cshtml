@@ -41,7 +41,7 @@
     </div>
 </div>
 
-
+<!-- Modal: Partilhar Nota -->
 <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -69,11 +69,53 @@
     </div>
 </div>
 
+<!-- Modal: Adicionar Tags à Nota -->
+<div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar Tag à Nota</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <select id="availableTags" class="form-select mb-3">
+                    <option value="">Seleciona uma tag</option>
+                </select>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-primary" onclick="addTagToNote()">Adicionar</button>
+                    <button class="btn btn-outline-secondary" onclick="openCreateTagModal()">+ Nova Tag</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Criar Nova Tag -->
+<div class="modal fade" id="inlineTagModal" tabindex="-1" aria-labelledby="inlineTagModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="inlineTagForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inlineTagModalLabel">Nova Tag</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="inlineTagName" class="form-control" placeholder="Nome da Tag" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 
 <script>
     const apiUrl = "/api/NotesApi";
+    const tagsApiUrl = "/api/TagsApi";
     const token = localStorage.getItem("token");
 
     function getAuthHeaders() {
@@ -97,17 +139,28 @@
         }
 
         for (const note of notes) {
+            let tagsHtml = "";
+            if (note.noteTags?.length > 0) {
+                tagsHtml = `
+                    <div class="position-absolute bottom-0 end-0 p-2">
+                        ${note.noteTags.map(t => `<span class="badge bg-secondary me-1">${t.tag.name}</span>`).join('')}
+                    </div>
+                `;
+            }
+
             list.innerHTML += `
                 <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 shadow">
+                    <div class="card h-100 shadow position-relative">
                         <div class="card-body">
                             <h5 class="card-title">${note.title}</h5>
                             <p class="card-text text-muted small">Atualizada em ${new Date(note.updatedAt).toLocaleString()}</p>
                             <p class="card-text">${note.content?.substring(0, 100) ?? ""}</p>
-                            <button class="btn btn-sm btn-outline-primary me-2" onclick="openEditModal(${note.noteId})">Editar</button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteNote(${note.noteId})">Eliminar</button>
-                            <button class="btn btn-sm btn-outline-info" onclick="openShareModal(${note.noteId})">Partilhar</button>
+                            <a class="btn btn-sm btn-outline-primary me-2" href="/Notes/Edit/${note.noteId}">Editar</a>
+                            <a class="btn btn-sm btn-outline-danger me-2" href="/Notes/Delete/${note.noteId}">Eliminar</a>
+                            <button class="btn btn-sm btn-outline-info me-2" onclick="openShareModal(${note.noteId})">Partilhar</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="openTagModal(${note.noteId})">+ Tags</button>
                         </div>
+                        ${tagsHtml}
                     </div>
                 </div>
             `;
@@ -175,6 +228,78 @@
         document.getElementById("canEdit").checked = false;
         new bootstrap.Modal(document.getElementById('shareModal')).show();
     }
+
+    // Modal de Tags
+    let currentNoteId = null;
+
+    function openTagModal(noteId) {
+        currentNoteId = noteId;
+        $('#tagModal').modal('show');
+
+        refreshAvailableTags();
+    }
+
+    function addTagToNote() {
+        const tagId = document.getElementById('availableTags').value;
+        if (!tagId || !currentNoteId) return;
+
+        fetch(`${tagsApiUrl}/notes`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ noteId: currentNoteId, tagId: parseInt(tagId) })
+        })
+            .then(response => {
+                if (response.ok) {
+                    $('#tagModal').modal('hide');
+                    loadNotes();
+                } else {
+                    response.json().then(err => alert(err.message || "Erro ao adicionar tag"));
+                }
+            });
+    }
+
+    function openCreateTagModal() {
+        document.getElementById("inlineTagName").value = "";
+        new bootstrap.Modal(document.getElementById("inlineTagModal")).show();
+    }
+
+    document.getElementById("inlineTagForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const name = document.getElementById("inlineTagName").value;
+
+        const response = await fetch("/api/TagsApi", {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ name })
+        });
+
+        if (response.ok) {
+            bootstrap.Modal.getInstance(document.getElementById("inlineTagModal")).hide();
+            alert("Tag criada com sucesso!");
+            refreshAvailableTags(); // Atualiza o dropdown
+        } else {
+            const err = await response.json();
+            alert(err.message || "Erro ao criar tag.");
+        }
+    });
+
+    function refreshAvailableTags() {
+        fetch(`${tagsApiUrl}/all`, {
+            headers: getAuthHeaders()
+        })
+            .then(res => res.json())
+            .then(tags => {
+                const select = document.getElementById('availableTags');
+                select.innerHTML = '<option value="">Seleciona uma tag</option>';
+                tags.forEach(tag => {
+                    const opt = document.createElement('option');
+                    opt.value = tag.tagId;
+                    opt.textContent = tag.name;
+                    select.appendChild(opt);
+                });
+            });
+    }
+
 
     document.getElementById("shareForm").addEventListener("submit", async function (e) {
         e.preventDefault();

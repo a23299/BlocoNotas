@@ -18,12 +18,12 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult Privacy()
+    public IActionResult Info()
     {
         return View();
     }
 
-    public IActionResult LogIn()
+    public IActionResult Login()
     {
         return View();
     }

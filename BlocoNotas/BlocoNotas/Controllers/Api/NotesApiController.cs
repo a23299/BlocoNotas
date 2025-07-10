@@ -35,11 +35,14 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
 
         var notes = await _context.Notes
             .Where(n => n.UserFK == userId && !n.IsDeleted)
+            //.Include(n => n.NoteTags)
+            //.ThenInclude(nt => nt.Tag)
             .OrderByDescending(n => n.UpdatedAt)
             .ToListAsync();
 
         return notes;
     }
+
 
 
     // GET: api/NotesApi/5
