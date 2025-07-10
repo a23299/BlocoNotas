@@ -35,8 +35,8 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
 
         var notes = await _context.Notes
             .Where(n => n.UserFK == userId && !n.IsDeleted)
-            //.Include(n => n.NoteTags)
-            //.ThenInclude(nt => nt.Tag)
+            .Include(n => n.NoteTags)
+            .ThenInclude(nt => nt.Tag)
             .OrderByDescending(n => n.UpdatedAt)
             .ToListAsync();
 
@@ -49,9 +49,12 @@ public class NotesApiController : ControllerBase // Note ControllerBase em vez d
     [HttpGet("{id}")]
     public async Task<ActionResult<Note>> GetNote(int id)
     {
-        var userId = GetCurrentUserId(); // string
+        var userId = GetCurrentUserId();
         var note = await _context.Notes
-            .FirstOrDefaultAsync(n => n.NoteId == id && n.UserFK == userId && !n.IsDeleted);
+            .Where(n => n.NoteId == id && n.UserFK == userId && !n.IsDeleted)
+            .Include(n => n.NoteTags)
+            .ThenInclude(nt => nt.Tag)
+            .FirstOrDefaultAsync();
 
         if (note == null)
         {

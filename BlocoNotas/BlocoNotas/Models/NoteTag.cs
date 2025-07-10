@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using BlocoNotas.Models;
 
 namespace BlocoNotas.Models;
@@ -11,6 +12,7 @@ public class NoteTag
     [Required]
     [ForeignKey(nameof(Note))]
     public int NoteTagFK { get; set; }
+    [JsonIgnore]
     public Note Note { get; set; }
     
     /// <summary>
@@ -19,5 +21,6 @@ public class NoteTag
     [Required]
     [ForeignKey(nameof(Tag))]
     public int TagFK { get; set; }
+    [JsonIgnore]
     public Tag Tag { get; set; }
 }
