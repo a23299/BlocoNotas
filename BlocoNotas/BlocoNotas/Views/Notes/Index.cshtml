@@ -128,30 +128,66 @@
 
     async function loadNotes() {
         const response = await fetch(apiUrl, { headers: getAuthHeaders() });
-        const notes = await response.json();
-        console.log("Notas carregadas:", notes);
-        notes.forEach(n => console.log(`Nota ${n.noteId}:`, n.noteTags));
+        const data = await response.json();
 
         const list = document.getElementById("notesList");
-
         list.innerHTML = "";
 
-        if (notes.length === 0) {
+        if (!data || data.length === 0) {
             list.innerHTML = "<p>Nenhuma nota encontrada.</p>";
             return;
         }
 
-        for (const note of notes) {
-            let tagsHtml = "";
-            if (note.noteTags?.length > 0) {
-                tagsHtml += `<div class="mt-3">`;
-                tagsHtml += note.noteTags
-                    .filter(t => t.tag && t.tag.name) // só inclui se a tag existir
-                    .map(t => `<span class="badge badge-info">${t.tag.name}</span>`)
-                    .join('');
-            }
+        // Detectar se a resposta é do admin (array de objetos com userId e notes)
+        const isAdminView = data[0] && data[0].userId && data[0].notes;
 
-            list.innerHTML += `
+        if (isAdminView) {
+            data.forEach(userGroup => {
+                const userHeader = document.createElement("h3");
+                userHeader.textContent = `Notas de ${userGroup.userName}`;
+                list.appendChild(userHeader);
+
+                const userRow = document.createElement("div");
+                userRow.className = "row gy-3 mb-4";
+
+                userGroup.notes.forEach(note => {
+                    let tagsHtml = "";
+                    if (note.tags?.length > 0) {
+                        tagsHtml = note.tags.map(tag => `<span class="badge bg-info text-dark me-1">${tag}</span>`).join("");
+                        tagsHtml = `<div class="mt-3">${tagsHtml}</div>`;
+                    }
+
+                    userRow.innerHTML += `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow position-relative">
+                            <div class="card-body">
+                                <h5 class="card-title">${note.title}</h5>
+                                <p class="card-text text-muted small">Atualizada em ${note.updatedAt ? new Date(note.updatedAt).toLocaleString() : 'N/A'}</p>
+                                <p class="card-text">${note.content?.substring(0, 100) ?? ""}</p>
+                                <a class="btn btn-sm btn-outline-primary me-2" href="/Notes/Edit/${note.noteId}">Editar</a>
+                                <a class="btn btn-sm btn-outline-danger me-2" href="/Notes/Delete/${note.noteId}">Eliminar</a>
+                                <button class="btn btn-sm btn-outline-info me-2" onclick="openShareModal(${note.noteId})">Partilhar</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="openTagModal(${note.noteId})">+ Tags</button>
+                                ${tagsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                });
+
+                list.appendChild(userRow);
+            });
+        } else {
+            // User normal: lista simples de notas
+            let markup = "";
+            data.forEach(note => {
+                let tagsHtml = "";
+                if (note.tags?.length > 0) {
+                    tagsHtml = note.tags.map(tag => `<span class="badge bg-info text-dark me-1">${tag}</span>`).join("");
+                    tagsHtml = `<div class="mt-3">${tagsHtml}</div>`;
+                }
+
+                markup += `
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 shadow position-relative">
                         <div class="card-body">
@@ -167,6 +203,8 @@
                     </div>
                 </div>
             `;
+            });
+            list.innerHTML = markup;
         }
     }
 
