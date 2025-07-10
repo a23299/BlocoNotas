@@ -30,6 +30,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Content Include="bloconotas.db">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+
+    <ItemGroup>
       <Folder Include="Migrations\" />
     </ItemGroup>
 
