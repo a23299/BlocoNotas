@@ -72,6 +72,8 @@ public class AuthController : ControllerBase
         var result = await _userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
             return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
+        
+        await _userManager.AddToRoleAsync(user, "Utilizador");
 
         var token = _tokenService.GenerateToken(user);
 

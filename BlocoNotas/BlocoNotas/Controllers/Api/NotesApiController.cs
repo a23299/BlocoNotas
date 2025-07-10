@@ -5,15 +5,16 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using BlocoNotas.Data;
 using BlocoNotas.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlocoNotas.Controllers.Api;
 
-[Route("api/[controller]")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
-[Authorize] // Para proteger com JWT
+[Route("api/[controller]")]
 public class NotesApiController : ControllerBase // Note ControllerBase em vez de Controller
 {
     private readonly ApplicationDbContext _context;

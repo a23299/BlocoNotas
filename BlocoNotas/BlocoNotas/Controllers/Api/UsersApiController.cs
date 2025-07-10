@@ -4,12 +4,15 @@ using BlocoNotas.Data;
 using BlocoNotas.Models;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 namespace BlocoNotas.Controllers.Api
 {
-    [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
+    [Route("api/[controller]")]
     public class UsersApiController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
