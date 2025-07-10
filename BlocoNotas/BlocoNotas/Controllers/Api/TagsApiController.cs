@@ -183,45 +183,46 @@ public class TagsApiController : ControllerBase
     public async Task<IActionResult> AddTagToNote([FromBody] NoteTagRequest request)
     {
         var userId = GetCurrentUserId();
-        
-        // Verifica se a nota pertence ao usuário
+        var isAdmin = User.IsInRole("Admin");
+
+        // Verifica se a nota existe e se o utilizador pode aceder a ela (admin ou dono)
         var note = await _context.Notes
-            .FirstOrDefaultAsync(n => n.NoteId == request.NoteId && n.UserFK == userId && !n.IsDeleted);
-            
+            .FirstOrDefaultAsync(n => n.NoteId == request.NoteId && !n.IsDeleted && (isAdmin || n.UserFK == userId));
+
         if (note == null)
         {
-            return NotFound(new { message = "Nota não encontrada" });
+            return NotFound(new { message = "Nota não encontrada ou sem permissão." });
         }
-        
+
         // Verifica se a tag existe
         var tag = await _context.Tags
             .FirstOrDefaultAsync(t => t.TagId == request.TagId);
-            
+
         if (tag == null)
         {
             return NotFound(new { message = "Tag não encontrada" });
         }
-        
+
         // Verifica se a associação já existe
         if (await _context.NoteTags.AnyAsync(nt => nt.NoteTagFK == request.NoteId && nt.TagFK == request.TagId))
         {
             return BadRequest(new { message = "Esta tag já está associada à nota" });
         }
-        
+
         // Cria a associação
         var noteTag = new NoteTag
         {
             NoteTagFK = request.NoteId,
             TagFK = request.TagId
         };
-        
+
         _context.NoteTags.Add(noteTag);
-        
+
         // Atualiza a data de atualização da nota
         note.UpdatedAt = DateTime.Now;
-        
+
         await _context.SaveChangesAsync();
-        
+
         return NoContent();
     }
     
@@ -230,32 +231,33 @@ public class TagsApiController : ControllerBase
     public async Task<IActionResult> RemoveTagFromNote([FromBody] NoteTagRequest request)
     {
         var userId = GetCurrentUserId();
-        
-        // Verifica se a nota pertence ao usuário
+        var isAdmin = User.IsInRole("Admin");
+
+        // ✅ Admin pode remover tags de qualquer nota, user só da sua
         var note = await _context.Notes
-            .FirstOrDefaultAsync(n => n.NoteId == request.NoteId && n.UserFK == userId && !n.IsDeleted);
-            
+            .FirstOrDefaultAsync(n => n.NoteId == request.NoteId && !n.IsDeleted && (isAdmin || n.UserFK == userId));
+
         if (note == null)
         {
-            return NotFound(new { message = "Nota não encontrada" });
+            return NotFound(new { message = "Nota não encontrada ou sem permissão." });
         }
-        
+
         // Busca a associação
         var noteTag = await _context.NoteTags
             .FirstOrDefaultAsync(nt => nt.NoteTagFK == request.NoteId && nt.TagFK == request.TagId);
-            
+
         if (noteTag == null)
         {
             return NotFound(new { message = "Esta tag não está associada à nota" });
         }
-        
+
         _context.NoteTags.Remove(noteTag);
-        
+
         // Atualiza a data de atualização da nota
         note.UpdatedAt = DateTime.Now;
-        
+
         await _context.SaveChangesAsync();
-        
+
         return NoContent();
     }
 
