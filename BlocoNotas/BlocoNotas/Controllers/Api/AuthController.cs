@@ -42,7 +42,9 @@ public class AuthController : ControllerBase
         if (!result.Succeeded)
             return Unauthorized(new { message = "Credenciais inválidas" });
 
-        var token = _tokenService.GenerateToken(user);
+        var token = await _tokenService.GenerateToken(user);
+
+        var roles = await _userManager.GetRolesAsync(user); // obter roles
 
         return Ok(new
         {
@@ -51,11 +53,13 @@ public class AuthController : ControllerBase
             {
                 id = user.Id,
                 username = user.UserName,
-                email = user.Email
+                email = user.Email,
+                roles = roles // adiciona roles aqui
             }
         });
     }
-
+    
+    
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -75,7 +79,7 @@ public class AuthController : ControllerBase
         
         await _userManager.AddToRoleAsync(user, "Utilizador");
 
-        var token = _tokenService.GenerateToken(user);
+        var token = await _tokenService.GenerateToken(user);
 
         return Ok(new
         {

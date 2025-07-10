@@ -22,19 +22,42 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
-    const tableBody = document.querySelector("#usersTable tbody");
+    document.addEventListener("DOMContentLoaded", async () => {
+        const tableBody = document.querySelector("#usersTable tbody");
+        const token = localStorage.getItem("token");
+        const roles = JSON.parse(localStorage.getItem("roles") || "[]");
 
-    try {
-        const response = await fetch("/api/UsersApi");
-        if (!response.ok) throw new Error("Erro ao carregar utilizadores");
+        if (!token) {
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-danger">Necessita fazer login para ver esta página.</td></tr>`;
+            return;
+        }
 
-        const users = await response.json();
+        try {
+            const response = await fetch("/api/UsersApi", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
 
-        users.forEach(user => {
-            const row = document.createElement("tr");
+            if (response.status === 401) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-danger">Não autorizado. Faça login novamente.</td></tr>`;
+                return;
+            }
 
-            row.innerHTML = `
+            if (!response.ok) throw new Error("Erro ao carregar utilizadores");
+
+            const users = await response.json();
+
+            const isAdmin = roles.includes("Admin");
+
+            users.forEach(user => {
+
+                const userIsAdmin = (user.roles || []).includes("Admin");
+                const canPromote = isAdmin && !userIsAdmin;
+
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
                 <td>${user.id}</td>
                 <td>${user.userName}</td>
                 <td>${user.email}</td>
@@ -42,17 +65,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <a href="/Users/Edit/${user.id}" class="btn btn-sm btn-outline-primary">Editar</a>
                     <a href="/Users/Details/${user.id}" class="btn btn-sm btn-outline-info ms-1">Detalhes</a>
                     <a href="/Users/Delete/${user.id}" class="btn btn-sm btn-outline-danger ms-1">Eliminar</a>
-            
+                    ${canPromote ? `<button class="btn btn-sm btn-warning ms-1" onclick="promoteToAdmin('${user.id}')">Dar Admin</button>` : ""}
                 </td>
             `;
 
-            tableBody.appendChild(row);
-        });
-    } catch (error) {
-        tableBody.innerHTML = `<tr><td colspan="4" class="text-danger">${error.message}</td></tr>`;
-    }
-});
-
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-danger">${error.message}</td></tr>`;
+        }
+    });
 async function deleteUser(id) {
     if (!confirm("Tem a certeza que quer eliminar este utilizador?")) return;
 
@@ -70,4 +92,29 @@ async function deleteUser(id) {
         alert("Erro: " + err.message);
     }
 }
+
+    async function promoteToAdmin(userId) {
+        const token = localStorage.getItem("token");
+
+        if (!confirm("Tem a certeza que quer promover este utilizador a Admin?")) return;
+
+        try {
+            const res = await fetch(`/api/UsersApi/MakeAdmin/${userId}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (res.ok) {
+                alert("Utilizador promovido a Admin com sucesso!");
+                location.reload();
+            } else {
+                const error = await res.json();
+                alert("Erro: " + (error.message || JSON.stringify(error)));
+            }
+        } catch (err) {
+            alert("Erro: " + err.message);
+        }
+    }
 </script>

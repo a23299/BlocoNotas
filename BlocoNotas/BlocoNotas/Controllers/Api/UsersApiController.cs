@@ -4,6 +4,7 @@ using BlocoNotas.Data;
 using BlocoNotas.Models;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -23,19 +24,44 @@ namespace BlocoNotas.Controllers.Api
             _context = context;
             _userManager = userManager;
         }
-
+        
+        
         // GET: api/UsersApi
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<object>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            if (!User.IsInRole("Admin"))
+                return Forbid();
+
+            var users = await _context.Users.ToListAsync();
+
+            var usersWithRoles = new List<object>();
+
+            foreach(var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                usersWithRoles.Add(new {
+                    id = user.Id,
+                    userName = user.UserName,
+                    email = user.Email,
+                    roles = roles
+                });
+            }
+
+            return Ok(usersWithRoles);
         }
 
         // GET: api/UsersApi/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ApplicationUser>> GetUser(string id)
         {
-            var user = await _context.Users.FindAsync(id);
+            
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            if (!User.IsInRole("Admin") && currentUserId != id)
+                return Forbid(); // Só admin ou dono podem ver
+
+            var user = await _context.Users.FindAsync(id);            
 
             if (user == null)
             {
@@ -49,6 +75,10 @@ namespace BlocoNotas.Controllers.Api
         [HttpPost]
         public async Task<ActionResult<ApplicationUser>> PostUser(ApplicationUser applicationUser)
         {
+            
+            if (!User.IsInRole("Admin"))
+                return Forbid();
+            
             _context.Users.Add(applicationUser);
             await _context.SaveChangesAsync();
 
@@ -59,6 +89,11 @@ namespace BlocoNotas.Controllers.Api
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(string id, ApplicationUser applicationUser)
         {
+            
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!User.IsInRole("Admin") && currentUserId != id)
+                return Forbid();
+            
             if (id != applicationUser.Id)
             {
                 return BadRequest();
@@ -85,9 +120,14 @@ namespace BlocoNotas.Controllers.Api
             return NoContent();
         }
 
+        
+        // DELETE
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
+            if (!User.IsInRole("Admin"))
+                return Forbid();
+            
             var user = await _context.Users
                 .Include(u => u.Notes)
                 .ThenInclude(n => n.SharedWith)
@@ -135,6 +175,27 @@ namespace BlocoNotas.Controllers.Api
 
             return NoContent();
         }
+        
+        [HttpPost("MakeAdmin/{id}")]
+        public async Task<IActionResult> MakeAdmin(string id)
+        {
+            if (!User.IsInRole("Admin"))
+                return Forbid();
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+                return BadRequest("Utilizador já é admin");
+
+            var result = await _userManager.AddToRoleAsync(user, "Admin");
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            return Ok(new { message = "Utilizador promovido a Admin com sucesso." });
+        }
+
 
         private bool UserExists(string id)
         {
