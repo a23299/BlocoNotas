@@ -13,26 +13,42 @@
                     <label for="username" class="form-label">Nome de Utilizador</label>
                     <input type="text" class="form-control" id="username" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" required />
+                    <input type="email" class="form-control" id="email" required/>
                 </div>
 
                 <br/>
-                
+
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-group">
-                        <input type="password" class="form-control" id="password" required />
-                        <button type="button" class="btn btn-outline-secondary" id="togglePassword" title="Mostrar password">
+                        <input type="password" class="form-control" id="password" required/>
+                        <button type="button" class="btn btn-outline-secondary" id="togglePassword"
+                                title="Mostrar password">
                             👁
                         </button>
                     </div>
                 </div>
-                
+
                 <br/>
-                
+
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="confirmPassword" required/>
+                        <button type="button" class="btn btn-outline-secondary" id="togglePassword"
+                                title="Mostrar password">
+                            👁
+                        </button>
+                    </div>
+                </div>
+
+                <br/>
+
+
                 <div class="d-grid">
                     <button type="submit" class="btn btn-success">Registar</button>
                 </div>
@@ -61,6 +77,14 @@
 
     document.getElementById("registerForm").addEventListener("submit", async function (e) {
         e.preventDefault();
+
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (password !== confirmPassword) {
+            document.getElementById("registerError").innerText = "As passwords não coincidem.";
+            return; // interrompe o envio
+        }
 
         const response = await fetch("/api/auth/register", {
             method: "POST",
