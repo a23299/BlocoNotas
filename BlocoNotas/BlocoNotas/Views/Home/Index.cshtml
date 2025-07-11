@@ -3,25 +3,64 @@
     ViewData["Title"] = "Página Inicial";
 }
 
-<div class="container py-5 d-flex flex-column justify-content-center align-items-center" style="min-height: 80vh;">
+<div class="container py-5 d-flex flex-column justify-content-center align-items-center" style="min-height: 85vh;">
+    <h1 class="display-4 fw-bold text-primary text-center mb-3">Bem-vindo ao <span class="text-dark">BlocoNotas</span></h1>
 
-    <h1 class="display-4 text-primary mb-3">Bem-vindo ao BlocoNotas</h1>
-
-    <p class="lead mb-4 text-center">
-        Organize as suas ideias e tarefas com facilidade e segurança.
+    <p class="lead text-secondary text-center mb-5">
+        Organize as suas ideias, tarefas e notas com simplicidade e segurança.
     </p>
 
-    <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
-        <a class="btn btn-primary btn-lg" asp-controller="Home" asp-action="Login">Log In</a>
-        <a class="btn btn-primary btn-lg" asp-controller="Home" asp-action="Register">Sign In</a>
+    <div class="row w-100 justify-content-center g-4">
+
+        <!-- Acesso -->
+        <div class="col-md-5">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-4">Acesso</h5>
+                    <div class="d-grid gap-3">
+                        <a class="btn btn-outline-success btn-lg" asp-controller="Home" asp-action="Login">
+                            Iniciar Sessão
+                        </a>
+                        <a class="btn btn-success btn-lg" asp-controller="Home" asp-action="Register">
+                            Criar Conta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Funcionalidades -->
+        <div class="col-md-5">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-4">Funcionalidades</h5>
+
+                    <!-- Linha com 2 botões lado a lado -->
+                    <div class="row g-3 mb-2">
+                        <div class="col-md-6">
+                            <a class="btn btn-outline-primary btn-lg w-100" asp-controller="Notes" asp-action="Index">
+                                📝 Notas
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a class="btn btn-outline-primary btn-lg w-100" asp-controller="Notes" asp-action="SharedWithMe">
+                                🤝 Partilhadas
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Linha com botão a ocupar toda a largura -->
+                    <div class="row">
+                        <div class="col">
+                            <a class="btn btn-outline-dark btn-lg w-100" asp-controller="Users" asp-action="Index">
+                                ⚙️ Gerir Utilizadores
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
-        <a class="btn btn-primary btn-lg" asp-controller="Notes" asp-action="Index">Ver Notas</a>
     </div>
-
-    <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
-        <a class="btn btn-outline-primary btn-lg" asp-controller="Users" asp-action="Index">Gerir Utilizadores</a>
-    </div>
-
-</div>

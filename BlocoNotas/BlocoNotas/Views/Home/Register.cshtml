@@ -3,98 +3,84 @@
     ViewBag.Title = "Registo";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h2 class="mb-4 text-center">Criar Conta</h2>
+<div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h2 class="mb-4 text-center text-primary fw-bold">Criar Conta</h2>
 
-            <form id="registerForm">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Nome de Utilizador</label>
-                    <input type="text" class="form-control" id="username" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" required/>
-                </div>
-
-                <br/>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-group">
-                        <input type="password" class="form-control" id="password" required/>
-                        <button type="button" class="btn btn-outline-secondary" id="togglePassword"
-                                title="Mostrar password">
-                            👁
-                        </button>
+                <form id="registerForm">
+                    <div class="form-group mb-3">
+                        <label for="username" class="form-label">Nome de Utilizador</label>
+                        <input type="text" class="form-control" id="username" placeholder="Ex: Teste02" required>
                     </div>
-                </div>
 
-                <br/>
-
-
-                <div class="form-group">
-                    <label for="confirmPassword">Confirmar Password</label>
-                    <div class="input-group">
-                        <input type="password" class="form-control" id="confirmPassword" required/>
-                        <button type="button" class="btn btn-outline-secondary" id="togglePassword"
-                                title="Mostrar password">
-                            👁
-                        </button>
+                    <div class="form-group mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="O seu email" required />
                     </div>
-                </div>
 
-                <br/>
+                    <div class="form-group mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" placeholder="Password segura" required />
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword1" title="Mostrar password">👁</button>
+                        </div>
+                    </div>
 
+                    <div class="form-group mb-4">
+                        <label for="confirmPassword" class="form-label">Confirmar Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Repita a password" required />
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword2" title="Mostrar password">👁</button>
+                        </div>
+                    </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-success">Registar</button>
-                </div>
-            </form>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">📝 Registar</button>
+                    </div>
+                </form>
 
-            <div id="registerError" class="text-danger mt-3"></div>
+                <div id="registerError" class="alert alert-danger mt-4 d-none" role="alert"></div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
     const passwordInput = document.getElementById("password");
-    const togglePasswordBtn = document.getElementById("togglePassword");
+    const confirmPasswordInput = document.getElementById("confirmPassword");
+    const togglePassword1 = document.getElementById("togglePassword1");
+    const togglePassword2 = document.getElementById("togglePassword2");
 
-    togglePasswordBtn.addEventListener("mousedown", () => {
-        passwordInput.type = "text";
-    });
+    togglePassword1.addEventListener("mousedown", () => passwordInput.type = "text");
+    togglePassword1.addEventListener("mouseup", () => passwordInput.type = "password");
+    togglePassword1.addEventListener("mouseleave", () => passwordInput.type = "password");
 
-    togglePasswordBtn.addEventListener("mouseup", () => {
-        passwordInput.type = "password";
-    });
-
-    togglePasswordBtn.addEventListener("mouseleave", () => {
-        passwordInput.type = "password";
-    });
+    togglePassword2.addEventListener("mousedown", () => confirmPasswordInput.type = "text");
+    togglePassword2.addEventListener("mouseup", () => confirmPasswordInput.type = "password");
+    togglePassword2.addEventListener("mouseleave", () => confirmPasswordInput.type = "password");
 
     document.getElementById("registerForm").addEventListener("submit", async function (e) {
         e.preventDefault();
 
-        const password = document.getElementById("password").value;
-        const confirmPassword = document.getElementById("confirmPassword").value;
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        const errorDiv = document.getElementById("registerError");
 
         if (password !== confirmPassword) {
-            document.getElementById("registerError").innerText = "As passwords não coincidem.";
-            return; // interrompe o envio
+            errorDiv.classList.remove("d-none");
+            errorDiv.innerText = "As passwords não coincidem.";
+            return;
         }
 
         const response = await fetch("/api/auth/register", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 username: document.getElementById("username").value,
                 email: document.getElementById("email").value,
-                password: document.getElementById("password").value
+                password: password
             })
         });
 
@@ -104,13 +90,11 @@
             window.location.href = "/";
         } else {
             const error = await response.json();
-            console.log("Erro no registo:", error);
-
+            errorDiv.classList.remove("d-none");
             if (error.errors && Array.isArray(error.errors)) {
-                // Mostra todos os erros recebidos, separados por vírgula
-                document.getElementById("registerError").innerText = error.errors.join(", ");
+                errorDiv.innerText = error.errors.join(", ");
             } else {
-                document.getElementById("registerError").innerText = error.message || "Erro ao registar";
+                errorDiv.innerText = error.message || "Erro ao registar";
             }
         }
     });

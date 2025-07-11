@@ -3,39 +3,37 @@
     ViewBag.Title = "Login";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h2 class="mb-4 text-center">Login</h2>
+<div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h2 class="mb-4 text-center text-primary fw-bold">Acesso ao BlocoNotas</h2>
 
-            <form id="loginForm">
-                
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" required />
-                </div>
-                
-                <br/>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-group">
-                        <input type="password" class="form-control" id="password" required />
-                        <button type="button" class="btn btn-outline-secondary" id="togglePassword" title="Mostrar password">
-                            👁
+                <form id="loginForm">
+                    <div class="form-group mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="O seu email" required />
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" placeholder="A sua password" required />
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword" title="Mostrar password">
+                                👁
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            🔐 Entrar
                         </button>
                     </div>
-                </div>
+                </form>
 
-                <br/>
-                
-
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Entrar</button>
-                </div>
-            </form>
-
-            <div id="loginError" class="text-danger mt-3"></div>
+                <div id="loginError" class="alert alert-danger mt-4 d-none" role="alert"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -56,10 +54,9 @@
         passwordInput.type = "password";
     });
 
-
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
         e.preventDefault();
-    
+
         const response = await fetch("/api/auth/login", {
             method: "POST",
             headers: {
@@ -70,16 +67,18 @@
                 password: document.getElementById("password").value
             })
         });
-    
+
+        const errorDiv = document.getElementById("loginError");
+
         if (response.ok) {
             const data = await response.json();
-            console.log("User roles in login response:", data.user.roles);
             localStorage.setItem("token", data.token);
-            localStorage.setItem("roles", JSON.stringify(data.user.roles)); // guardar roles
+            localStorage.setItem("roles", JSON.stringify(data.user.roles));
             window.location.href = "/";
         } else {
             const error = await response.json();
-            document.getElementById("loginError").innerText = error.message || "Erro ao fazer login";
+            errorDiv.classList.remove("d-none");
+            errorDiv.innerText = error.message || "Erro ao fazer login";
         }
     });
 </script>
