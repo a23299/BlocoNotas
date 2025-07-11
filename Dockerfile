@@ -7,12 +7,11 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# Caminho correto a partir da raiz do repositório
-COPY BlocoNotas/BlocoNotas.csproj ./BlocoNotas.csproj
+# Caminho correto
+COPY BlocoNotas/BlocoNotas/BlocoNotas.csproj ./BlocoNotas.csproj
 RUN dotnet restore "BlocoNotas.csproj"
 
-COPY BlocoNotas/. .
-
+COPY BlocoNotas/BlocoNotas/. .
 RUN dotnet build "BlocoNotas.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
