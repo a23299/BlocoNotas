@@ -24,8 +24,8 @@ namespace BlocoNotas.Controllers.Api
             _context = context;
             _userManager = userManager;
         }
-        
-        
+
+
         // GET: api/UsersApi
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetUsers()
@@ -36,10 +36,11 @@ namespace BlocoNotas.Controllers.Api
 
                 var usersWithRoles = new List<object>();
 
-                foreach(var user in users)
+                foreach (var user in users)
                 {
                     var roles = await _userManager.GetRolesAsync(user);
-                    usersWithRoles.Add(new {
+                    usersWithRoles.Add(new
+                    {
                         id = user.Id,
                         userName = user.UserName,
                         email = user.Email,
@@ -59,8 +60,10 @@ namespace BlocoNotas.Controllers.Api
 
                 var roles = await _userManager.GetRolesAsync(user);
 
-                var userWithRoles = new List<object> {
-                    new {
+                var userWithRoles = new List<object>
+                {
+                    new
+                    {
                         id = user.Id,
                         userName = user.UserName,
                         email = user.Email,
@@ -73,18 +76,16 @@ namespace BlocoNotas.Controllers.Api
         }
 
 
-
         // GET: api/UsersApi/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ApplicationUser>> GetUser(string id)
         {
-            
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            
+
             if (!User.IsInRole("Admin") && currentUserId != id)
                 return Forbid(); // Só admin ou dono podem ver
 
-            var user = await _context.Users.FindAsync(id);            
+            var user = await _context.Users.FindAsync(id);
 
             if (user == null)
             {
@@ -98,10 +99,9 @@ namespace BlocoNotas.Controllers.Api
         [HttpPost]
         public async Task<ActionResult<ApplicationUser>> PostUser(ApplicationUser applicationUser)
         {
-            
             if (!User.IsInRole("Admin"))
                 return Forbid();
-            
+
             _context.Users.Add(applicationUser);
             await _context.SaveChangesAsync();
 
@@ -141,14 +141,13 @@ namespace BlocoNotas.Controllers.Api
         }
 
 
-        
         // DELETE
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             if (!User.IsInRole("Admin"))
                 return Forbid();
-            
+
             var user = await _context.Users
                 .Include(u => u.Notes)
                 .ThenInclude(n => n.SharedWith)
@@ -196,7 +195,7 @@ namespace BlocoNotas.Controllers.Api
 
             return NoContent();
         }
-        
+
         [HttpPost("MakeAdmin/{id}")]
         public async Task<IActionResult> MakeAdmin(string id)
         {
