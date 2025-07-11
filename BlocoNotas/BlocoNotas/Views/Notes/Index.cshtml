@@ -4,114 +4,85 @@
     ViewData["Title"] = "Minhas Notas";
 }
 
-<h1 class="mb-4">Notas</h1>
+<div class="container py-4">
+    <h1 class="mb-4 text-primary">Notas</h1>
 
-<div class="mb-3">
-    <a class="btn btn-success" asp-controller="Notes" asp-action="Create">+ Nova Nota</a>
-</div>
+    <div class="mb-3">
+        <a class="btn btn-success" asp-controller="Notes" asp-action="Create">+ Nova Nota</a>
+    </div>
 
-<div id="notesList" class="row gy-3"></div>
+    <div id="notesList" class="row gy-4"></div>
 
-<!-- Modal para criar/editar nota -->
-<div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form id="noteForm">
+    <!-- Modal: Partilhar Nota -->
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="shareForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="shareModalLabel">Partilhar Nota</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="shareNoteId">
+                        <div class="mb-3">
+                            <label for="shareWith" class="form-label">Nome do Utilizador</label>
+                            <input type="text" class="form-control" id="shareWith" required>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="canEdit">
+                            <label class="form-check-label" for="canEdit">Pode editar?</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Partilhar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Tags à Nota -->
+    <div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="noteModalLabel">Nova Nota</h5>
+                    <h5 class="modal-title">Adicionar Tag à Nota</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="noteId">
-                    <div class="mb-3">
-                        <label for="noteTitle" class="form-label">Título</label>
-                        <input type="text" class="form-control" id="noteTitle" required>
+                    <select id="availableTags" class="form-select mb-3">
+                        <option value="">Seleciona uma tag</option>
+                    </select>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary" onclick="addTagToNote()">Adicionar</button>
+                        <button class="btn btn-outline-secondary" onclick="openCreateTagModal()">+ Nova Tag</button>
                     </div>
-                    <div class="mb-3">
-                        <label for="noteContent" class="form-label">Conteúdo</label>
-                        <textarea class="form-control" id="noteContent" rows="5"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Guardar</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Partilhar Nota -->
-<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="shareForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="shareModalLabel">Partilhar Nota</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="shareNoteId">
-                    <div class="mb-3">
-                        <label for="shareWith" class="form-label">Nome do Utilizador</label>
-                        <input type="text" class="form-control" id="shareWith" required>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="canEdit">
-                        <label class="form-check-label" for="canEdit">Pode editar?</label>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Partilhar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Adicionar Tags à Nota -->
-<div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Adicionar Tag à Nota</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-            </div>
-            <div class="modal-body">
-                <select id="availableTags" class="form-select mb-3">
-                    <option value="">Seleciona uma tag</option>
-                </select>
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-primary" onclick="addTagToNote()">Adicionar</button>
-                    <button class="btn btn-outline-secondary" onclick="openCreateTagModal()">+ Nova Tag</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal: Criar Nova Tag -->
-<div class="modal fade" id="inlineTagModal" tabindex="-1" aria-labelledby="inlineTagModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="inlineTagForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="inlineTagModalLabel">Nova Tag</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" id="inlineTagName" class="form-control" placeholder="Nome da Tag" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Guardar</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                </div>
-            </form>
+    <!-- Modal: Criar Nova Tag -->
+    <div class="modal fade" id="inlineTagModal" tabindex="-1" aria-labelledby="inlineTagModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="inlineTagForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="inlineTagModalLabel">Nova Tag</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="inlineTagName" class="form-control" placeholder="Nome da Tag" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
-
-
 
 <script>
     const apiUrl = "/api/NotesApi";
@@ -138,7 +109,6 @@
             return;
         }
 
-        // Detectar se a resposta é do admin (array de objetos com userId e notes)
         const isAdminView = data[0] && data[0].userId && data[0].notes;
 
         if (isAdminView) {
@@ -158,27 +128,26 @@
                     }
 
                     userRow.innerHTML += `
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 shadow position-relative">
-                            <div class="card-body">
-                                <h5 class="card-title">${note.title}</h5>
-                                <p class="card-text text-muted small">Atualizada em ${note.updatedAt ? new Date(note.updatedAt).toLocaleString() : 'N/A'}</p>
-                                <p class="card-text">${note.content?.substring(0, 100) ?? ""}</p>
-                                <a class="btn btn-sm btn-outline-primary me-2" href="/Notes/Edit/${note.noteId}">Editar</a>
-                                <a class="btn btn-sm btn-outline-danger me-2" href="/Notes/Delete/${note.noteId}">Eliminar</a>
-                                <button class="btn btn-sm btn-outline-info me-2" onclick="openShareModal(${note.noteId})">Partilhar</button>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="openTagModal(${note.noteId})">+ Tags</button>
-                                ${tagsHtml}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm rounded position-relative">
+                                <div class="card-body">
+                                    <h5 class="card-title">${note.title}</h5>
+                                    <p class="card-text text-muted small">🕒 Atualizada em ${note.updatedAt ? new Date(note.updatedAt).toLocaleString() : 'N/A'}</p>
+                                    <p class="card-text">${note.content?.substring(0, 100) ?? ""}</p>
+                                    <a class="btn btn-sm btn-outline-primary me-2" href="/Notes/Edit/${note.noteId}">✏️ Editar</a>
+                                    <a class="btn btn-sm btn-outline-danger me-2" href="/Notes/Delete/${note.noteId}">🗑️ Eliminar</a>
+                                    <button class="btn btn-sm btn-outline-info me-2" onclick="openShareModal(${note.noteId})">🤝 Partilhar</button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="openTagModal(${note.noteId})">🏷️ + Tags</button>
+                                    ${tagsHtml}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
                 });
 
                 list.appendChild(userRow);
             });
         } else {
-            // User normal: lista simples de notas
             let markup = "";
             data.forEach(note => {
                 let tagsHtml = "";
@@ -188,81 +157,26 @@
                 }
 
                 markup += `
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 shadow position-relative">
-                        <div class="card-body">
-                            <h5 class="card-title">${note.title}</h5>
-                            <p class="card-text text-muted small">Atualizada em ${note.updatedAt ? new Date(note.updatedAt).toLocaleString() : 'N/A'}</p>
-                            <p class="card-text">${note.content?.substring(0, 100) ?? ""}</p>
-                            <a class="btn btn-sm btn-outline-primary me-2" href="/Notes/Edit/${note.noteId}">Editar</a>
-                            <a class="btn btn-sm btn-outline-danger me-2" href="/Notes/Delete/${note.noteId}">Eliminar</a>
-                            <button class="btn btn-sm btn-outline-info me-2" onclick="openShareModal(${note.noteId})">Partilhar</button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="openTagModal(${note.noteId})">+ Tags</button>
-                            ${tagsHtml}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm rounded position-relative">
+                            <div class="card-body">
+                                <h5 class="card-title">${note.title}</h5>
+                                <p class="card-text text-muted small">🕒 Atualizada em ${note.updatedAt ? new Date(note.updatedAt).toLocaleString() : 'N/A'}</p>
+                                <p class="card-text">${note.content?.substring(0, 100) ?? ""}</p>
+                                <a class="btn btn-sm btn-outline-primary me-2" href="/Notes/Edit/${note.noteId}">✏️ Editar</a>
+                                <a class="btn btn-sm btn-outline-danger me-2" href="/Notes/Delete/${note.noteId}">🗑️ Eliminar</a>
+                                <button class="btn btn-sm btn-outline-info me-2" onclick="openShareModal(${note.noteId})">🤝 Partilhar</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="openTagModal(${note.noteId})">🏷️ + Tags</button>
+                                ${tagsHtml}
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
             });
             list.innerHTML = markup;
         }
     }
 
-    function openCreateModal() {
-        document.getElementById("noteId").value = "";
-        document.getElementById("noteTitle").value = "";
-        document.getElementById("noteContent").value = "";
-        document.getElementById("noteModalLabel").innerText = "Nova Nota";
-    }
-
-    async function openEditModal(id) {
-        const response = await fetch(`${apiUrl}/${id}`, { headers: getAuthHeaders() });
-        const note = await response.json();
-
-        document.getElementById("noteId").value = note.noteId;
-        document.getElementById("noteTitle").value = note.title;
-        document.getElementById("noteContent").value = note.content;
-        document.getElementById("noteModalLabel").innerText = "Editar Nota";
-        new bootstrap.Modal(document.getElementById('noteModal')).show();
-    }
-
-    async function deleteNote(id) {
-        if (!confirm("Tens a certeza que queres eliminar esta nota?")) return;
-        await fetch(`${apiUrl}/${id}`, {
-            method: "DELETE",
-            headers: getAuthHeaders()
-        });
-        loadNotes();
-    }
-
-    document.getElementById("noteForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
-
-        const id = document.getElementById("noteId").value;
-        const title = document.getElementById("noteTitle").value;
-        const content = document.getElementById("noteContent").value;
-
-        const payload = JSON.stringify({ noteId: id, title, content });
-
-        if (id) {
-            await fetch(`${apiUrl}/${id}`, {
-                method: "PUT",
-                headers: getAuthHeaders(),
-                body: payload
-            });
-        } else {
-            await fetch(apiUrl, {
-                method: "POST",
-                headers: getAuthHeaders(),
-                body: payload
-            });
-        }
-
-        bootstrap.Modal.getInstance(document.getElementById("noteModal")).hide();
-        loadNotes();
-    });
-
-    
     function openShareModal(noteId) {
         document.getElementById("shareNoteId").value = noteId;
         document.getElementById("shareWith").value = "";
@@ -275,7 +189,9 @@
 
     function openTagModal(noteId) {
         currentNoteId = noteId;
-        $('#tagModal').modal('show');
+        const modalEl = document.getElementById('tagModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
 
         refreshAvailableTags();
     }
@@ -291,7 +207,7 @@
         })
             .then(response => {
                 if (response.ok) {
-                    $('#tagModal').modal('hide');
+                    bootstrap.Modal.getInstance(document.getElementById("tagModal")).hide();
                     loadNotes();
                 } else {
                     response.json().then(err => alert(err.message || "Erro ao adicionar tag"));
@@ -317,7 +233,7 @@
         if (response.ok) {
             bootstrap.Modal.getInstance(document.getElementById("inlineTagModal")).hide();
             alert("Tag criada com sucesso!");
-            refreshAvailableTags(); // Atualiza o dropdown
+            refreshAvailableTags();
         } else {
             const err = await response.json();
             alert(err.message || "Erro ao criar tag.");
@@ -340,7 +256,6 @@
                 });
             });
     }
-
 
     document.getElementById("shareForm").addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -366,10 +281,6 @@
     });
 
     document.addEventListener("DOMContentLoaded", () => {
-    //    if (!token) {
-    //        window.location.href = "/Home/LogIn";
-    //        return;
-    //    }
         loadNotes();
     });
 </script>

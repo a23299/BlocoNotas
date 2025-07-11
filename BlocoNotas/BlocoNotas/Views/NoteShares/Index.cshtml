@@ -1,37 +1,13 @@
 @{
+    Layout = "_Layout";
     ViewData["Title"] = "Notas Partilhadas Comigo";
 }
 
-<h1 class="mb-4">Notas Partilhadas Comigo</h1>
+<div class="container py-5">
+    <h1 class="mb-4 text-primary">@ViewData["Title"]</h1>
 
-<div id="sharedNotesList" class="row gy-3"></div>
-
-<!-- Modal de Edição -->
-<div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editNoteModalLabel">Editar Nota</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editNoteForm">
-                    <input type="hidden" id="editNoteId" />
-                    <div class="mb-3">
-                        <label for="editNoteTitle" class="form-label">Título</label>
-                        <input type="text" class="form-control" id="editNoteTitle" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editNoteContent" class="form-label">Conteúdo</label>
-                        <textarea class="form-control" id="editNoteContent" rows="6"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="submitEditNote()">Guardar Alterações</button>
-            </div>
-        </div>
+    <div id="sharedNotesList" class="row gy-4">
+        <!-- Notas partilhadas carregadas aqui -->
     </div>
 </div>
 
@@ -49,70 +25,64 @@
 
     async function loadSharedNotes() {
         const response = await fetch(sharedNotesApi, { headers: getAuthHeaders() });
-
         const list = document.getElementById("sharedNotesList");
         list.innerHTML = "";
 
         if (!response.ok) {
-            list.innerHTML = "<p class='text-danger'>Erro ao carregar notas partilhadas.</p>";
+            list.innerHTML = `<div class="col-12"><div class="alert alert-danger shadow-sm">Erro ao carregar notas partilhadas.</div></div>`;
             return;
         }
 
         const notes = await response.json();
 
         if (notes.length === 0) {
-            list.innerHTML = "<p>Nenhuma nota foi partilhada contigo.</p>";
+            list.innerHTML = `<div class="col-12"><p class="text-muted fst-italic">Nenhuma nota foi partilhada contigo.</p></div>`;
             return;
         }
 
-        for (const note of notes) {
-            list.innerHTML += `
+        let markup = "";
+        notes.forEach(note => {
+            let tagsHtml = "";
+            if (note.tags?.length > 0) {
+                tagsHtml = note.tags.map(tag => `<span class="badge bg-info text-dark me-1">${escapeHtml(tag)}</span>`).join("");
+                tagsHtml = `<div class="mt-3">${tagsHtml}</div>`;
+            }
+
+            const canEditBtn = note.canEdit
+                ? `<a href="/Notes/Edit/${note.noteId}" class="btn btn-sm btn-outline-primary me-2">✏️ Editar</a>`
+                : "";
+
+            markup += `
                 <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 shadow border-info">
-                        <div class="card-body">
-                            <h5 class="card-title">${note.title}</h5>
-                            <p class="card-text text-muted small">Atualizada em ${new Date(note.updatedAt).toLocaleString()}</p>
-                            <p class="card-text">${note.content?.substring(0, 100) ?? ""}</p>
-                            <p class="card-text"><strong>De:</strong> ${note.user?.userName ?? "Desconhecido"}</p>
-                            ${note.canEdit ? `
-                                <button class="btn btn-sm btn-outline-warning mt-2" onclick="openEditModal(${note.noteId}, \`${note.title}\`, \`${note.content ?? ""}\`)">Editar</button>
-                            ` : ""}
+                    <div class="card h-100 shadow-sm rounded position-relative">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">${escapeHtml(note.title)}</h5>
+                            <p class="card-text text-muted small">🕒 Atualizada em ${note.updatedAt ? new Date(note.updatedAt).toLocaleString() : 'N/A'}</p>
+                            <p class="card-text flex-grow-1">${escapeHtml(note.content?.substring(0, 100) ?? "")}${note.content?.length > 100 ? "..." : ""}</p>
+                            <p class="card-text"><small><strong>De:</strong> ${escapeHtml(note.user?.userName ?? "Desconhecido")}</small></p>
+                            <div class="mt-auto d-flex justify-content-start align-items-center">
+                                ${canEditBtn}
+                            </div>
+                            ${tagsHtml}
                         </div>
                     </div>
                 </div>
             `;
-        }
-    }
-
-    function openEditModal(noteId, title, content) {
-        document.getElementById("editNoteId").value = noteId;
-        document.getElementById("editNoteTitle").value = title;
-        document.getElementById("editNoteContent").value = content;
-        const modal = new bootstrap.Modal(document.getElementById('editNoteModal'));
-        modal.show();
-    }
-
-    async function submitEditNote() {
-        const noteId = document.getElementById("editNoteId").value;
-        const title = document.getElementById("editNoteTitle").value;
-        const content = document.getElementById("editNoteContent").value;
-
-        const response = await fetch(`/api/NoteSharesApi/shared-note-edit/${noteId}`, {
-            method: "PUT",
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ title, content })
         });
 
-        if (response.ok) {
-            alert("Nota atualizada com sucesso!");
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
-            modal.hide();
-            loadSharedNotes();
-        } else {
-            alert("Erro ao atualizar a nota.");
-        }
+        list.innerHTML = markup;
     }
 
+    function escapeHtml(text) {
+        if (!text) return "";
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;")
+            .replace(/`/g, "&#96;");
+    }
 
     document.addEventListener("DOMContentLoaded", loadSharedNotes);
 </script>

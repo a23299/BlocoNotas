@@ -6,33 +6,49 @@ ViewData["Title"] = "Criar Nota";
 
 <h2>@ViewData["Title"]</h2>
 
-<form id="noteForm">
-    <div class="mb-3">
-        <label for="title" class="form-label">Título</label>
-        <input type="text" class="form-control" id="title" name="title" required />
-    </div>
-    <div class="mb-3">
-        <label for="content" class="form-label">Conteúdo</label>
-        <textarea class="form-control" id="content" name="content" rows="5"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Criar</button>
-</form>
+<div class="container py-5 d-flex justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow border-0">
+            <div class="card-body">
+                <h2 class="card-title mb-4 text-primary text-center">📝 Criar Nova Nota</h2>
 
+                <div id="alertArea"></div>
+
+                <form id="noteForm">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="title" name="title" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Conteúdo</label>
+                        <textarea class="form-control" id="content" name="content" rows="5"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="/Notes" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success">Guardar Nota</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     document.getElementById("noteForm").addEventListener("submit", async e => {
         e.preventDefault();
-    
+
         const token = localStorage.getItem("token");
         if (!token) {
-            alert("Precisa de estar autenticado para criar notas.");
+            showAlert("danger", "Precisa de estar autenticado para criar notas.");
             return;
         }
-    
+
         const note = {
             Title: document.getElementById("title").value,
             Content: document.getElementById("content").value
         };
-    
+
         try {
             const response = await fetch("/api/NotesApi", {
                 method: "POST",
@@ -42,17 +58,27 @@ ViewData["Title"] = "Criar Nota";
                 },
                 body: JSON.stringify(note)
             });
-    
+
             if (response.ok) {
-                window.location.href = "/Notes"; // redirecionar após sucesso
+                window.location.href = "/Notes";
             } else {
                 const data = await response.json();
-                alert(data.message || "Erro ao criar nota.");
+                showAlert("danger", data.message || "Erro ao criar nota.");
             }
         } catch (error) {
-            alert("Erro ao conectar com o servidor.");
+            showAlert("danger", "Erro ao conectar com o servidor.");
             console.error(error);
         }
     });
+
+    function showAlert(type, message) {
+        const alertArea = document.getElementById("alertArea");
+        alertArea.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show mt-3" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            </div>
+        `;
+    }
 </script>
 

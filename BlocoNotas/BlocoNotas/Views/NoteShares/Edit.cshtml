@@ -1,55 +1,49 @@
-@model BlocoNotas.Models.NoteShare
+@model BlocoNotas.Models.Note
 
 @{
-    ViewData["Title"] = "Edit Note Share";
+    ViewData["Title"] = "Editar Nota";
 }
 
-<!DOCTYPE html>
+<div class="container py-4">
+    <h2>@ViewData["Title"]</h2>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Edit</title>
-</head>
-<body>
+    <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+        <input type="hidden" asp-for="NoteId" />
 
-<h4>NoteShare</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="NoteShareId" />
-            <div class="form-group">
-                <label asp-for="NoteId" class="control-label"></label>
-                <select asp-for="NoteId" class="form-control" asp-items="ViewBag.NoteId"></select>
-                <span asp-validation-for="NoteId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserShareFK" class="control-label"></label>
-                <select asp-for="UserShareFK" class="form-control" asp-items="ViewBag.SharedWithUserId"></select>
-                <span asp-validation-for="UserShareFK" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SharedAt" class="control-label"></label>
-                <input asp-for="SharedAt" class="form-control" />
-                <span asp-validation-for="SharedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="CanEdit" /> @Html.DisplayNameFor(model => model.CanEdit)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label"></label>
+            <input asp-for="Title" class="form-control" required />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Content" class="form-label"></label>
+            <textarea asp-for="Content" class="form-control" rows="6"></textarea>
+            <span asp-validation-for="Content" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success me-2">Guardar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
-</body>
-</html>
+    <script>
+        // Bootstrap 5 client-side validation example
+        (function () {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+}
