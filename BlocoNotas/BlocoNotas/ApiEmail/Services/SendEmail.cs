@@ -39,8 +39,7 @@ public class SendEmail : ISendEmail
 
                 if (_env.IsDevelopment())
                 {
-                    await client.ConnectAsync(_smtpSettings.Server,
-                        _smtpSettings.Port, true);
+                    await client.ConnectAsync(_smtpSettings.Server, _smtpSettings.Port, MailKit.Security.SecureSocketOptions.StartTls);
                 }
                 else
                 {

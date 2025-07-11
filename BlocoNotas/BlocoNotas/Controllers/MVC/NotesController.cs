@@ -1,160 +1,126 @@
-using System.Security.Claims;
-using BlocoNotas.Data;
-using BlocoNotas.Models;
+﻿using BlocoNotas.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using BlocoNotas.Models;
 
-namespace BlocoNotas.Controllers.MVC;
-
-public class NotesController : Controller
+namespace BlocoNotas.Controllers.MVC
 {
-    private readonly ApplicationDbContext _context;
-
-    public NotesController(ApplicationDbContext context)
+    public class NotesController : Controller
     {
-        _context = context;
-    }
+        private readonly ApplicationDbContext _context;
 
-    // GET: Notes
-    public async Task<IActionResult> Index()
-    {
-        var applicationDbContext = _context.Notes.Include(n => n.User);
-        return View(await applicationDbContext.ToListAsync());
-    }
-
-    // GET: Notes/Details/5
-    public async Task<IActionResult> Details(int? id)
-    {
-        if (id == null)
+        public NotesController(ApplicationDbContext context)
         {
-            return NotFound();
+            _context = context;
         }
 
-        var note = await _context.Notes
-            .Include(n => n.User)
-            .FirstOrDefaultAsync(m => m.NoteId == id);
-        if (note == null)
+        // GET: Notes
+        public async Task<IActionResult> Index()
         {
-            return NotFound();
+            // Lista simples das notas para exibir na view
+            var notes = await _context.Notes
+                .Include(n => n.User)
+                .ToListAsync();
+
+            return View(notes);
         }
 
-        return View(note);
-    }
-
-    // GET: Notes/Create
-    public IActionResult Create()
-    {
-        ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Password");
-        return View();
-    }
-
-    // POST: Notes/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("NoteId,Title,Content,CreatedAt,UpdatedAt,IsDeleted,UserId")] Note note)
-    {
-        if (ModelState.IsValid)
+        // GET: Notes/Details/5
+        public async Task<IActionResult> Details(int? id)
         {
-            _context.Add(note);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-        ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Password", note.UserFK);
-        return View(note);
-    }
+            if (id == null) return NotFound();
 
-    // GET: Notes/Edit/5
-    public async Task<IActionResult> Edit(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
+            var note = await _context.Notes
+                .Include(n => n.User)
+                .FirstOrDefaultAsync(n => n.NoteId == id);
+
+            if (note == null) return NotFound();
+
+            return View(note);
         }
 
-        var note = await _context.Notes.FindAsync(id);
-        if (note == null)
+        // GET: Notes/Create
+        public IActionResult Create()
         {
-            return NotFound();
-        }
-        ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Password", note.UserFK);
-        return View(note);
-    }
-
-    // POST: Notes/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("NoteId,Title,Content,CreatedAt,UpdatedAt,IsDeleted,UserId")] Note note)
-    {
-        if (id != note.NoteId)
-        {
-            return NotFound();
+            return View();
         }
 
-        if (ModelState.IsValid)
+        // POST: Notes/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Note note)
         {
-            try
+            if (ModelState.IsValid)
             {
-                _context.Update(note);
+                _context.Add(note);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(note);
+        }
+
+        // GET: Notes/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var note = await _context.Notes.FindAsync(id);
+            if (note == null) return NotFound();
+
+            return View(note);
+        }
+
+        // POST: Notes/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Note note)
+        {
+            if (id != note.NoteId) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(note);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Notes.Any(e => e.NoteId == id)) return NotFound();
+                    else throw;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(note);
+        }
+
+        // GET: Notes/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var note = await _context.Notes
+                .Include(n => n.User)
+                .FirstOrDefaultAsync(n => n.NoteId == id);
+
+            if (note == null) return NotFound();
+
+            return View(note);
+        }
+
+        // POST: Notes/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var note = await _context.Notes.FindAsync(id);
+            if (note != null)
+            {
+                _context.Notes.Remove(note);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!NoteExists(note.NoteId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
             return RedirectToAction(nameof(Index));
         }
-        ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Password", note.UserFK);
-        return View(note);
-    }
-
-    // GET: Notes/Delete/5
-    public async Task<IActionResult> Delete(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
-        }
-
-        var note = await _context.Notes
-            .Include(n => n.User)
-            .FirstOrDefaultAsync(m => m.NoteId == id);
-        if (note == null)
-        {
-            return NotFound();
-        }
-
-        return View(note);
-    }
-
-    // POST: Notes/Delete/5
-    [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
-    {
-        var note = await _context.Notes.FindAsync(id);
-        if (note != null)
-        {
-            _context.Notes.Remove(note);
-        }
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
-    }
-    
-    private bool NoteExists(int id)
-    {
-        return _context.Notes.Any(e => e.NoteId == id);
     }
 }

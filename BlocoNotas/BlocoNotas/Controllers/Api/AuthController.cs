@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using BlocoNotas.ApiEmail.Services;
 using BlocoNotas.Data;
 using BlocoNotas.Models;
 using BlocoNotas.Services;
@@ -18,17 +19,21 @@ public class AuthController : ControllerBase
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ApplicationDbContext _context;
     private readonly TokenService _tokenService;
+    private readonly ISendEmail _sendEmail;
 
+    //Email
     public AuthController(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         ApplicationDbContext context,
-        TokenService tokenService)
+        TokenService tokenService,
+        ISendEmail sendEmail)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _context = context;
         _tokenService = tokenService;
+        _sendEmail = sendEmail;
     }
 
     [HttpPost("login")]
@@ -70,19 +75,38 @@ public class AuthController : ControllerBase
         var user = new ApplicationUser
         {
             UserName = request.Username,
-            Email = request.Email
+            Email = request.Email,
+            EmailConfirmed = true
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
             return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
         
+        // Adiciona role padrão
         await _userManager.AddToRoleAsync(user, "Utilizador");
-
+        
+        // Gera o token JWT
         var token = await _tokenService.GenerateToken(user);
+        
+        // Enviar email de confirmação
+        try
+        {
+            await _sendEmail.SendEmailAsync(
+                user.Email,
+                "Conta criada com sucesso",
+                $"Olá {user.UserName}, a tua conta foi criada com sucesso no BlocoNotas."
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Erro ao enviar email: " + ex.Message);
+        }
 
+        // Return do Token e Dados do Utilizador
         return Ok(new
         {
+            message = "Registo efetuado com sucesso.",
             token,
             user = new
             {
@@ -106,3 +130,4 @@ public class RegisterRequest
     public string Email { get; set; }
     public string Password { get; set; }
 }
+
