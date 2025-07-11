@@ -10,8 +10,8 @@ WORKDIR /src
 COPY BlocoNotas.csproj .
 RUN dotnet restore "BlocoNotas.csproj"
 COPY . .
-WORKDIR "/src/BlocoNotas"
-RUN dotnet build "./BlocoNotas.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR /src
+RUN dotnet build "BlocoNotas.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
