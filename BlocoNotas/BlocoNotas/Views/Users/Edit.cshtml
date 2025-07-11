@@ -29,11 +29,12 @@
         <div class="form-group">
             <label for="password">Password</label>
             <div class="input-group">
-                <input type="password" class="form-control" id="password" required />
+                <input type="password" class="form-control" id="password" />
                 <button type="button" class="btn btn-outline-secondary" id="togglePassword" title="Mostrar password">
                     👁
                 </button>
             </div>
+            <small class="form-text text-muted">Deixe em branco para manter a password atual.</small>
         </div>
 
         <br/>        
@@ -65,10 +66,18 @@
         const userId = document.getElementById("UserId").value;
         const nameInput = document.getElementById("username");
         const emailInput = document.getElementById("email");
+        const token = localStorage.getItem("token");
 
         try {
-            const response = await fetch(`/api/UsersApi/${userId}`);
+            const response = await fetch(`/api/UsersApi/${userId}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            
+            
             if (!response.ok) throw new Error("Erro ao carregar dados");
+            
 
             const user = await response.json();
             nameInput.value = user.userName;
@@ -86,10 +95,18 @@
                 email: emailInput.value
             };
 
+            const newPassword = passwordInput.value.trim();
+            if (newPassword.length > 0) {
+                updatedUser.password = newPassword;
+            }
+
             try {
                 const res = await fetch(`/api/UsersApi/${userId}`, {
                     method: "PUT",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
                     body: JSON.stringify(updatedUser)
                 });
 

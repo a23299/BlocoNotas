@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlocoNotas.Models
 {
@@ -20,5 +21,8 @@ namespace BlocoNotas.Models
 
         // Relação 1:n com partilhas de notas que este utilizador recebeu
         public ICollection<NoteShare> SharedWithMe { get; set; } = new List<NoteShare>();
+        
+        [NotMapped]
+        public string? Password { get; set; }  // só para receber no input
     }
 }

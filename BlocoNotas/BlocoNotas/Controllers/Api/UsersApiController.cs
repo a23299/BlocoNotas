@@ -112,36 +112,34 @@ namespace BlocoNotas.Controllers.Api
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(string id, ApplicationUser applicationUser)
         {
-            
-            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!User.IsInRole("Admin") && currentUserId != id)
-                return Forbid();
-            
             if (id != applicationUser.Id)
-            {
                 return BadRequest();
-            }
 
-            _context.Entry(applicationUser).State = EntityState.Modified;
+            if (!User.IsInRole("Admin") && User.FindFirst(ClaimTypes.NameIdentifier)?.Value != id)
+                return Forbid();
 
-            try
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            user.UserName = applicationUser.UserName;
+            user.Email = applicationUser.Email;
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+                return BadRequest(updateResult.Errors);
+
+            if (!string.IsNullOrEmpty(applicationUser.Password))
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var passwordResult = await _userManager.ResetPasswordAsync(user, token, applicationUser.Password);
+                if (!passwordResult.Succeeded)
+                    return BadRequest(passwordResult.Errors);
             }
 
             return NoContent();
         }
+
 
         
         // DELETE

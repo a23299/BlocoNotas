@@ -37,10 +37,14 @@ document.getElementById("deleteForm").addEventListener("submit", async e => {
     e.preventDefault();
 
     const userId = document.getElementById("HiddenUserId").value;
+    const token = localStorage.getItem("token");
 
     try {
         const res = await fetch(`/api/UsersApi/${userId}`, {
-            method: "DELETE"
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
         });
 
         if (res.ok) {
