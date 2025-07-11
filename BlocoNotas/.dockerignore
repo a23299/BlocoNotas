@@ -1,0 +1,41 @@
+﻿# Ignorar ficheiros de configuração e pastas de IDE
+**/.dockerignore
+**/.env
+**/.git
+**/.gitignore
+**/.project
+**/.settings
+**/.toolstarget
+**/.vs
+**/.vscode
+**/.idea
+
+# Ignorar ficheiros temporários do Visual Studio e outros
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+**/azds.yaml
+
+# Ignorar pastas de build e dependências
+**/bin
+**/obj
+**/node_modules
+**/npm-debug.log
+
+# Ignorar ficheiros de Docker Compose e Dockerfile extras
+**/docker-compose*
+**/Dockerfile*
+
+# Ignorar ficheiros de configuração específicos
+**/secrets.dev.yaml
+**/values.dev.yaml
+
+# Ignorar documentação e licença (opcional)
+LICENSE
+README.md
+
+# **Não ignorar ficheiros de base de dados SQLite**
+# Se o teu ficheiro SQLite tem extensão .db, .sqlite ou similar, não inclua nenhuma linha para ignorá-los aqui
+# Exemplo: Não colocar nada como *.db ou *.sqlite
+
+# Caso o ficheiro da base esteja numa pasta específica, garante que a pasta não está ignorada

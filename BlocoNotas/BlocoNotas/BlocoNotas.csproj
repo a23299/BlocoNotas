@@ -4,6 +4,7 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,6 +29,16 @@
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.1.4" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.9.0" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+      <Content Include="bloconotas.db">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 
     <ItemGroup>
       <Folder Include="Migrations\" />
