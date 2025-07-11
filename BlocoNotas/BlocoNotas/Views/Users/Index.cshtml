@@ -4,21 +4,24 @@
     ViewData["Title"] = "Lista de Utilizadores";
 }
 
-<div class="container mt-4">
-    <h2>Lista de Utilizadores</h2>
-    <table class="table table-striped mt-3" id="usersTable">
-        <thead class="thead-dark">
-        <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Ações</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- Linhas geradas via JS -->
-        </tbody>
-    </table>
+<div class="container mt-5">
+    <h2 class="mb-4 text-primary border-bottom pb-2">Lista de Utilizadores</h2>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle mb-0" id="usersTable">
+            <thead class="table-primary text-primary">
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th class="text-center">Ações</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Linhas geradas via JS -->
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
@@ -28,7 +31,7 @@
         const roles = JSON.parse(localStorage.getItem("roles") || "[]");
 
         if (!token) {
-            tableBody.innerHTML = `<tr><td colspan="4" class="text-danger">Necessita fazer login para ver esta página.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-danger text-center">Necessita fazer login para ver esta página.</td></tr>`;
             return;
         }
 
@@ -40,58 +43,74 @@
             });
 
             if (response.status === 401) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="text-danger">Não autorizado. Faça login novamente.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-danger text-center">Não autorizado. Faça login novamente.</td></tr>`;
                 return;
             }
 
             if (!response.ok) throw new Error("Erro ao carregar utilizadores");
 
             const users = await response.json();
-
             const isAdmin = roles.includes("Admin");
 
-            users.forEach(user => {
+            tableBody.innerHTML = ""; // limpa
 
+            users.forEach(user => {
                 const userIsAdmin = (user.roles || []).includes("Admin");
                 const canPromote = isAdmin && !userIsAdmin;
 
                 const row = document.createElement("tr");
 
                 row.innerHTML = `
-                <td>${user.id}</td>
-                <td>${user.userName}</td>
-                <td>${user.email}</td>
-                <td>
-                    <a href="/Users/Edit/${user.id}" class="btn btn-sm btn-outline-primary">Editar</a>
-                    <a href="/Users/Details/${user.id}" class="btn btn-sm btn-outline-info ms-1">Detalhes</a>
-                    <a href="/Users/Delete/${user.id}" class="btn btn-sm btn-outline-danger ms-1">Eliminar</a>
-                    ${canPromote ? `<button class="btn btn-sm btn-warning ms-1" onclick="promoteToAdmin('${user.id}')">Dar Admin</button>` : ""}
-                </td>
-            `;
+                    <td class="text-truncate" style="max-width:120px;">${user.id}</td>
+                    <td>${user.userName}</td>
+                    <td>${user.email}</td>
+<td class="text-center" style="white-space: nowrap;">
+    <a href="/Users/Edit/${user.id}" class="btn btn-sm btn-outline-primary me-1" title="Editar Utilizador">
+        <i class="bi bi-pencil me-1"></i> ✏️ Editar
+    </a>
+    <a href="/Users/Details/${user.id}" class="btn btn-sm btn-outline-info me-1" title="Detalhes">
+        <i class="bi bi-info-circle me-1"></i> ⚙️ Detalhes
+    </a>
+    <button class="btn btn-sm btn-outline-danger me-1" title="Eliminar Utilizador" onclick="deleteUser('${user.id}')">
+        <i class="bi bi-trash me-1"></i> 🗑️ Eliminar
+    </button>
+    ${canPromote ? `<button class="btn btn-sm btn-warning" title="Dar permissões de Admin" onclick="promoteToAdmin('${user.id}')">
+        <i class="bi bi-shield-lock me-1"></i> Dar Admin
+    </button>` : ''}
+</td>
+
+                `;
 
                 tableBody.appendChild(row);
             });
+
         } catch (error) {
-            tableBody.innerHTML = `<tr><td colspan="4" class="text-danger">${error.message}</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-danger text-center">${error.message}</td></tr>`;
         }
     });
-async function deleteUser(id) {
-    if (!confirm("Tem a certeza que quer eliminar este utilizador?")) return;
 
-    try {
-        const res = await fetch(`/api/UsersApi/${id}`, {
-            method: "DELETE"
-        });
+    async function deleteUser(id) {
+        if (!confirm("Tem a certeza que quer eliminar este utilizador?")) return;
 
-        if (res.ok) {
-            location.reload(); // Ou remove diretamente do DOM
-        } else {
-            alert("Erro ao eliminar utilizador");
+        const token = localStorage.getItem("token");
+
+        try {
+            const res = await fetch(`/api/UsersApi/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (res.ok) {
+                location.reload();
+            } else {
+                alert("Erro ao eliminar utilizador");
+            }
+        } catch (err) {
+            alert("Erro: " + err.message);
         }
-    } catch (err) {
-        alert("Erro: " + err.message);
     }
-}
 
     async function promoteToAdmin(userId) {
         const token = localStorage.getItem("token");

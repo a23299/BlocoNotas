@@ -4,39 +4,26 @@
     ViewData["Title"] = "Detalhes do Utilizador";
 }
 
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="utf-8" />
-    <title>@ViewData["Title"]</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-</head>
-<body style="background: linear-gradient(to bottom right, #f8f9fa, #e9ecef); min-height: 100vh;">
-
 <div class="container py-4">
     <h2 class="text-primary mb-4">Detalhes do Utilizador</h2>
 
     <dl class="row bg-white p-4 rounded shadow-sm">
-        <dt class="col-sm-2">Nome</dt>
-        <dd class="col-sm-10">@Model.UserName</dd>
+        <dt class="col-sm-3 fw-semibold">Nome</dt>
+        <dd class="col-sm-9">@Model.UserName</dd>
 
-        <dt class="col-sm-2">Email</dt>
-        <dd class="col-sm-10">@Model.Email</dd>
+        <dt class="col-sm-3 fw-semibold">Email</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
 
-        <dt class="col-sm-2">Senha</dt>
-        <dd class="col-sm-10">••••••••</dd>
-
-        <dt class="col-sm-2">Data de criação</dt>
-        <dd class="col-sm-10">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+        <dt class="col-sm-3 fw-semibold">Data de criação</dt>
+        <dd class="col-sm-9">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
     </dl>
 
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary me-2">Editar</a>
-    <a asp-action="Index" class="btn btn-outline-secondary">Voltar à lista</a>
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary me-2">
+            ✏️ Editar
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            🔙 Voltar à lista
+        </a>
+    </div>
 </div>
-
-<!-- Bootstrap JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
