@@ -7,6 +7,29 @@
     <h1 class="mb-4 text-primary">@ViewData["Title"]</h1>
 
     <div id="sharedNotesList" class="row gy-4">
+
+        <!-- Modal: Remover Partilha -->
+        <div class="modal fade" id="removeShareModal" tabindex="-1" aria-labelledby="removeShareModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="removeShareModalLabel">Remover Partilha</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">Tem a certeza que deseja remover o acesso a esta nota partilhada? Esta ação não
+                            afeta o autor da nota.</p>
+                        <input type="hidden" id="noteIdToRemove">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" onclick="confirmRemoveShare()">Remover</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Notas partilhadas carregadas aqui -->
     </div>
 </div>
@@ -15,8 +38,27 @@
     const sharedNotesApi = "/api/NoteSharesApi/shared-with-me";
     const token = localStorage.getItem("token");
 
+
+    // Função que remove a partilha da nota (para quem recebeu a partilha)
+    async function openRemoveShareModal(noteId) {
+        if (!confirm("Tem a certeza que deseja remover o acesso a esta nota?")) return;
+
+        const response = await fetch(`/api/NoteSharesApi/remove-my-access/${noteId}`, {
+            method: "DELETE",
+            headers: getAuthHeaders()
+        });
+
+        if (response.ok) {
+            alert("Acesso removido com sucesso.");
+            loadSharedNotes(); // atualiza a lista
+        } else {
+            const error = await response.json();
+            alert(error.message ?? "Erro ao remover acesso à nota.");
+        }
+    }
+
     function getAuthHeaders() {
-        const headers = { "Content-Type": "application/json" };
+        const headers = {"Content-Type": "application/json"};
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
         }
@@ -24,7 +66,7 @@
     }
 
     async function loadSharedNotes() {
-        const response = await fetch(sharedNotesApi, { headers: getAuthHeaders() });
+        const response = await fetch(sharedNotesApi, {headers: getAuthHeaders()});
         const list = document.getElementById("sharedNotesList");
         list.innerHTML = "";
 
@@ -48,9 +90,13 @@
                 tagsHtml = `<div class="mt-3">${tagsHtml}</div>`;
             }
 
-            const canEditBtn = note.canEdit
-                ? `<a href="/Notes/Edit/${note.noteId}" class="btn btn-sm btn-outline-primary me-2">✏️ Editar</a>`
-                : "";
+            let actionsHtml = "";
+
+            if (note.canEdit) {
+                actionsHtml += `<a href="/Notes/Edit/${note.noteId}" class="btn btn-sm btn-outline-primary me-2">✏️ Editar</a>`;
+            }
+
+            actionsHtml += `<button class="btn btn-sm btn-outline-danger" onclick="openRemoveShareModal(${note.noteId})">🗑️ Remover Partilha</button>`;
 
             markup += `
                 <div class="col-md-6 col-lg-4">
@@ -60,13 +106,14 @@
                             <p class="card-text text-muted small">🕒 Atualizada em ${note.updatedAt ? new Date(note.updatedAt).toLocaleString() : 'N/A'}</p>
                             <p class="card-text flex-grow-1">${escapeHtml(note.content?.substring(0, 100) ?? "")}${note.content?.length > 100 ? "..." : ""}</p>
                             <p class="card-text"><small><strong>De:</strong> ${escapeHtml(note.user?.userName ?? "Desconhecido")}</small></p>
-                            <div class="mt-auto d-flex justify-content-start align-items-center">
-                                ${canEditBtn}
-                            </div>
+<div class="mt-auto d-flex justify-content-start align-items-center">
+    ${actionsHtml}
+</div>
                             ${tagsHtml}
                         </div>
                     </div>
                 </div>
+                
             `;
         });
 

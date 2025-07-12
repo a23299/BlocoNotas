@@ -132,9 +132,9 @@ namespace BlocoNotas.Controllers.Api
             return CreatedAtAction(nameof(GetShareDetails), new { id = noteShare.NoteShareId }, noteShare);
         }
         
-        // DELETE: api/NoteSharesApi/remove-shared-note/{noteId}
-        [HttpDelete("remove-shared-note/{noteId}")]
-        public async Task<IActionResult> RemoveSharedNote(int noteId)
+// DELETE: api/NoteSharesApi/remove-my-access/{noteId}
+        [HttpDelete("remove-my-access/{noteId}")]
+        public async Task<IActionResult> RemoveMyAccess(int noteId)
         {
             var userId = GetCurrentUserId();
 
@@ -143,7 +143,7 @@ namespace BlocoNotas.Controllers.Api
 
             if (noteShare == null)
             {
-                return NotFound(new { message = "Nota partilhada não encontrada." });
+                return NotFound(new { message = "Partilha não encontrada." });
             }
 
             _context.NoteShares.Remove(noteShare);
