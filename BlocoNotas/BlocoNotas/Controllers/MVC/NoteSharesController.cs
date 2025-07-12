@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BlocoNotas.Data;
-using BlocoNotas.Dto;
 using BlocoNotas.Models;
-using Microsoft.AspNetCore.Authorization;
+
 
 namespace BlocoNotas.Controllers.MVC;
 
@@ -29,28 +24,7 @@ public class NoteSharesController : Controller
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         Console.WriteLine($"[DEBUG] userId = {userId}");
 
-        if (string.IsNullOrEmpty(userId))
-        {
-            Console.WriteLine("[DEBUG] Utilizador não autenticado");
-            var emptyModel = new SharedNotesViewModel
-            {
-                SharedByMe = new List<NoteShare>(),
-                SharedWithMe = new List<Note>()
-            };
-            ViewBag.NotAuthenticated = true;
-            return View(emptyModel);
-        }
-
-        if (string.IsNullOrEmpty(userId))
-        {
-            var emptyModel = new SharedNotesViewModel
-            {
-                SharedByMe = new List<NoteShare>(),
-                SharedWithMe = new List<Note>()
-            };
-            ViewBag.NotAuthenticated = true;
-            return View(emptyModel);
-        }
+        
         
 
 
@@ -88,14 +62,8 @@ public class NoteSharesController : Controller
         {
             Console.WriteLine($"SharedWithMe: NoteId={note.NoteId}, Title={note.Title}, Owner={note.User?.UserName}");
         }
-
-        var model = new SharedNotesViewModel
-        {
-            SharedByMe = sharedByMe,
-            SharedWithMe = sharedWithMe
-        };
-
-        return View(model);
+        
+        return View();
     }
     // GET: NoteShares/Details/5
     public async Task<IActionResult> Details(int? id)
