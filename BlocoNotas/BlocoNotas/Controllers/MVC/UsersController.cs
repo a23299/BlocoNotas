@@ -1,31 +1,42 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BlocoNotas.Data;
 using BlocoNotas.Models;
 
 namespace BlocoNotas.Controllers.MVC;
 
+/// <summary>
+/// Controlador MVC para manipulação dos usuários do sistema.
+/// </summary>
 public class UsersController : Controller
 {
     private readonly ApplicationDbContext _context;
 
+    /// <summary>
+    /// Construtor do controlador UsersController.
+    /// </summary>
+    /// <param name="context">Contexto do banco de dados</param>
     public UsersController(ApplicationDbContext context)
     {
         _context = context;
     }
 
-    // GET: Users
+    /// <summary>
+    /// GET: Users
+    /// Lista todos os usuários.
+    /// </summary>
+    /// <returns>View com a lista de usuários</returns>
     public async Task<IActionResult> Index()
     {
         return View(await _context.Users.ToListAsync());
     }
 
-    // GET: Users/Details/5
+    /// <summary>
+    /// GET: Users/Details/5
+    /// Exibe os detalhes de um usuário específico.
+    /// </summary>
+    /// <param name="id">Id do usuário</param>
+    /// <returns>View com os detalhes do usuário ou NotFound se não existir</returns>
     public async Task<IActionResult> Details(string? id)
     {
         if (id == null)
@@ -43,15 +54,22 @@ public class UsersController : Controller
         return View(user);
     }
 
-    // GET: Users/Create
+    /// <summary>
+    /// GET: Users/Create
+    /// Exibe o formulário para criação de um novo usuário.
+    /// </summary>
+    /// <returns>View de criação de usuário</returns>
     public IActionResult Create()
     {
         return View();
     }
 
-    // POST: Users/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    /// <summary>
+    /// POST: Users/Create
+    /// Cria um novo usuário com os dados fornecidos.
+    /// </summary>
+    /// <param name="applicationUser">Objeto ApplicationUser com os dados do usuário</param>
+    /// <returns>Redireciona para Index em caso de sucesso ou retorna a view com erros</returns>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("UserId,UserName,Password,CreatedAt")] ApplicationUser applicationUser)
@@ -65,7 +83,12 @@ public class UsersController : Controller
         return View(applicationUser);
     }
 
-    // GET: Users/Edit/5
+    /// <summary>
+    /// GET: Users/Edit/5
+    /// Exibe o formulário para edição de um usuário específico.
+    /// </summary>
+    /// <param name="id">Id do usuário</param>
+    /// <returns>View de edição ou NotFound se não existir</returns>
     [HttpGet]
     public async Task<IActionResult> Edit(string? id)
     {
@@ -82,9 +105,13 @@ public class UsersController : Controller
         return View(user);
     }
 
-    // POST: Users/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    /// <summary>
+    /// POST: Users/Edit/5
+    /// Atualiza os dados de um usuário existente.
+    /// </summary>
+    /// <param name="id">Id do usuário a ser editado</param>
+    /// <param name="applicationUser">Objeto ApplicationUser com os dados atualizados</param>
+    /// <returns>Redireciona para Index em caso de sucesso ou retorna a view com erros</returns>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string? id, [Bind("UserId,UserName,Password,CreatedAt")] ApplicationUser applicationUser)
@@ -117,7 +144,12 @@ public class UsersController : Controller
         return View(applicationUser);
     }
 
-    // GET: Users/Delete/5
+    /// <summary>
+    /// GET: Users/Delete/5
+    /// Exibe confirmação para exclusão do usuário especificado.
+    /// </summary>
+    /// <param name="id">Id do usuário</param>
+    /// <returns>View de confirmação ou NotFound se não existir</returns>
     public async Task<IActionResult> Delete(string? id)
     {
         if (id == null)
@@ -135,7 +167,12 @@ public class UsersController : Controller
         return View(user);
     }
 
-    // POST: Users/Delete/5
+    /// <summary>
+    /// POST: Users/Delete/5
+    /// Confirma a exclusão do usuário especificado.
+    /// </summary>
+    /// <param name="id">Id do usuário</param>
+    /// <returns>Redireciona para Index após exclusão</returns>
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(string? id)
@@ -150,6 +187,11 @@ public class UsersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    /// <summary>
+    /// Verifica se um usuário existe pelo Id.
+    /// </summary>
+    /// <param name="id">Id do usuário</param>
+    /// <returns>True se o usuário existir, False caso contrário</returns>
     private bool UserExists(string id)
     {
         return _context.Users.Any(e => e.Id == id);
