@@ -1,30 +1,38 @@
 @model BlocoNotas.Models.Note;
 
 @{
-ViewData["Title"] = "Criar Nota";
+    ViewData["Title"] = "Criar Nota";  <!-- Define o título da página -->
 }
 
+<!-- Título principal da página -->
 <h2>@ViewData["Title"]</h2>
 
+<!-- Container principal para centralizar o formulário -->
 <div class="container py-5 d-flex justify-content-center">
     <div class="col-md-8">
         <div class="card shadow border-0">
             <div class="card-body">
+                <!-- Título da card para criar nova nota -->
                 <h2 class="card-title mb-4 text-primary text-center">📝 Criar Nova Nota</h2>
 
+                <!-- Área para mostrar alertas de sucesso ou erro dinamicamente -->
                 <div id="alertArea"></div>
 
+                <!-- Formulário para criação de nova nota -->
                 <form id="noteForm">
+                    <!-- Campo para o título da nota (obrigatório) -->
                     <div class="mb-3">
                         <label for="title" class="form-label">Título</label>
                         <input type="text" class="form-control" id="title" name="title" required />
                     </div>
 
+                    <!-- Campo para o conteúdo da nota -->
                     <div class="mb-3">
                         <label for="content" class="form-label">Conteúdo</label>
                         <textarea class="form-control" id="content" name="content" rows="5"></textarea>
                     </div>
 
+                    <!-- Botões para cancelar ou submeter o formulário -->
                     <div class="d-flex justify-content-between">
                         <a href="/Notes" class="btn btn-outline-secondary">Cancelar</a>
                         <button type="submit" class="btn btn-success">Guardar Nota</button>
@@ -34,22 +42,27 @@ ViewData["Title"] = "Criar Nota";
         </div>
     </div>
 </div>
-<script>
-    document.getElementById("noteForm").addEventListener("submit", async e => {
-        e.preventDefault();
 
+<script>
+    // Captura o evento submit do formulário para enviar via fetch API
+    document.getElementById("noteForm").addEventListener("submit", async e => {
+        e.preventDefault();  // Impede o reload da página
+
+        // Verifica se o utilizador está autenticado (token guardado no localStorage)
         const token = localStorage.getItem("token");
         if (!token) {
             showAlert("danger", "Precisa de estar autenticado para criar notas.");
             return;
         }
 
+        // Cria objeto note com os valores do formulário
         const note = {
             Title: document.getElementById("title").value,
             Content: document.getElementById("content").value
         };
 
         try {
+            // Envia o pedido POST para a API criar nova nota com token de autenticação
             const response = await fetch("/api/NotesApi", {
                 method: "POST",
                 headers: {
@@ -60,17 +73,21 @@ ViewData["Title"] = "Criar Nota";
             });
 
             if (response.ok) {
+                // Se sucesso, redireciona para a lista de notas
                 window.location.href = "/Notes";
             } else {
+                // Se erro, obtém a mensagem e mostra alerta
                 const data = await response.json();
                 showAlert("danger", data.message || "Erro ao criar nota.");
             }
         } catch (error) {
+            // Se falha na conexão, mostra mensagem e loga erro no console
             showAlert("danger", "Erro ao conectar com o servidor.");
             console.error(error);
         }
     });
 
+    // Função para mostrar alertas dinamicamente na página
     function showAlert(type, message) {
         const alertArea = document.getElementById("alertArea");
         alertArea.innerHTML = `
@@ -81,4 +98,3 @@ ViewData["Title"] = "Criar Nota";
         `;
     }
 </script>
-

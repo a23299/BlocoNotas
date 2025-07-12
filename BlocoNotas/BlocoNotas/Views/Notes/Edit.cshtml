@@ -1,29 +1,37 @@
 @model BlocoNotas.Models.Note
 @{
-    ViewData["Title"] = "Editar Nota";
+    ViewData["Title"] = "Editar Nota";  <!-- Define o título da página -->
 }
 
+<!-- Container principal para centralizar o conteúdo -->
 <div class="container py-5 d-flex justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-sm border-0">
             <div class="card-body">
+                <!-- Título da página com ícone -->
                 <h2 class="card-title text-primary mb-4 text-center">✏️ Editar Nota</h2>
 
+                <!-- Área para exibir alertas dinâmicos -->
                 <div id="alertArea"></div>
 
+                <!-- Formulário para edição da nota -->
                 <form id="editNoteForm">
+                    <!-- Campo oculto para armazenar o ID da nota -->
                     <input type="hidden" id="noteId" value="@Model.NoteId" />
 
+                    <!-- Campo para editar o título da nota -->
                     <div class="mb-3">
                         <label for="title" class="form-label">Título</label>
                         <input type="text" class="form-control" id="title" value="@Model.Title" required />
                     </div>
 
+                    <!-- Campo para editar o conteúdo da nota -->
                     <div class="mb-3">
                         <label for="content" class="form-label">Conteúdo</label>
                         <textarea class="form-control" id="content" rows="6">@Model.Content</textarea>
                     </div>
 
+                    <!-- Botões para cancelar ou submeter alterações -->
                     <div class="d-flex justify-content-between">
                         <a href="/Notes" class="btn btn-outline-secondary">Cancelar</a>
                         <button type="submit" class="btn btn-success">Guardar Alterações</button>
@@ -34,17 +42,19 @@
     </div>
 </div>
 
-@section Scripts {
 <script>
+    // Evento de submit do formulário para editar nota
     document.getElementById("editNoteForm").addEventListener("submit", async e => {
         e.preventDefault();
 
+        // Obter token de autenticação
         const token = localStorage.getItem("token");
         if (!token) {
             showAlert("danger", "Precisa de estar autenticado.");
             return;
         }
 
+        // Obter dados do formulário
         const noteId = document.getElementById("noteId").value;
         const note = {
             NoteId: noteId,
@@ -53,6 +63,7 @@
         };
 
         try {
+            // Enviar pedido PUT para atualizar a nota na API
             const response = await fetch(`/api/NotesApi/${noteId}`, {
                 method: "PUT",
                 headers: {
@@ -63,17 +74,21 @@
             });
 
             if (response.ok) {
+                // Redirecionar para lista de notas após sucesso
                 window.location.href = "/Notes";
             } else {
+                // Mostrar erro caso a resposta não seja OK
                 const data = await response.json();
                 showAlert("danger", data.message || "Erro ao editar nota.");
             }
         } catch (error) {
+            // Mostrar erro de conexão e logar no console
             showAlert("danger", "Erro ao conectar com o servidor.");
             console.error(error);
         }
     });
 
+    // Função para mostrar alertas no local designado
     function showAlert(type, message) {
         const alertArea = document.getElementById("alertArea");
         alertArea.innerHTML = `
@@ -84,4 +99,3 @@
         `;
     }
 </script>
-}

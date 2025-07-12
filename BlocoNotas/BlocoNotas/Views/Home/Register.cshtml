@@ -1,25 +1,31 @@
 @{
-    Layout = "_Layout";
-    ViewBag.Title = "Registo";
+    Layout = "_Layout";  <!-- Define o layout base da página -->
+    ViewBag.Title = "Registo";  <!-- Define o título da página para o cabeçalho -->
 }
 
+<!-- Container principal para centrar vertical e horizontalmente o conteúdo -->
 <div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: 85vh;">
     <div class="col-md-6 col-lg-5">
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
+                <!-- Título do formulário de registo -->
                 <h2 class="mb-4 text-center text-primary fw-bold">Criar Conta</h2>
 
+                <!-- Formulário de registo de novo utilizador -->
                 <form id="registerForm">
+                    <!-- Campo para o nome de utilizador -->
                     <div class="form-group mb-3">
                         <label for="username" class="form-label">Nome de Utilizador</label>
                         <input type="text" class="form-control" id="username" placeholder="Ex: Teste02" required>
                     </div>
 
+                    <!-- Campo para o email -->
                     <div class="form-group mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" placeholder="O seu email" required />
                     </div>
 
+                    <!-- Campo para a password com botão para mostrar/ocultar -->
                     <div class="form-group mb-3">
                         <label for="password" class="form-label">Password</label>
                         <div class="input-group">
@@ -28,6 +34,7 @@
                         </div>
                     </div>
 
+                    <!-- Campo para confirmar a password com botão para mostrar/ocultar -->
                     <div class="form-group mb-4">
                         <label for="confirmPassword" class="form-label">Confirmar Password</label>
                         <div class="input-group">
@@ -36,11 +43,13 @@
                         </div>
                     </div>
 
+                    <!-- Botão de submissão do formulário -->
                     <div class="d-grid">
                         <button type="submit" class="btn btn-success btn-lg">📝 Registar</button>
                     </div>
                 </form>
 
+                <!-- Div para mostrar mensagens de erro no registo, inicialmente oculta -->
                 <div id="registerError" class="alert alert-danger mt-4 d-none" role="alert"></div>
             </div>
         </div>
@@ -48,32 +57,38 @@
 </div>
 
 <script>
+    // Referências aos inputs de password e aos botões de mostrar/ocultar password
     const passwordInput = document.getElementById("password");
     const confirmPasswordInput = document.getElementById("confirmPassword");
     const togglePassword1 = document.getElementById("togglePassword1");
     const togglePassword2 = document.getElementById("togglePassword2");
 
+    // Mostrar password do primeiro campo enquanto o botão estiver pressionado
     togglePassword1.addEventListener("mousedown", () => passwordInput.type = "text");
     togglePassword1.addEventListener("mouseup", () => passwordInput.type = "password");
     togglePassword1.addEventListener("mouseleave", () => passwordInput.type = "password");
 
+    // Mostrar password do segundo campo enquanto o botão estiver pressionado
     togglePassword2.addEventListener("mousedown", () => confirmPasswordInput.type = "text");
     togglePassword2.addEventListener("mouseup", () => confirmPasswordInput.type = "password");
     togglePassword2.addEventListener("mouseleave", () => confirmPasswordInput.type = "password");
 
+    // Captura o evento submit do formulário para registo via AJAX
     document.getElementById("registerForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
+        e.preventDefault();  // Previne reload da página
 
         const password = passwordInput.value;
         const confirmPassword = confirmPasswordInput.value;
         const errorDiv = document.getElementById("registerError");
 
+        // Validação simples para verificar se as passwords coincidem
         if (password !== confirmPassword) {
             errorDiv.classList.remove("d-none");
             errorDiv.innerText = "As passwords não coincidem.";
             return;
         }
 
+        // Envia a requisição POST para a API de registo com os dados do formulário
         const response = await fetch("/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -85,10 +100,12 @@
         });
 
         if (response.ok) {
+            // Se o registo foi bem sucedido, guarda token no localStorage e redireciona para a homepage
             const data = await response.json();
             localStorage.setItem("token", data.token);
             window.location.href = "/";
         } else {
+            // Em caso de erro, mostra mensagem adequada ao utilizador
             const error = await response.json();
             errorDiv.classList.remove("d-none");
 

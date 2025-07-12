@@ -1,23 +1,28 @@
-@model BlocoNotas.Models.Note
+@model BlocoNotas.Models.Note 
 @{
-    ViewData["Title"] = "Eliminar Nota";
+    ViewData["Title"] = "Eliminar Nota";  <!-- Define o título da página -->
 }
 
+<!-- Container principal para centralizar o conteúdo -->
 <div class="container py-5 d-flex justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-sm border-0">
             <div class="card-body">
+                <!-- Título de alerta para eliminação da nota -->
                 <h2 class="card-title text-danger text-center mb-4">⚠️ Eliminar Nota</h2>
 
+                <!-- Área para exibir alertas dinâmicos -->
                 <div id="alertArea"></div>
 
+                <!-- Mensagem de confirmação com detalhes da nota a eliminar -->
                 <div class="alert alert-warning">
                     <h5 class="alert-heading">Tem a certeza que deseja eliminar esta nota?</h5>
                     <hr />
-                    <p><strong>Título:</strong> @Model.Title</p>
-                    <p><strong>Conteúdo:</strong> @Model.Content</p>
+                    <p><strong>Título:</strong> @Model.Title</p>  <!-- Título da nota -->
+                    <p><strong>Conteúdo:</strong> @Model.Content</p>  <!-- Conteúdo da nota -->
                 </div>
 
+                <!-- Botões para cancelar ou confirmar a eliminação -->
                 <div class="d-flex justify-content-between">
                     <a href="/Notes" class="btn btn-outline-secondary">Cancelar</a>
                     <button id="confirmDelete" class="btn btn-danger">Confirmar Eliminação</button>
@@ -28,16 +33,20 @@
 </div>
 
 <script>
+    // Adiciona evento ao botão para confirmar eliminação
     document.getElementById("confirmDelete").addEventListener("click", async () => {
+        // Obtém token do localStorage para autenticação
         const token = localStorage.getItem("token");
         if (!token) {
             showAlert("danger", "Precisa de estar autenticado.");
             return;
         }
 
+        // Obtém o ID da nota do modelo
         const noteId = @Model.NoteId;
 
         try {
+            // Faz pedido DELETE à API para eliminar a nota
             const response = await fetch(`/api/NotesApi/${noteId}`, {
                 method: "DELETE",
                 headers: {
@@ -46,25 +55,28 @@
             });
 
             if (response.ok) {
+                // Se sucesso, redireciona para a lista de notas
                 window.location.href = "/Notes";
             } else {
+                // Em caso de erro, mostra alerta com a mensagem da API
                 const data = await response.json();
                 showAlert("danger", data.message || "Erro ao eliminar nota.");
             }
         } catch (error) {
+            // Em caso de falha na conexão, alerta e loga o erro
             alert("Erro ao conectar com o servidor.");
             console.error(error);
+        }
+    });
 
-
-            function showAlert(type, message) {
-                const alertArea = document.getElementById("alertArea");
-                alertArea.innerHTML = `
+    // Função para mostrar alertas na área dedicada
+    function showAlert(type, message) {
+        const alertArea = document.getElementById("alertArea");
+        alertArea.innerHTML = `
             <div class="alert alert-${type} alert-dismissible fade show mt-3" role="alert">
                 ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
         `;
-            }
-        }
-    });
+    }
 </script>

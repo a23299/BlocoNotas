@@ -1,20 +1,25 @@
 @{
-    Layout = "_Layout";
-    ViewBag.Title = "Login";
+    Layout = "_Layout";  <!-- Define o layout base da página -->
+    ViewBag.Title = "Login";  <!-- Define o título da página para o cabeçalho -->
 }
 
+<!-- Container principal para centrar vertical e horizontalmente o conteúdo -->
 <div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: 85vh;">
     <div class="col-md-6 col-lg-5">
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
+                <!-- Título da página de login -->
                 <h2 class="mb-4 text-center text-primary fw-bold">Acesso ao BlocoNotas</h2>
 
+                <!-- Formulário de login -->
                 <form id="loginForm">
+                    <!-- Campo para o email do utilizador -->
                     <div class="form-group mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" placeholder="O seu email" required />
                     </div>
 
+                    <!-- Campo para a password com botão para mostrar/ocultar -->
                     <div class="form-group mb-4">
                         <label for="password" class="form-label">Password</label>
                         <div class="input-group">
@@ -25,6 +30,7 @@
                         </div>
                     </div>
 
+                    <!-- Botão de submissão do formulário -->
                     <div class="d-grid">
                         <button type="submit" class="btn btn-success btn-lg">
                             🔐 Entrar
@@ -32,6 +38,7 @@
                     </div>
                 </form>
 
+                <!-- Div para mostrar mensagens de erro no login, inicialmente oculta -->
                 <div id="loginError" class="alert alert-danger mt-4 d-none" role="alert"></div>
             </div>
         </div>
@@ -39,26 +46,30 @@
 </div>
 
 <script>
+    // Obtenção dos elementos do DOM para manipulação
     const passwordInput = document.getElementById("password");
     const togglePasswordBtn = document.getElementById("togglePassword");
 
+    // Mostrar password enquanto o botão estiver pressionado
     togglePasswordBtn.addEventListener("mousedown", () => {
         passwordInput.type = "text";
     });
 
+    // Ocultar password quando o botão for solto
     togglePasswordBtn.addEventListener("mouseup", () => {
         passwordInput.type = "password";
     });
 
+    // Ocultar password se o cursor sair do botão antes de soltar
     togglePasswordBtn.addEventListener("mouseleave", () => {
         passwordInput.type = "password";
     });
 
+    // Captura o evento submit do formulário para login via AJAX
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
-        
-        
+        e.preventDefault();  // Previne reload da página
 
+        // Envia a requisição POST com email e password para a API de autenticação
         const response = await fetch("/api/auth/login", {
             method: "POST",
             headers: {
@@ -73,14 +84,16 @@
         const errorDiv = document.getElementById("loginError");
 
         if (response.ok) {
+            // Se o login foi bem sucedido, guarda token e roles no localStorage e redireciona para página inicial
             const data = await response.json();
             localStorage.setItem("token", data.token);
             localStorage.setItem("roles", JSON.stringify(data.user.roles));
             window.location.href = "/";
         } else {
+            // Em caso de erro, mostra mensagem apropriada ao utilizador
             const error = await response.json();
             errorDiv.classList.remove("d-none");
-            
+
             if (response.status === 400) {
                 errorDiv.innerText = "Credenciais inválidas. Verifique o email e a password.";
             } else if (response.status === 404) {

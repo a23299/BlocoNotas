@@ -1,16 +1,21 @@
 ﻿@{
-    Layout = "_Layout";
-    ViewData["Title"] = "Informação";
+    Layout = "_Layout";  <!-- Define o layout base da página -->
+    ViewData["Title"] = "Informação";  <!-- Define o título da página para o cabeçalho -->
 }
 
+<!-- Container principal com padding e altura mínima para centralizar o conteúdo verticalmente -->
 <div class="container py-5 d-flex justify-content-center" style="min-height: 85vh;">
     <div class="col-md-8 col-lg-6">
+        <!-- Título principal da página -->
         <h1 class="mb-4 text-primary text-center">@ViewData["Title"]</h1>
 
+        <!-- Cartão com sombra e sem borda para mostrar informações do projeto -->
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
+                <!-- Subtítulo do cartão com estilo e caixa alta -->
                 <h5 class="card-title text-uppercase text-secondary mb-4 fw-semibold">Projeto Web App - Bloco de Notas</h5>
 
+                <!-- Lista de definições com duas colunas: título e conteúdo -->
                 <dl class="row mb-0">
                     <dt class="col-sm-4 fw-semibold">Curso</dt>
                     <dd class="col-sm-8">Engenharia Informática</dd>

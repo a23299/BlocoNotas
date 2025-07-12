@@ -1,19 +1,21 @@
 @model IEnumerable<BlocoNotas.Models.Note>
-
 @{
     ViewData["Title"] = "Minhas Notas";
 }
 
 <div class="container py-4">
+    <!-- Título principal da página -->
     <h1 class="mb-4 text-primary">Notas</h1>
 
+    <!-- Botão para criar uma nova nota -->
     <div class="mb-3">
         <a class="btn btn-success" asp-controller="Notes" asp-action="Create">+ Nova Nota</a>
     </div>
 
+    <!-- Área onde as notas carregadas serão exibidas -->
     <div id="notesList" class="row gy-4"></div>
 
-    <!-- Modal: Partilhar Nota -->
+    <!-- Modal para partilhar uma nota com outro utilizador -->
     <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -23,11 +25,14 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
+                        <!-- Guarda o ID da nota a partilhar -->
                         <input type="hidden" id="shareNoteId">
+                        <!-- Campo para inserir o nome do utilizador com quem se quer partilhar -->
                         <div class="mb-3">
                             <label for="shareWith" class="form-label">Nome do Utilizador</label>
                             <input type="text" class="form-control" id="shareWith" required>
                         </div>
+                        <!-- Opção para permitir edição da nota partilhada -->
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="canEdit">
                             <label class="form-check-label" for="canEdit">Pode editar?</label>
@@ -41,7 +46,7 @@
         </div>
     </div>
 
-    <!-- Modal: Adicionar Tags à Nota -->
+    <!-- Modal para adicionar tags a uma nota -->
     <div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -50,9 +55,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Dropdown para selecionar tag disponível -->
                     <select id="availableTags" class="form-select mb-3">
                         <option value="">Seleciona uma tag</option>
                     </select>
+                    <!-- Botões para adicionar tag selecionada ou criar nova tag -->
                     <div class="d-flex justify-content-between">
                         <button class="btn btn-primary" onclick="addTagToNote()">Adicionar</button>
                         <button class="btn btn-outline-secondary" onclick="openCreateTagModal()">+ Nova Tag</button>
@@ -62,7 +69,7 @@
         </div>
     </div>
 
-    <!-- Modal: Criar Nova Tag -->
+    <!-- Modal para criar uma nova tag -->
     <div class="modal fade" id="inlineTagModal" tabindex="-1" aria-labelledby="inlineTagModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -72,6 +79,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                     </div>
                     <div class="modal-body">
+                        <!-- Input para nome da nova tag -->
                         <input type="text" id="inlineTagName" class="form-control" placeholder="Nome da Tag" required>
                     </div>
                     <div class="modal-footer">
@@ -89,6 +97,7 @@
     const tagsApiUrl = "/api/TagsApi";
     const token = localStorage.getItem("token");
 
+    <!-- Função para obter cabeçalhos HTTP incluindo autenticação se existir -->
     function getAuthHeaders() {
         const headers = { "Content-Type": "application/json" };
         if (token) {
@@ -97,6 +106,7 @@
         return headers;
     }
 
+    <!-- Função que carrega as notas da API e exibe no DOM -->
     async function loadNotes() {
         const response = await fetch(apiUrl, { headers: getAuthHeaders() });
         const data = await response.json();
@@ -104,14 +114,17 @@
         const list = document.getElementById("notesList");
         list.innerHTML = "";
 
+        <!-- Caso não existam notas, mostra mensagem -->
         if (!data || data.length === 0) {
             list.innerHTML = "<p>Nenhuma nota encontrada.</p>";
             return;
         }
 
+        <!-- Verifica se os dados representam um admin view (notas agrupadas por utilizador) -->
         const isAdminView = data[0] && data[0].userId && data[0].notes;
 
         if (isAdminView) {
+            <!-- Renderiza grupos de notas por utilizador -->
             data.forEach(userGroup => {
                 const userHeader = document.createElement("h3");
                 userHeader.textContent = `Notas de ${userGroup.userName}`;
@@ -121,12 +134,14 @@
                 userRow.className = "row gy-3 mb-4";
 
                 userGroup.notes.forEach(note => {
+                    <!-- Gera badges das tags associadas -->
                     let tagsHtml = "";
                     if (note.tags?.length > 0) {
                         tagsHtml = note.tags.map(tag => `<span class="badge bg-info text-dark me-1">${tag}</span>`).join("");
                         tagsHtml = `<div class="mt-3">${tagsHtml}</div>`;
                     }
 
+                    <!-- Adiciona cartão com detalhes da nota e botões -->
                     userRow.innerHTML += `
                         <div class="col-md-6 col-lg-4">
                             <div class="card h-100 shadow-sm rounded position-relative">
@@ -148,6 +163,7 @@
                 list.appendChild(userRow);
             });
         } else {
+            <!-- Renderiza lista simples de notas -->
             let markup = "";
             data.forEach(note => {
                 let tagsHtml = "";
@@ -177,6 +193,7 @@
         }
     }
 
+    <!-- Função que abre o modal para partilhar uma nota -->
     function openShareModal(noteId) {
         document.getElementById("shareNoteId").value = noteId;
         document.getElementById("shareWith").value = "";
@@ -184,9 +201,10 @@
         new bootstrap.Modal(document.getElementById('shareModal')).show();
     }
 
-    // Modal de Tags
+    <!-- Variável global para guardar a nota atual para adicionar tags -->
     let currentNoteId = null;
 
+    <!-- Função que abre o modal para adicionar tags -->
     function openTagModal(noteId) {
         currentNoteId = noteId;
         const modalEl = document.getElementById('tagModal');
@@ -196,6 +214,7 @@
         refreshAvailableTags();
     }
 
+    <!-- Função que adiciona uma tag selecionada a uma nota -->
     function addTagToNote() {
         const tagId = document.getElementById('availableTags').value;
         if (!tagId || !currentNoteId) return;
@@ -215,11 +234,13 @@
             });
     }
 
+    <!-- Função que abre o modal para criar uma nova tag -->
     function openCreateTagModal() {
         document.getElementById("inlineTagName").value = "";
         new bootstrap.Modal(document.getElementById("inlineTagModal")).show();
     }
 
+    <!-- Listener para submissão do formulário de criação de nova tag -->
     document.getElementById("inlineTagForm").addEventListener("submit", async function (e) {
         e.preventDefault();
         const name = document.getElementById("inlineTagName").value;
@@ -232,54 +253,54 @@
 
         if (response.ok) {
             bootstrap.Modal.getInstance(document.getElementById("inlineTagModal")).hide();
-            alert("Tag criada com sucesso!");
             refreshAvailableTags();
         } else {
             const err = await response.json();
-            alert(err.message || "Erro ao criar tag.");
+            alert(err.message || "Erro ao criar tag");
         }
     });
 
-    function refreshAvailableTags() {
-        fetch(`${tagsApiUrl}/all`, {
-            headers: getAuthHeaders()
-        })
-            .then(res => res.json())
-            .then(tags => {
-                const select = document.getElementById('availableTags');
-                select.innerHTML = '<option value="">Seleciona uma tag</option>';
-                tags.forEach(tag => {
-                    const opt = document.createElement('option');
-                    opt.value = tag.tagId;
-                    opt.textContent = tag.name;
-                    select.appendChild(opt);
-                });
-            });
+    <!-- Função que atualiza a lista de tags disponíveis no dropdown -->
+    async function refreshAvailableTags() {
+        const response = await fetch(tagsApiUrl, { headers: getAuthHeaders() });
+        const tags = await response.json();
+
+        const select = document.getElementById("availableTags");
+        select.innerHTML = `<option value="">Seleciona uma tag</option>`;
+        tags.forEach(tag => {
+            select.innerHTML += `<option value="${tag.tagId}">${tag.name}</option>`;
+        });
     }
 
+    <!-- Listener para submissão do formulário de partilha -->
     document.getElementById("shareForm").addEventListener("submit", async function (e) {
         e.preventDefault();
+
         const noteId = document.getElementById("shareNoteId").value;
-        const username = document.getElementById("shareWith").value;
+        const username = document.getElementById("shareWith").value.trim();
         const canEdit = document.getElementById("canEdit").checked;
 
-        const payload = JSON.stringify({ noteId, shareWithUsername: username, canEdit });
+        if (!username) {
+            alert("Por favor, insira o nome do utilizador.");
+            return;
+        }
 
-        const response = await fetch("/api/NoteSharesApi", {
+        const response = await fetch(`${apiUrl}/share`, {
             method: "POST",
             headers: getAuthHeaders(),
-            body: payload
+            body: JSON.stringify({ noteId: parseInt(noteId), username, canEdit })
         });
 
         if (response.ok) {
-            alert("Nota partilhada com sucesso!");
             bootstrap.Modal.getInstance(document.getElementById("shareModal")).hide();
+            alert("Nota partilhada com sucesso!");
         } else {
-            const error = await response.json();
-            alert(error.message ?? "Erro ao partilhar");
+            const err = await response.json();
+            alert(err.message || "Erro ao partilhar nota.");
         }
     });
 
+    <!-- Carrega as notas quando a página termina de carregar -->
     document.addEventListener("DOMContentLoaded", () => {
         loadNotes();
     });

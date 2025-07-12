@@ -1,26 +1,35 @@
 ﻿@{
-    Layout = "_Layout";
-    ViewData["Title"] = "Página Inicial";
+    Layout = "_Layout";  // Define o layout padrão da página
+    ViewData["Title"] = "Página Inicial";  // Define o título da página
 }
 
+<!-- Container principal centrado verticalmente -->
 <div class="container py-5 d-flex flex-column justify-content-center align-items-center" style="min-height: 85vh;">
-    <h1 class="display-4 fw-bold text-primary text-center mb-3">Bem-vindo ao <span class="text-dark">BlocoNotas</span></h1>
 
+    <!-- Cabeçalho principal -->
+    <h1 class="display-4 fw-bold text-primary text-center mb-3">
+        Bem-vindo ao <span class="text-dark">BlocoNotas</span>
+    </h1>
+
+    <!-- Descrição breve da aplicação -->
     <p class="lead text-secondary text-center mb-5">
         Organize as suas ideias, tarefas e notas com simplicidade e segurança.
     </p>
 
+    <!-- Linha com duas colunas: Acesso e Funcionalidades -->
     <div class="row w-100 justify-content-center g-4">
 
-        <!-- Acesso -->
+        <!-- Seção de Acesso -->
         <div class="col-md-5">
             <div class="card shadow-sm h-100 border-0">
                 <div class="card-body text-center">
                     <h5 class="card-title mb-4">Acesso</h5>
                     <div class="d-grid gap-3">
+                        <!-- Botão para página de login -->
                         <a class="btn btn-outline-success btn-lg" asp-controller="Home" asp-action="Login">
                             Iniciar Sessão
                         </a>
+                        <!-- Botão para página de registo -->
                         <a class="btn btn-success btn-lg" asp-controller="Home" asp-action="Register">
                             Criar Conta
                         </a>
@@ -29,29 +38,32 @@
             </div>
         </div>
 
-        <!-- Funcionalidades -->
+        <!-- Seção de Funcionalidades -->
         <div class="col-md-5">
             <div class="card shadow-sm h-100 border-0">
                 <div class="card-body text-center">
                     <h5 class="card-title mb-4">Funcionalidades</h5>
 
-                    <!-- Linha com 2 botões lado a lado -->
+                    <!-- Linha com dois botões lado a lado -->
                     <div class="row g-3 mb-2">
                         <div class="col-md-6">
+                            <!-- Botão para a lista de Notas -->
                             <a class="btn btn-outline-primary btn-lg w-100" asp-controller="Notes" asp-action="Index">
                                 📝 Notas
                             </a>
                         </div>
                         <div class="col-md-6">
+                            <!-- Botão para notas partilhadas -->
                             <a class="btn btn-outline-primary btn-lg w-100" asp-controller="NoteShares" asp-action="Index">
                                 🤝 Notas Partilhadas
                             </a>
                         </div>
                     </div>
 
-                    <!-- Linha com botão a ocupar toda a largura -->
+                    <!-- Linha com botão que ocupa toda a largura -->
                     <div class="row">
                         <div class="col">
+                            <!-- Botão para gerir utilizadores -->
                             <a class="btn btn-outline-dark btn-lg w-100" asp-controller="Users" asp-action="Index">
                                 ⚙️ Gerir Utilizadores
                             </a>
@@ -62,5 +74,4 @@
             </div>
         </div>
     </div>
-
-    </div>
+</div>
