@@ -91,6 +91,15 @@
         } else {
             const error = await response.json();
             errorDiv.classList.remove("d-none");
+
+            if (response.status === 400) {
+                errorDiv.innerText = "Dados inválidos. Verifique os campos.";
+            } else if (response.status === 409) {
+                errorDiv.innerText = "Email ou utilizador já existe.";
+            } else {
+                errorDiv.innerText = error.message || "Erro ao registar.";
+            }
+            
             if (error.errors && Array.isArray(error.errors)) {
                 errorDiv.innerText = error.errors.join(", ");
             } else {

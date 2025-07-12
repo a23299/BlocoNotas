@@ -56,6 +56,8 @@
 
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
         e.preventDefault();
+        
+        
 
         const response = await fetch("/api/auth/login", {
             method: "POST",
@@ -78,7 +80,14 @@
         } else {
             const error = await response.json();
             errorDiv.classList.remove("d-none");
-            errorDiv.innerText = error.message || "Erro ao fazer login";
+            
+            if (response.status === 400) {
+                errorDiv.innerText = "Credenciais inválidas. Verifique o email e a password.";
+            } else if (response.status === 404) {
+                errorDiv.innerText = "Utilizador não encontrado.";
+            } else {
+                errorDiv.innerText = error.message || "Erro ao fazer login.";
+            }
         }
     });
 </script>
