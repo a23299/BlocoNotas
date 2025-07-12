@@ -1,26 +1,26 @@
 @model BlocoNotas.Models.Tag
 
 @{
-    ViewData["Title"] = "Criar Tag";
+    ViewData["Title"] = "Criar Tag"; <!-- Define o título da página -->
 }
 
 <div class="container py-5 d-flex justify-content-center">
     <div class="col-md-6">
         <div class="card shadow border-0">
             <div class="card-body">
-                <h2 class="card-title mb-4 text-primary text-center">🏷️ Criar Nova Tag</h2>
+                <h2 class="card-title mb-4 text-primary text-center">🏷️ Criar Nova Tag</h2> <!-- Título do formulário -->
 
-                <div id="alertArea"></div>
+                <div id="alertArea"></div> <!-- Área para exibir mensagens de alerta -->
 
-                <form id="tagForm">
+                <form id="tagForm"> <!-- Formulário para criar uma nova tag -->
                     <div class="mb-3">
-                        <label for="tagName" class="form-label">Nome da Tag</label>
-                        <input type="text" class="form-control" id="tagName" name="name" required />
+                        <label for="tagName" class="form-label">Nome da Tag</label> <!-- Label para o input da tag -->
+                        <input type="text" class="form-control" id="tagName" name="name" required /> <!-- Input obrigatório para o nome da tag -->
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="/Tags" class="btn btn-outline-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-success">Guardar Tag</button>
+                        <a href="/Tags" class="btn btn-outline-secondary">Cancelar</a> <!-- Botão para cancelar e voltar à lista de tags -->
+                        <button type="submit" class="btn btn-success">Guardar Tag</button> <!-- Botão para submeter o formulário -->
                     </div>
                 </form>
             </div>
@@ -30,29 +30,32 @@
 
 @section Scripts {
     <script>
+        // Evento para capturar o envio do formulário
         document.getElementById("tagForm").addEventListener("submit", async function (e) {
-            e.preventDefault();
+            e.preventDefault(); // Evita o envio tradicional do formulário
 
-            const name = document.getElementById("tagName").value;
-            const token = localStorage.getItem("token");
+            const name = document.getElementById("tagName").value; // Obtém o valor do input do nome da tag
+            const token = localStorage.getItem("token"); // Obtém o token JWT do armazenamento local para autenticação
 
+            // Envia requisição POST para a API de tags
             const response = await fetch("/api/TagsApi", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Content-Type": "application/json", // Indica que o corpo da requisição é JSON
+                    "Authorization": `Bearer ${token}` // Cabeçalho de autorização com token JWT
                 },
-                body: JSON.stringify({ name })
+                body: JSON.stringify({ name }) // Envia o nome da tag no corpo da requisição
             });
 
             if (response.ok) {
-                window.location.href = "/Tags";
+                window.location.href = "/Tags"; // Se sucesso, redireciona para a página de lista de tags
             } else {
-                const data = await response.json();
-                showAlert("danger", data.message ?? "Erro ao criar a tag.");
+                const data = await response.json(); // Lê a resposta de erro da API
+                showAlert("danger", data.message ?? "Erro ao criar a tag."); // Mostra alerta de erro
             }
         });
 
+        // Função para mostrar alertas dinâmicos na página
         function showAlert(type, message) {
             const alertArea = document.getElementById("alertArea");
             alertArea.innerHTML = `

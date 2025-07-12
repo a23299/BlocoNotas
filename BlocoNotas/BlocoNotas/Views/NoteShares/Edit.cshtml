@@ -1,37 +1,43 @@
 @model BlocoNotas.Models.Note
-
 @{
-    ViewData["Title"] = "Editar Nota";
+    ViewData["Title"] = "Editar Nota"; <!-- Define o título da página -->
 }
 
 <div class="container py-4">
+    <!-- Título da página, usando o título definido no ViewData -->
     <h2>@ViewData["Title"]</h2>
 
+    <!-- Formulário para edição da nota -->
     <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+        <!-- Campo oculto para enviar o ID da nota -->
         <input type="hidden" asp-for="NoteId" />
 
+        <!-- Campo para o título da nota -->
         <div class="mb-3">
-            <label asp-for="Title" class="form-label"></label>
-            <input asp-for="Title" class="form-control" required />
-            <span asp-validation-for="Title" class="text-danger"></span>
+            <label asp-for="Title" class="form-label"></label> <!-- Label ligado à propriedade Title -->
+            <input asp-for="Title" class="form-control" required /> <!-- Input para o título, obrigatório -->
+            <span asp-validation-for="Title" class="text-danger"></span> <!-- Mensagem de validação para o título -->
         </div>
 
+        <!-- Campo para o conteúdo da nota -->
         <div class="mb-3">
-            <label asp-for="Content" class="form-label"></label>
-            <textarea asp-for="Content" class="form-control" rows="6"></textarea>
-            <span asp-validation-for="Content" class="text-danger"></span>
+            <label asp-for="Content" class="form-label"></label> <!-- Label ligado à propriedade Content -->
+            <textarea asp-for="Content" class="form-control" rows="6"></textarea> <!-- Textarea para o conteúdo -->
+            <span asp-validation-for="Content" class="text-danger"></span> <!-- Mensagem de validação para o conteúdo -->
         </div>
 
+        <!-- Botões para submeter o formulário ou cancelar a edição -->
         <button type="submit" class="btn btn-success me-2">Guardar</button>
         <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 
 @section Scripts {
+    <!-- Inclusão parcial dos scripts de validação client-side do ASP.NET Core -->
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
-        // Bootstrap 5 client-side validation example
+        <!-- Script para ativar a validação client-side do Bootstrap -->
         (function () {
             'use strict';
             const forms = document.querySelectorAll('.needs-validation');

@@ -1,45 +1,46 @@
 @model BlocoNotas.Models.ApplicationUser
 
 @{
-    ViewData["Title"] = "Editar Utilizador";
+    ViewData["Title"] = "Editar Utilizador"; <!-- Define o título da página -->
 }
 
 <div class="container py-5 d-flex justify-content-center">
     <div class="card shadow-sm border-0" style="max-width: 480px; width: 100%;">
         <div class="card-body">
-            <h2 class="card-title text-center mb-4 text-primary fw-bold">@ViewData["Title"]</h2>
+            <h2 class="card-title text-center mb-4 text-primary fw-bold">@ViewData["Title"]</h2> <!-- Cabeçalho com o título -->
 
-            <div id="alertArea"></div>
+            <div id="alertArea"></div> <!-- Área para mostrar alertas -->
 
             <form id="editUserForm" class="needs-validation" novalidate>
-                <input type="hidden" id="UserId" value="@Model.Id" />
+                <!-- Formulário para editar utilizador -->
+                <input type="hidden" id="UserId" value="@Model.Id" /> <!-- Guarda o ID do utilizador -->
 
                 <div class="mb-3">
-                    <label for="username" class="form-label fw-semibold">Nome</label>
-                    <input type="text" class="form-control" id="username" required />
-                    <div class="invalid-feedback">Por favor insira o nome.</div>
+                    <label for="username" class="form-label fw-semibold">Nome</label> <!-- Label do campo Nome -->
+                    <input type="text" class="form-control" id="username" required /> <!-- Input para nome, obrigatório -->
+                    <div class="invalid-feedback">Por favor insira o nome.</div> <!-- Mensagem de validação -->
                 </div>
 
                 <div class="mb-3">
-                    <label for="email" class="form-label fw-semibold">Email</label>
-                    <input type="email" class="form-control" id="email" required />
-                    <div class="invalid-feedback">Por favor insira um email válido.</div>
+                    <label for="email" class="form-label fw-semibold">Email</label> <!-- Label do campo Email -->
+                    <input type="email" class="form-control" id="email" required /> <!-- Input para email, obrigatório -->
+                    <div class="invalid-feedback">Por favor insira um email válido.</div> <!-- Mensagem de validação -->
                 </div>
 
                 <div class="mb-4">
-                    <label for="password" class="form-label fw-semibold">Password</label>
+                    <label for="password" class="form-label fw-semibold">Password</label> <!-- Label do campo Password -->
                     <div class="input-group">
-                        <input type="password" class="form-control" id="password" />
+                        <input type="password" class="form-control" id="password" /> <!-- Input para password -->
                         <button type="button" class="btn btn-outline-secondary" id="togglePassword" title="Mostrar password">
-                            👁
+                            👁 <!-- Botão para mostrar/ocultar password -->
                         </button>
                     </div>
-                    <small class="form-text text-muted">Deixe em branco para manter a password atual.</small>
+                    <small class="form-text text-muted">Deixe em branco para manter a password atual.</small> <!-- Nota explicativa -->
                 </div>
 
                 <div class="d-flex justify-content-between">
-                    <a href="/Users/Index" class="btn btn-outline-secondary px-4">Cancelar</a>
-                    <button type="submit" class="btn btn-success px-4">💾 Guardar Alterações</button>
+                    <a href="/Users/Index" class="btn btn-outline-secondary px-4">Cancelar</a> <!-- Botão cancelar -->
+                    <button type="submit" class="btn btn-success px-4">💾 Guardar Alterações</button> <!-- Botão guardar -->
                 </div>
             </form>
         </div>
@@ -47,34 +48,39 @@
 </div>
 
 <script>
-    // Bootstrap validation
+    // Validação Bootstrap do formulário
     (() => {
         'use strict'
         const form = document.getElementById('editUserForm');
         form.addEventListener('submit', event => {
-            if (!form.checkValidity()) {
+            if (!form.checkValidity()) {  // Se o formulário não for válido
                 event.preventDefault();
                 event.stopPropagation();
             }
-            form.classList.add('was-validated');
+            form.classList.add('was-validated'); // Adiciona classe para feedback visual da validação
         }, false);
     })();
 
+    // Referências ao input de password e botão para mostrar/ocultar password
     const passwordInput = document.getElementById("password");
     const togglePasswordBtn = document.getElementById("togglePassword");
 
+    // Mostra a password ao pressionar o botão
     togglePasswordBtn.addEventListener("mousedown", () => {
         passwordInput.type = "text";
     });
 
+    // Volta a ocultar a password ao soltar o botão
     togglePasswordBtn.addEventListener("mouseup", () => {
         passwordInput.type = "password";
     });
 
+    // Também oculta a password se o mouse sair do botão
     togglePasswordBtn.addEventListener("mouseleave", () => {
         passwordInput.type = "password";
     });
 
+    // Código executado quando a página está carregada
     document.addEventListener("DOMContentLoaded", async () => {
         const userId = document.getElementById("UserId").value;
         const nameInput = document.getElementById("username");
@@ -82,6 +88,7 @@
         const token = localStorage.getItem("token");
 
         try {
+            // Busca os dados do utilizador da API
             const response = await fetch(`/api/UsersApi/${userId}`, {
                 headers: {
                     "Authorization": `Bearer ${token}`
@@ -91,29 +98,33 @@
             if (!response.ok) throw new Error("Erro ao carregar dados");
 
             const user = await response.json();
-            nameInput.value = user.userName;
-            emailInput.value = user.email;
+            nameInput.value = user.userName; // Preenche nome
+            emailInput.value = user.email;   // Preenche email
         } catch (err) {
-            showAlert("danger", "Erro: " + err.message);
+            showAlert("danger", "Erro: " + err.message); // Mostra erro se falhar
         }
 
+        // Evento para enviar formulário via AJAX
         document.getElementById("editUserForm").addEventListener("submit", async e => {
             e.preventDefault();
 
-            if (!e.target.checkValidity()) return;
+            if (!e.target.checkValidity()) return; // Não envia se inválido
 
+            // Prepara objeto atualizado
             const updatedUser = {
                 id: userId,
                 userName: nameInput.value,
                 email: emailInput.value
             };
 
+            // Se a password foi alterada, adiciona ao objeto
             const newPassword = passwordInput.value.trim();
             if (newPassword.length > 0) {
                 updatedUser.password = newPassword;
             }
 
             try {
+                // Envia atualização para a API
                 const res = await fetch(`/api/UsersApi/${userId}`, {
                     method: "PUT",
                     headers: {
@@ -124,19 +135,20 @@
                 });
 
                 if (res.ok) {
-                    showAlert("success", "Utilizador atualizado com sucesso.");
-                    form.classList.remove('was-validated');
-                    passwordInput.value = ""; // limpa password
+                    showAlert("success", "Utilizador atualizado com sucesso."); // Mensagem de sucesso
+                    form.classList.remove('was-validated'); // Remove validação visual
+                    passwordInput.value = ""; // Limpa o campo de password
                 } else {
                     const errText = await res.text();
-                    showAlert("danger", "Erro ao guardar: " + errText);
+                    showAlert("danger", "Erro ao guardar: " + errText); // Mostra erro na atualização
                 }
             } catch (err) {
-                showAlert("danger", "Erro: " + err.message);
+                showAlert("danger", "Erro: " + err.message); // Erro de exceção
             }
         });
     });
 
+    // Função para mostrar alertas na UI
     function showAlert(type, message) {
         const alertArea = document.getElementById("alertArea");
         alertArea.innerHTML = `

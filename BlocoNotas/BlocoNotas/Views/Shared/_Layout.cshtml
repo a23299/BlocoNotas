@@ -1,26 +1,31 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <title>@ViewData["Title"] - BlocoNotas</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/BlocoNotas.styles.css" asp-append-version="true"/>
+    <meta charset="utf-8"/> <!-- Define a codificação de caracteres para UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- Configura o viewport para responsividade -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- Bootstrap CSS via CDN -->
+    <title>@ViewData["Title"] - BlocoNotas</title> <!-- Título da página dinâmico via ViewData -->
+    <script type="importmap"></script> <!-- Placeholder para import map, caso necessário -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/> <!-- Bootstrap CSS local -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/> <!-- CSS customizado do site com versão para cache busting -->
+    <link rel="stylesheet" href="~/BlocoNotas.styles.css" asp-append-version="true"/> <!-- Estilos específicos do BlocoNotas -->
 </head>
 <body>
 <header>
+    <!-- Barra de navegação principal -->
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
         <div class="container-fluid">
+            <!-- Logo / Nome do site que linka para a página inicial -->
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">📝 BlocoNotas</a>
+            <!-- Botão para expandir menu em dispositivos pequenos -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
                     aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
+            <!-- Conteúdo do menu, que pode colapsar -->
             <div class="collapse navbar-collapse" id="navbarContent">
+                <!-- Lista de links de navegação principais -->
                 <ul class="navbar-nav me-auto mb-2 mb-sm-0">
                     <li class="nav-item">
                         <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
@@ -42,6 +47,7 @@
                     </li>
                 </ul>
 
+                <!-- Área para links de autenticação que será preenchida via JavaScript -->
                 <ul class="navbar-nav ms-auto" id="authLinks">
                     <!-- Links de autenticação serão adicionados por JS -->
                 </ul>
@@ -51,41 +57,49 @@
 </header>
 
 <div class="container">
+    <!-- Conteúdo principal da página -->
     <main role="main" class="pb-3">
-        @RenderBody()
+        @RenderBody() <!-- Renderiza o conteúdo específico da view -->
     </main>
 </div>
 
+<!-- Rodapé do site -->
 <footer class="border-top footer text-muted">
     <div class="container">
-        &copy; 2025 - BlocoNotas de Jorge Lavado a23037 e Pedro Martinho a23299 - <a asp-area="" asp-controller="Home" asp-action="Info">Informação</a>
+        &copy; 2025 - BlocoNotas de Jorge Lavado a23037 e Pedro Martinho a23299 - 
+        <a asp-area="" asp-controller="Home" asp-action="Info">Informação</a>
     </div>
 </footer>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
+
+<!-- Scripts JS locais -->
+<script src="~/lib/jquery/dist/jquery.min.js"></script> <!-- jQuery -->
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS -->
+<script src="~/js/site.js" asp-append-version="true"></script> <!-- Script customizado do site -->
 
 <script>
+    // Função para decodificar o payload de um token JWT
     function decodeTokenPayload(token) {
         try {
-            const payloadBase64 = token.split('.')[1];
-            const payloadJson = atob(payloadBase64);
-            return JSON.parse(payloadJson);
+            const payloadBase64 = token.split('.')[1]; // Extrai a segunda parte do token
+            const payloadJson = atob(payloadBase64); // Decodifica Base64 para JSON
+            return JSON.parse(payloadJson); // Converte string JSON em objeto
         } catch (e) {
-            return null;
+            return null; // Retorna null em caso de erro
         }
     }
 
+    // Função para renderizar os links de autenticação na navbar
     function renderNavbarAuthLinks() {
         const authLinks = document.getElementById("authLinks");
         authLinks.innerHTML = "";
 
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token"); // Obtém token armazenado localmente
 
         if (token) {
             const payload = decodeTokenPayload(token);
-            const username = payload?.unique_name || "Utilizador";
+            const username = payload?.unique_name || "Utilizador"; // Obtém o nome do utilizador do token
 
+            // Renderiza dropdown com opções para utilizador autenticado
             authLinks.innerHTML = `
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
@@ -99,12 +113,14 @@
                 </li>
             `;
 
+            // Evento para logout: remove token e redireciona para página inicial
             document.getElementById("logoutBtn").addEventListener("click", function (e) {
                 e.preventDefault();
                 localStorage.removeItem("token");
                 window.location.href = "/Home/Index";
             });
         } else {
+            // Renderiza links de login e registo para utilizadores não autenticados
             authLinks.innerHTML = `
                 <li class="nav-item">
                     <a class="nav-link text-white" href="/Home/LogIn">Login</a>
@@ -116,9 +132,10 @@
         }
     }
 
+    // Executa a função quando o DOM estiver completamente carregado
     document.addEventListener("DOMContentLoaded", renderNavbarAuthLinks);
 </script>
 
-@await RenderSectionAsync("Scripts", required: false)
+@await RenderSectionAsync("Scripts", required: false) <!-- Permite incluir scripts adicionais nas views -->
 </body>
 </html>

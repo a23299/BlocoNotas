@@ -1,24 +1,24 @@
 @model IEnumerable<BlocoNotas.Models.ApplicationUser>
 
 @{
-    ViewData["Title"] = "Lista de Utilizadores";
+    ViewData["Title"] = "Lista de Utilizadores"; <!-- Define o título da página -->
 }
 
 <div class="container mt-5">
-    <h2 class="mb-4 text-primary border-bottom pb-2">Lista de Utilizadores</h2>
+    <h2 class="mb-4 text-primary border-bottom pb-2">Lista de Utilizadores</h2> <!-- Cabeçalho principal -->
 
     <div class="table-responsive shadow-sm rounded">
         <table class="table table-hover align-middle mb-0" id="usersTable">
             <thead class="table-primary text-primary">
             <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Email</th>
-                <th class="text-center">Ações</th>
+                <th>ID</th> <!-- Coluna do ID do utilizador -->
+                <th>Nome</th> <!-- Coluna do nome do utilizador -->
+                <th>Email</th> <!-- Coluna do email -->
+                <th class="text-center">Ações</th> <!-- Coluna para botões de ação -->
             </tr>
             </thead>
             <tbody>
-            <!-- Linhas geradas via JS -->
+            <!-- Linhas da tabela geradas dinamicamente via JavaScript -->
             </tbody>
         </table>
     </div>
@@ -27,15 +27,17 @@
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
         const tableBody = document.querySelector("#usersTable tbody");
-        const token = localStorage.getItem("token");
-        const roles = JSON.parse(localStorage.getItem("roles") || "[]");
+        const token = localStorage.getItem("token"); <!-- Obtém token de autenticação do armazenamento local -->
+        const roles = JSON.parse(localStorage.getItem("roles") || "[]"); <!-- Obtém roles do utilizador logado -->
 
         if (!token) {
+            <!-- Caso não haja token, mostra mensagem de erro -->
             tableBody.innerHTML = `<tr><td colspan="4" class="text-danger text-center">Necessita fazer login para ver esta página.</td></tr>`;
             return;
         }
 
         try {
+            <!-- Faz requisição à API para obter lista de utilizadores -->
             const response = await fetch("/api/UsersApi", {
                 headers: {
                     "Authorization": `Bearer ${token}`
@@ -43,52 +45,54 @@
             });
 
             if (response.status === 401) {
+                <!-- Se não autorizado, mostra mensagem e pede login -->
                 tableBody.innerHTML = `<tr><td colspan="4" class="text-danger text-center">Não autorizado. Faça login novamente.</td></tr>`;
                 return;
             }
 
-            if (!response.ok) throw new Error("Erro ao carregar utilizadores");
+            if (!response.ok) throw new Error("Erro ao carregar utilizadores"); <!-- Se erro geral, lança exceção -->
 
             const users = await response.json();
-            const isAdmin = roles.includes("Admin");
+            const isAdmin = roles.includes("Admin"); <!-- Verifica se o utilizador atual é Admin -->
 
-            tableBody.innerHTML = ""; // limpa
+            tableBody.innerHTML = ""; <!-- Limpa o conteúdo da tabela antes de preencher -->
 
             users.forEach(user => {
-                const userIsAdmin = (user.roles || []).includes("Admin");
-                const canPromote = isAdmin && !userIsAdmin;
+                const userIsAdmin = (user.roles || []).includes("Admin"); <!-- Verifica se o utilizador listado é Admin -->
+                const canPromote = isAdmin && !userIsAdmin; <!-- Só pode promover se for admin e o utilizador não for admin -->
 
                 const row = document.createElement("tr");
 
                 row.innerHTML = `
-                    <td class="text-truncate" style="max-width:120px;">${user.id}</td>
-                    <td>${user.userName}</td>
-                    <td>${user.email}</td>
-<td class="text-center" style="white-space: nowrap;">
-    <a href="/Users/Edit/${user.id}" class="btn btn-sm btn-outline-primary me-1" title="Editar Utilizador">
-        <i class="bi bi-pencil me-1"></i> ✏️ Editar
-    </a>
-    <a href="/Users/Details/${user.id}" class="btn btn-sm btn-outline-info me-1" title="Detalhes">
-        <i class="bi bi-info-circle me-1"></i> ⚙️ Detalhes
-    </a>
-    <button class="btn btn-sm btn-outline-danger me-1" title="Eliminar Utilizador" onclick="deleteUser('${user.id}')">
-        <i class="bi bi-trash me-1"></i> 🗑️ Eliminar
-    </button>
-    ${canPromote ? `<button class="btn btn-sm btn-warning" title="Dar permissões de Admin" onclick="promoteToAdmin('${user.id}')">
-        <i class="bi bi-shield-lock me-1"></i> Dar Admin
-    </button>` : ''}
-</td>
-
+                    <td class="text-truncate" style="max-width:120px;">${user.id}</td> <!-- ID do utilizador -->
+                    <td>${user.userName}</td> <!-- Nome do utilizador -->
+                    <td>${user.email}</td> <!-- Email do utilizador -->
+                    <td class="text-center" style="white-space: nowrap;"> <!-- Coluna de ações -->
+                        <a href="/Users/Edit/${user.id}" class="btn btn-sm btn-outline-primary me-1" title="Editar Utilizador">
+                            <i class="bi bi-pencil me-1"></i> ✏️ Editar
+                        </a>
+                        <a href="/Users/Details/${user.id}" class="btn btn-sm btn-outline-info me-1" title="Detalhes">
+                            <i class="bi bi-info-circle me-1"></i> ⚙️ Detalhes
+                        </a>
+                        <button class="btn btn-sm btn-outline-danger me-1" title="Eliminar Utilizador" onclick="deleteUser('${user.id}')">
+                            <i class="bi bi-trash me-1"></i> 🗑️ Eliminar
+                        </button>
+                        ${canPromote ? `<button class="btn btn-sm btn-warning" title="Dar permissões de Admin" onclick="promoteToAdmin('${user.id}')">
+                            <i class="bi bi-shield-lock me-1"></i> Dar Admin
+                        </button>` : ''}
+                    </td>
                 `;
 
-                tableBody.appendChild(row);
+                tableBody.appendChild(row); <!-- Adiciona a linha na tabela -->
             });
 
         } catch (error) {
+            <!-- Mostra mensagem de erro caso a requisição falhe -->
             tableBody.innerHTML = `<tr><td colspan="4" class="text-danger text-center">${error.message}</td></tr>`;
         }
     });
 
+    // Função para eliminar utilizador após confirmação
     async function deleteUser(id) {
         if (!confirm("Tem a certeza que quer eliminar este utilizador?")) return;
 
@@ -103,15 +107,16 @@
             });
 
             if (res.ok) {
-                location.reload();
+                location.reload(); <!-- Recarrega a página para atualizar lista -->
             } else {
-                alert("Erro ao eliminar utilizador");
+                alert("Erro ao eliminar utilizador"); <!-- Mostra erro se falhar -->
             }
         } catch (err) {
-            alert("Erro: " + err.message);
+            alert("Erro: " + err.message); <!-- Mostra erro da exceção -->
         }
     }
 
+    // Função para promover utilizador a Admin após confirmação
     async function promoteToAdmin(userId) {
         const token = localStorage.getItem("token");
 
@@ -126,14 +131,14 @@
             });
 
             if (res.ok) {
-                alert("Utilizador promovido a Admin com sucesso!");
-                location.reload();
+                alert("Utilizador promovido a Admin com sucesso!"); <!-- Confirmação de sucesso -->
+                location.reload(); <!-- Recarrega a página para atualizar -->
             } else {
                 const error = await res.json();
-                alert("Erro: " + (error.message || JSON.stringify(error)));
+                alert("Erro: " + (error.message || JSON.stringify(error))); <!-- Mensagem de erro detalhada -->
             }
         } catch (err) {
-            alert("Erro: " + err.message);
+            alert("Erro: " + err.message); <!-- Mostra erro da exceção -->
         }
     }
 </script>

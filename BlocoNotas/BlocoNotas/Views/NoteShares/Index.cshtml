@@ -1,28 +1,31 @@
 @{
-    Layout = "_Layout";
-    ViewData["Title"] = "Notas Partilhadas Comigo";
+    Layout = "_Layout"; <!-- Define o layout da página -->
+    ViewData["Title"] = "Notas Partilhadas Comigo"; <!-- Define o título da página -->
 }
 
 <div class="container py-5">
+    <!-- Título principal da página -->
     <h1 class="mb-4 text-primary">@ViewData["Title"]</h1>
 
     <div id="sharedNotesList" class="row gy-4">
-
-        <!-- Modal: Remover Partilha -->
+        <!-- Modal para confirmar remoção da partilha da nota -->
         <div class="modal fade" id="removeShareModal" tabindex="-1" aria-labelledby="removeShareModalLabel"
              aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
+                    <!-- Cabeçalho do modal com título e botão fechar -->
                     <div class="modal-header bg-danger text-white">
                         <h5 class="modal-title" id="removeShareModalLabel">Remover Partilha</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                 aria-label="Fechar"></button>
                     </div>
+                    <!-- Corpo do modal com mensagem de confirmação -->
                     <div class="modal-body">
                         <p class="mb-0">Tem a certeza que deseja remover o acesso a esta nota partilhada? Esta ação não
                             afeta o autor da nota.</p>
-                        <input type="hidden" id="noteIdToRemove">
+                        <input type="hidden" id="noteIdToRemove"> <!-- Campo oculto para armazenar o ID da nota -->
                     </div>
+                    <!-- Rodapé do modal com botões Cancelar e Remover -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-danger" onclick="confirmRemoveShare()">Remover</button>
@@ -30,33 +33,15 @@
                 </div>
             </div>
         </div>
-        <!-- Notas partilhadas carregadas aqui -->
+        <!-- Aqui as notas partilhadas são carregadas dinamicamente -->
     </div>
 </div>
 
 <script>
-    const sharedNotesApi = "/api/NoteSharesApi/shared-with-me";
-    const token = localStorage.getItem("token");
+    const sharedNotesApi = "/api/NoteSharesApi/shared-with-me"; <!-- URL da API para obter notas partilhadas -->
+    const token = localStorage.getItem("token"); <!-- Token de autenticação armazenado localmente -->
 
-
-    // Função que remove a partilha da nota (para quem recebeu a partilha)
-    async function openRemoveShareModal(noteId) {
-        if (!confirm("Tem a certeza que deseja remover o acesso a esta nota?")) return;
-
-        const response = await fetch(`/api/NoteSharesApi/remove-my-access/${noteId}`, {
-            method: "DELETE",
-            headers: getAuthHeaders()
-        });
-
-        if (response.ok) {
-            alert("Acesso removido com sucesso.");
-            loadSharedNotes(); // atualiza a lista
-        } else {
-            const error = await response.json();
-            alert(error.message ?? "Erro ao remover acesso à nota.");
-        }
-    }
-
+    <!-- Função que obtém os headers de autenticação para as chamadas API -->
     function getAuthHeaders() {
         const headers = {"Content-Type": "application/json"};
         if (token) {
@@ -65,6 +50,7 @@
         return headers;
     }
 
+    <!-- Função que carrega as notas partilhadas e atualiza a interface -->
     async function loadSharedNotes() {
         const response = await fetch(sharedNotesApi, {headers: getAuthHeaders()});
         const list = document.getElementById("sharedNotesList");
@@ -106,20 +92,20 @@
                             <p class="card-text text-muted small">🕒 Atualizada em ${note.updatedAt ? new Date(note.updatedAt).toLocaleString() : 'N/A'}</p>
                             <p class="card-text flex-grow-1">${escapeHtml(note.content?.substring(0, 100) ?? "")}${note.content?.length > 100 ? "..." : ""}</p>
                             <p class="card-text"><small><strong>De:</strong> ${escapeHtml(note.user?.userName ?? "Desconhecido")}</small></p>
-<div class="mt-auto d-flex justify-content-start align-items-center">
-    ${actionsHtml}
-</div>
+                            <div class="mt-auto d-flex justify-content-start align-items-center">
+                                ${actionsHtml}
+                            </div>
                             ${tagsHtml}
                         </div>
                     </div>
                 </div>
-                
             `;
         });
 
         list.innerHTML = markup;
     }
 
+    <!-- Função para escapar caracteres especiais em HTML para evitar XSS -->
     function escapeHtml(text) {
         if (!text) return "";
         return text
@@ -131,5 +117,24 @@
             .replace(/`/g, "&#96;");
     }
 
+    <!-- Função que abre o modal para confirmar remoção da partilha e chama a API para remover -->
+    async function openRemoveShareModal(noteId) {
+        if (!confirm("Tem a certeza que deseja remover o acesso a esta nota?")) return;
+
+        const response = await fetch(`/api/NoteSharesApi/remove-my-access/${noteId}`, {
+            method: "DELETE",
+            headers: getAuthHeaders()
+        });
+
+        if (response.ok) {
+            alert("Acesso removido com sucesso.");
+            loadSharedNotes(); // Recarrega a lista após remoção
+        } else {
+            const error = await response.json();
+            alert(error.message ?? "Erro ao remover acesso à nota.");
+        }
+    }
+
+    <!-- Executa a função para carregar as notas quando o documento estiver pronto -->
     document.addEventListener("DOMContentLoaded", loadSharedNotes);
 </script>

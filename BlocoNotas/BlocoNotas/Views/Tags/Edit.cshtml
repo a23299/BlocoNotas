@@ -1,28 +1,28 @@
 @model BlocoNotas.Models.Tag
 
 @{
-    ViewData["Title"] = "Editar Tag";
+    ViewData["Title"] = "Editar Tag"; <!-- Define o título da página como "Editar Tag" -->
 }
 
 <div class="container py-5 d-flex justify-content-center">
     <div class="col-md-6">
         <div class="card shadow border-0">
             <div class="card-body">
-                <h2 class="card-title mb-4 text-primary text-center">✏️ Editar Tag</h2>
+                <h2 class="card-title mb-4 text-primary text-center">✏️ Editar Tag</h2> <!-- Título do formulário -->
 
-                <div id="alertArea"></div>
+                <div id="alertArea"></div> <!-- Área para mostrar alertas de sucesso ou erro -->
 
-                <form id="tagForm">
-                    <input type="hidden" id="tagId" value="@Model.TagId" />
+                <form id="tagForm"> <!-- Formulário para editar a tag -->
+                    <input type="hidden" id="tagId" value="@Model.TagId" /> <!-- Guarda o ID da tag para envio -->
 
                     <div class="mb-3">
-                        <label for="tagName" class="form-label">Nome da Tag</label>
-                        <input type="text" class="form-control" id="tagName" value="@Model.Name" required />
+                        <label for="tagName" class="form-label">Nome da Tag</label> <!-- Label do campo nome -->
+                        <input type="text" class="form-control" id="tagName" value="@Model.Name" required /> <!-- Campo para editar o nome da tag, preenchido com o valor atual -->
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="/Tags" class="btn btn-outline-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-success">Guardar Alterações</button>
+                        <a href="/Tags" class="btn btn-outline-secondary">Cancelar</a> <!-- Link para cancelar e voltar à lista de tags -->
+                        <button type="submit" class="btn btn-success">Guardar Alterações</button> <!-- Botão para submeter as alterações -->
                     </div>
                 </form>
             </div>
@@ -32,30 +32,33 @@
 
 @section Scripts {
     <script>
+        // Evento para capturar o envio do formulário e tratar via AJAX
         document.getElementById("tagForm").addEventListener("submit", async function (e) {
-            e.preventDefault();
+            e.preventDefault(); // Previne o comportamento padrão de envio
 
-            const tagId = document.getElementById("tagId").value;
-            const name = document.getElementById("tagName").value;
-            const token = localStorage.getItem("token");
+            const tagId = document.getElementById("tagId").value; // Obtém o ID da tag
+            const name = document.getElementById("tagName").value; // Obtém o nome atualizado
+            const token = localStorage.getItem("token"); // Obtém token JWT para autenticação
 
+            // Envia requisição PUT para atualizar a tag na API
             const response = await fetch(`/api/TagsApi/${tagId}`, {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Content-Type": "application/json", // Corpo no formato JSON
+                    "Authorization": `Bearer ${token}` // Token de autenticação
                 },
-                body: JSON.stringify({ tagId: tagId, name: name })
+                body: JSON.stringify({ tagId: tagId, name: name }) // Dados enviados no corpo da requisição
             });
 
             if (response.ok) {
-                window.location.href = "/Tags";
+                window.location.href = "/Tags"; // Se sucesso, redireciona para a lista de tags
             } else {
-                const data = await response.json();
-                showAlert("danger", data.message ?? "Erro ao editar a tag.");
+                const data = await response.json(); // Captura erro da resposta
+                showAlert("danger", data.message ?? "Erro ao editar a tag."); // Mostra alerta de erro
             }
         });
 
+        // Função para mostrar alertas dinâmicos na página
         function showAlert(type, message) {
             const alertArea = document.getElementById("alertArea");
             alertArea.innerHTML = `

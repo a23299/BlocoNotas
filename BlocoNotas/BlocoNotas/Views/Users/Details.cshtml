@@ -1,29 +1,33 @@
 @model BlocoNotas.Models.ApplicationUser
 
 @{
-    ViewData["Title"] = "Detalhes do Utilizador";
+    ViewData["Title"] = "Detalhes do Utilizador"; <!-- Define o título da página -->
 }
 
 <div class="container py-4">
-    <h2 class="text-primary mb-4">Detalhes do Utilizador</h2>
+    <h2 class="text-primary mb-4">Detalhes do Utilizador</h2> <!-- Cabeçalho principal da página -->
 
     <dl class="row bg-white p-4 rounded shadow-sm">
-        <dt class="col-sm-3 fw-semibold">Nome</dt>
-        <dd class="col-sm-9">@Model.UserName</dd>
+        <!-- Definição da lista de detalhes do utilizador -->
 
-        <dt class="col-sm-3 fw-semibold">Email</dt>
-        <dd class="col-sm-9">@Model.Email</dd>
+        <dt class="col-sm-3 fw-semibold">Nome</dt> <!-- Título do detalhe: Nome -->
+        <dd class="col-sm-9">@Model.UserName</dd> <!-- Valor do nome do utilizador -->
 
-        <dt class="col-sm-3 fw-semibold">Data de criação</dt>
-        <dd class="col-sm-9">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+        <dt class="col-sm-3 fw-semibold">Email</dt> <!-- Título do detalhe: Email -->
+        <dd class="col-sm-9">@Model.Email</dd> <!-- Valor do email do utilizador -->
+
+        <dt class="col-sm-3 fw-semibold">Data de criação</dt> <!-- Título do detalhe: Data de criação -->
+        <dd class="col-sm-9">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd> <!-- Valor formatado da data de criação -->
     </dl>
 
     <div class="mt-4">
+        <!-- Botões para ações relacionadas ao utilizador -->
+
         <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary me-2">
-            ✏️ Editar
+            ✏️ Editar <!-- Link para editar o utilizador -->
         </a>
         <a asp-action="Index" class="btn btn-outline-secondary">
-            🔙 Voltar à lista
+            🔙 Voltar à lista <!-- Link para voltar à lista de utilizadores -->
         </a>
     </div>
 </div>
