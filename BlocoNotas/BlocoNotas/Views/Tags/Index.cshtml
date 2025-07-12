@@ -2,131 +2,75 @@
     ViewData["Title"] = "Tags";
 }
 
-<h1 class="mb-4">Tags</h1>
+<div class="container py-4">
+    <h2 class="mb-4 text-primary">🏷️ Lista de Tags</h2>
 
-<div class="mb-3">
-    <button class="btn btn-success" onclick="openCreateTagModal()">+ Nova Tag</button>
-</div>
+    <div class="mb-3">
+        <a href="/Tags/Create" class="btn btn-success">+ Nova Tag</a>
+    </div>
 
-<div id="tagList" class="row gy-3"></div>
-
-<!-- ✅ Modal: Criar/Editar Tag -->
-<div class="modal fade" id="tagFormModal" tabindex="-1" aria-labelledby="tagFormModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="tagForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="tagFormModalLabel">Nova Tag</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="tagId">
-                    <div class="mb-3">
-                        <label for="tagName" class="form-label">Nome da Tag</label>
-                        <input type="text" class="form-control" id="tagName" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Guardar</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                </div>
-            </form>
-        </div>
+    <div id="tagList" class="row gy-3">
+        <!-- Carregamento dinâmico -->
     </div>
 </div>
 
-<script>
-    const tagsApiUrl = "/api/TagsApi";
-    const token = localStorage.getItem("token");
+@section Scripts {
+    <script>
+        const tagsApiUrl = "/api/TagsApi";
+        const token = localStorage.getItem("token");
 
-    function getAuthHeaders() {
-        const headers = { "Content-Type": "application/json" };
-        if (token) headers["Authorization"] = `Bearer ${token}`;
-        return headers;
-    }
-
-    async function loadTags() {
-        const res = await fetch(`${tagsApiUrl}/all`, { headers: getAuthHeaders() });
-        const tags = await res.json();
-        const list = document.getElementById("tagList");
-
-        list.innerHTML = "";
-
-        if (tags.length === 0) {
-            list.innerHTML = "<p>Nenhuma tag encontrada.</p>";
-            return;
+        function getAuthHeaders() {
+            const headers = { "Content-Type": "application/json" };
+            if (token) headers["Authorization"] = `Bearer ${token}`;
+            return headers;
         }
 
-        for (const tag of tags) {
-            list.innerHTML += `
+        async function loadTags() {
+            const res = await fetch(`${tagsApiUrl}/all`, { headers: getAuthHeaders() });
+            const tags = await res.json();
+            const list = document.getElementById("tagList");
+
+            list.innerHTML = "";
+
+            if (tags.length === 0) {
+                list.innerHTML = "<p class='text-muted fst-italic'>😕 Nenhuma tag encontrada.</p>";
+                return;
+            }
+
+            for (const tag of tags) {
+                list.innerHTML += `
                 <div class="col-md-4 col-lg-3">
-                    <div class="card shadow h-100">
+                    <div class="card shadow-sm h-100">
                         <div class="card-body d-flex justify-content-between align-items-center">
-                            <span class="fw-bold">${tag.name}</span>
+                            <span class="fw-bold">🏷️ ${tag.name}</span>
                             <div>
-                                <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditTagModal(${tag.tagId}, '${tag.name}')">Editar</button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTag(${tag.tagId})">Eliminar</button>
+                                <a href="/Tags/Edit/${tag.tagId}" class="btn btn-sm btn-outline-primary me-1">✏️ Editar</a>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTag(${tag.tagId})">🗑️ Eliminar</button>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
-        }
-    }
-
-    function openCreateTagModal() {
-        document.getElementById("tagId").value = "";
-        document.getElementById("tagName").value = "";
-        document.getElementById("tagFormModalLabel").innerText = "Nova Tag";
-        new bootstrap.Modal(document.getElementById("tagFormModal")).show();
-    }
-
-    function openEditTagModal(id, name) {
-        document.getElementById("tagId").value = id;
-        document.getElementById("tagName").value = name;
-        document.getElementById("tagFormModalLabel").innerText = "Editar Tag";
-        new bootstrap.Modal(document.getElementById("tagFormModal")).show();
-    }
-
-    document.getElementById("tagForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
-
-        const id = document.getElementById("tagId").value;
-        const name = document.getElementById("tagName").value;
-
-        const payload = JSON.stringify({ tagId: id, name });
-
-        if (id) {
-            await fetch(`${tagsApiUrl}/${id}`, {
-                method: "PUT",
-                headers: getAuthHeaders(),
-                body: payload
-            });
-        } else {
-            await fetch(tagsApiUrl, {
-                method: "POST",
-                headers: getAuthHeaders(),
-                body: payload
-            });
+            }
         }
 
-        bootstrap.Modal.getInstance(document.getElementById("tagFormModal")).hide();
-        loadTags();
-    });
+        async function deleteTag(id) {
+            if (!confirm("❗ Tens a certeza que queres eliminar esta tag?")) return;
 
-    async function deleteTag(id) {
-        if (!confirm("Tens a certeza que queres eliminar esta tag?")) return;
+            const res = await fetch(`${tagsApiUrl}/${id}`, {
+                method: "DELETE",
+                headers: getAuthHeaders()
+            });
 
-        const res = await fetch(`${tagsApiUrl}/${id}`, {
-            method: "DELETE",
-            headers: getAuthHeaders()
+            if (res.ok) {
+                loadTags();
+            } else {
+                alert("⚠️ Erro ao eliminar tag.");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadTags();
         });
-
-        if (res.ok) loadTags();
-        else alert("Erro ao eliminar tag");
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        loadTags();
-    });
-</script>
+    </script>
+}

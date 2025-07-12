@@ -1,40 +1,69 @@
 @model BlocoNotas.Models.Tag
 
 @{
-    ViewData["Title"] = "Edit Tag";
+    ViewData["Title"] = "Editar Tag";
 }
 
-<!DOCTYPE html>
+<div class="container py-5 d-flex justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow border-0">
+            <div class="card-body">
+                <h2 class="card-title mb-4 text-primary text-center">✏️ Editar Tag</h2>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Edit</title>
-</head>
-<body>
+                <div id="alertArea"></div>
 
-<h4>Tag</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="TagId" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <form id="tagForm">
+                    <input type="hidden" id="tagId" value="@Model.TagId" />
+
+                    <div class="mb-3">
+                        <label for="tagName" class="form-label">Nome da Tag</label>
+                        <input type="text" class="form-control" id="tagName" value="@Model.Name" required />
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="/Tags" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success">Guardar Alterações</button>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    <script>
+        document.getElementById("tagForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
 
-</body>
-</html>
+            const tagId = document.getElementById("tagId").value;
+            const name = document.getElementById("tagName").value;
+            const token = localStorage.getItem("token");
+
+            const response = await fetch(`/api/TagsApi/${tagId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ tagId: tagId, name: name })
+            });
+
+            if (response.ok) {
+                window.location.href = "/Tags";
+            } else {
+                const data = await response.json();
+                showAlert("danger", data.message ?? "Erro ao editar a tag.");
+            }
+        });
+
+        function showAlert(type, message) {
+            const alertArea = document.getElementById("alertArea");
+            alertArea.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            </div>
+        `;
+        }
+    </script>
+}

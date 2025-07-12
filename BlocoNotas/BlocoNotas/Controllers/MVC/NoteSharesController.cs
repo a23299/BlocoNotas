@@ -213,7 +213,7 @@ public class NoteSharesController : Controller
         }
 
         // Only allow editing CanEdit permission
-        return View(noteShare);
+        return View();
     }
 
     // POST: NoteShares/Edit/5
@@ -258,7 +258,7 @@ public class NoteSharesController : Controller
             return RedirectToAction(nameof(Index));
         }
         
-        return View(existingShare);
+        return View();
     }
 
     // GET: NoteShares/Delete/5
