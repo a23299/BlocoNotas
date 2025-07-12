@@ -1,25 +1,38 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using BlocoNotas.Models;
 
-namespace BlocoNotas.Models;
-public class NoteTag
+namespace BlocoNotas.Models
 {
     /// <summary>
-    /// Nota que tem a tag
+    /// Representa a relação entre uma Nota e uma Tag (etiqueta).
+    /// Esta classe funciona como tabela de ligação (join table) entre Note e Tag.
     /// </summary>
-    [Required]
-    [ForeignKey(nameof(Note))]
-    public int NoteTagFK { get; set; }
-    [JsonIgnore]
-    public Note Note { get; set; }
-    
-    /// <summary>
-    /// Tag que está na Nota
-    /// </summary>
-    [Required]
-    [ForeignKey(nameof(Tag))]
-    public int TagFK { get; set; }
-    public Tag Tag { get; set; }
+    public class NoteTag
+    {
+        /// <summary>
+        /// Chave estrangeira para a Nota associada a esta relação.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(Note))]
+        public int NoteTagFK { get; set; }
+
+        /// <summary>
+        /// A Nota associada a esta relação.
+        /// </summary>
+        [JsonIgnore]
+        public Note Note { get; set; }
+        
+        /// <summary>
+        /// Chave estrangeira para a Tag associada a esta relação.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(Tag))]
+        public int TagFK { get; set; }
+
+        /// <summary>
+        /// A Tag associada a esta relação.
+        /// </summary>
+        public Tag Tag { get; set; }
+    }
 }

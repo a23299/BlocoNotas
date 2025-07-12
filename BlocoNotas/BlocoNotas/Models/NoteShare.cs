@@ -1,40 +1,50 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
-namespace BlocoNotas.Models;
-public class NoteShare
+namespace BlocoNotas.Models
 {
     /// <summary>
-    /// ID do partilhar da Nota
+    /// Representa uma partilha de uma nota com um utilizador específico, incluindo permissões.
     /// </summary>
-    public int NoteShareId { get; set; }
-    
-    /// <summary>
-    /// Nota partilhada
-    /// </summary>
-    [Required]
-    
-    [ForeignKey(nameof(Note))]
-    public int NoteId { get; set; }
-    public Note Note { get; set; }
-    
-    /// <summary>
-    /// User que a Nota foi partilhada
-    /// </summary>
-    [Required]
-    [ForeignKey(nameof(SharedWithUser))]
-    
-    public string UserShareFK { get; set; }
-    public ApplicationUser SharedWithUser { get; set; }
-    
-    /// <summary>
-    /// Quando a Nota foi partilhada
-    /// </summary>
-    public DateTime SharedAt { get; set; } = DateTime.Now;
-    
-    /// <summary>
-    /// Se o User que a Nota foi partilhada pode-a modificar
-    /// </summary>
-    public bool CanEdit { get; set; } = false;
+    public class NoteShare
+    {
+        /// <summary>
+        /// Identificador único da partilha da nota.
+        /// </summary>
+        public int NoteShareId { get; set; }
+        
+        /// <summary>
+        /// Identificador da nota que está a ser partilhada.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(Note))]
+        public int NoteId { get; set; }
+
+        /// <summary>
+        /// Referência à nota que está a ser partilhada.
+        /// </summary>
+        public Note Note { get; set; }
+        
+        /// <summary>
+        /// Identificador do utilizador com quem a nota foi partilhada.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(SharedWithUser))]
+        public string UserShareFK { get; set; }
+
+        /// <summary>
+        /// Referência ao utilizador com quem a nota foi partilhada.
+        /// </summary>
+        public ApplicationUser SharedWithUser { get; set; }
+        
+        /// <summary>
+        /// Data e hora em que a nota foi partilhada.
+        /// </summary>
+        public DateTime SharedAt { get; set; } = DateTime.Now;
+        
+        /// <summary>
+        /// Indica se o utilizador com quem a nota foi partilhada tem permissão para editar a nota.
+        /// </summary>
+        public bool CanEdit { get; set; } = false;
+    }
 }
