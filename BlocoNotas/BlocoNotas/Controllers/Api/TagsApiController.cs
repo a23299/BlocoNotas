@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using BlocoNotas.Data;
 using BlocoNotas.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlocoNotas.Controllers.Api;
 
+/// <summary>
+/// Controller API para gerenciar operações relacionadas a Tags.
+/// </summary>
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/[controller]")]
@@ -19,18 +18,24 @@ public class TagsApiController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
 
+    /// <summary>
+    /// Construtor que recebe o contexto do banco de dados.
+    /// </summary>
+    /// <param name="context">Contexto do banco de dados.</param>
     public TagsApiController(ApplicationDbContext context)
     {
         _context = context;
     }
 
-    // GET: api/TagsApi
+    /// <summary>
+    /// Obtém todas as tags associadas a pelo menos uma nota do usuário atual.
+    /// </summary>
+    /// <returns>Lista de tags do usuário.</returns>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Tag>>> GetTags()
     {
         var userId = GetCurrentUserId();
         
-        // Busca todas as tags que estão associadas a pelo menos uma nota do usuário atual
         var tags = await _context.Tags
             .Where(t => t.NoteTags.Any(nt => nt.Note.UserFK == userId && !nt.Note.IsDeleted))
             .OrderBy(t => t.Name)
@@ -39,12 +44,13 @@ public class TagsApiController : ControllerBase
         return tags;
     }
 
-    // GET: api/TagsApi/all
+    /// <summary>
+    /// Obtém todas as tags existentes no sistema.
+    /// </summary>
+    /// <returns>Lista completa de tags.</returns>
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<Tag>>> GetAllTags()
     {
-        // Busca todas as tags disponíveis no sistema
-        // Isso é útil quando o usuário quer associar uma tag existente a uma nota
         var tags = await _context.Tags
             .OrderBy(t => t.Name)
             .ToListAsync();
@@ -52,7 +58,11 @@ public class TagsApiController : ControllerBase
         return tags;
     }
 
-    // GET: api/TagsApi/5
+    /// <summary>
+    /// Obtém uma tag pelo seu ID.
+    /// </summary>
+    /// <param name="id">ID da tag.</param>
+    /// <returns>Tag encontrada ou NotFound.</returns>
     [HttpGet("{id}")]
     public async Task<ActionResult<Tag>> GetTag(int id)
     {
@@ -67,13 +77,16 @@ public class TagsApiController : ControllerBase
         return tag;
     }
 
-    // GET: api/TagsApi/5/notes
+    /// <summary>
+    /// Obtém as notas associadas a uma tag específica para o usuário atual.
+    /// </summary>
+    /// <param name="id">ID da tag.</param>
+    /// <returns>Lista de notas associadas.</returns>
     [HttpGet("{id}/notes")]
     public async Task<ActionResult<IEnumerable<Note>>> GetNotesByTag(int id)
     {
         var userId = GetCurrentUserId();
         
-        // Verifica se a tag existe
         var tag = await _context.Tags
             .FirstOrDefaultAsync(t => t.TagId == id);
             
@@ -82,7 +95,6 @@ public class TagsApiController : ControllerBase
             return NotFound();
         }
         
-        // Busca as notas do usuário atual que têm essa tag
         var notes = await _context.Notes
             .Where(n => n.UserFK == userId && !n.IsDeleted)
             .Where(n => n.NoteTags.Any(nt => nt.TagFK == id))
@@ -92,11 +104,14 @@ public class TagsApiController : ControllerBase
         return notes;
     }
 
-    // POST: api/TagsApi
+    /// <summary>
+    /// Cria uma nova tag.
+    /// </summary>
+    /// <param name="tag">Objeto Tag com os dados da nova tag.</param>
+    /// <returns>Tag criada ou erro se nome já existir.</returns>
     [HttpPost]
     public async Task<ActionResult<Tag>> CreateTag(Tag tag)
     {
-        // Verifica se já existe uma tag com o mesmo nome
         if (await _context.Tags.AnyAsync(t => t.Name == tag.Name))
         {
             return BadRequest(new { message = "Já existe uma tag com este nome" });
@@ -108,7 +123,12 @@ public class TagsApiController : ControllerBase
         return CreatedAtAction(nameof(GetTag), new { id = tag.TagId }, tag);
     }
 
-    // PUT: api/TagsApi/5
+    /// <summary>
+    /// Atualiza o nome de uma tag existente.
+    /// </summary>
+    /// <param name="id">ID da tag a ser atualizada.</param>
+    /// <param name="tag">Objeto Tag com os novos dados.</param>
+    /// <returns>Status da operação.</returns>
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateTag(int id, Tag tag)
     {
@@ -125,13 +145,11 @@ public class TagsApiController : ControllerBase
             return NotFound();
         }
 
-        // Verifica se já existe outra tag com o mesmo nome
         if (await _context.Tags.AnyAsync(t => t.Name == tag.Name && t.TagId != id))
         {
             return BadRequest(new { message = "Já existe uma tag com este nome" });
         }
 
-        // Atualiza apenas o nome da tag
         existingTag.Name = tag.Name;
 
         try
@@ -150,7 +168,11 @@ public class TagsApiController : ControllerBase
         return NoContent();
     }
 
-    // DELETE: api/TagsApi/5
+    /// <summary>
+    /// Remove uma tag pelo seu ID, incluindo suas associações com notas.
+    /// </summary>
+    /// <param name="id">ID da tag a ser removida.</param>
+    /// <returns>Status da operação.</returns>
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTag(int id)
     {
@@ -162,11 +184,6 @@ public class TagsApiController : ControllerBase
             return NotFound();
         }
 
-        // Verificar se é seguro deletar (se outras pessoas usam)
-        // Aqui você pode decidir se permite a exclusão apenas se nenhuma nota estiver usando a tag
-        // ou sempre permite excluir
-
-        // Remover todas as associações NoteTags antes de remover a tag
         var noteTags = await _context.NoteTags
             .Where(nt => nt.TagFK == id)
             .ToListAsync();
@@ -178,14 +195,17 @@ public class TagsApiController : ControllerBase
         return NoContent();
     }
 
-    // POST: api/TagsApi/notes
+    /// <summary>
+    /// Associa uma tag a uma nota, se o usuário tiver permissão.
+    /// </summary>
+    /// <param name="request">Objeto contendo NoteId e TagId para associação.</param>
+    /// <returns>Status da operação.</returns>
     [HttpPost("notes")]
     public async Task<IActionResult> AddTagToNote([FromBody] NoteTagRequest request)
     {
         var userId = GetCurrentUserId();
         var isAdmin = User.IsInRole("Admin");
 
-        // Verifica se a nota existe e se o utilizador pode aceder a ela (admin ou dono)
         var note = await _context.Notes
             .FirstOrDefaultAsync(n => n.NoteId == request.NoteId && !n.IsDeleted && (isAdmin || n.UserFK == userId));
 
@@ -194,7 +214,6 @@ public class TagsApiController : ControllerBase
             return NotFound(new { message = "Nota não encontrada ou sem permissão." });
         }
 
-        // Verifica se a tag existe
         var tag = await _context.Tags
             .FirstOrDefaultAsync(t => t.TagId == request.TagId);
 
@@ -203,13 +222,11 @@ public class TagsApiController : ControllerBase
             return NotFound(new { message = "Tag não encontrada" });
         }
 
-        // Verifica se a associação já existe
         if (await _context.NoteTags.AnyAsync(nt => nt.NoteTagFK == request.NoteId && nt.TagFK == request.TagId))
         {
             return BadRequest(new { message = "Esta tag já está associada à nota" });
         }
 
-        // Cria a associação
         var noteTag = new NoteTag
         {
             NoteTagFK = request.NoteId,
@@ -218,7 +235,6 @@ public class TagsApiController : ControllerBase
 
         _context.NoteTags.Add(noteTag);
 
-        // Atualiza a data de atualização da nota
         note.UpdatedAt = DateTime.Now;
 
         await _context.SaveChangesAsync();
@@ -226,14 +242,17 @@ public class TagsApiController : ControllerBase
         return NoContent();
     }
     
-    // DELETE: api/TagsApi/notes
+    /// <summary>
+    /// Remove a associação entre uma tag e uma nota, respeitando permissões.
+    /// </summary>
+    /// <param name="request">Objeto contendo NoteId e TagId para remoção da associação.</param>
+    /// <returns>Status da operação.</returns>
     [HttpDelete("notes")]
     public async Task<IActionResult> RemoveTagFromNote([FromBody] NoteTagRequest request)
     {
         var userId = GetCurrentUserId();
         var isAdmin = User.IsInRole("Admin");
 
-        // ✅ Admin pode remover tags de qualquer nota, user só da sua
         var note = await _context.Notes
             .FirstOrDefaultAsync(n => n.NoteId == request.NoteId && !n.IsDeleted && (isAdmin || n.UserFK == userId));
 
@@ -242,7 +261,6 @@ public class TagsApiController : ControllerBase
             return NotFound(new { message = "Nota não encontrada ou sem permissão." });
         }
 
-        // Busca a associação
         var noteTag = await _context.NoteTags
             .FirstOrDefaultAsync(nt => nt.NoteTagFK == request.NoteId && nt.TagFK == request.TagId);
 
@@ -253,7 +271,6 @@ public class TagsApiController : ControllerBase
 
         _context.NoteTags.Remove(noteTag);
 
-        // Atualiza a data de atualização da nota
         note.UpdatedAt = DateTime.Now;
 
         await _context.SaveChangesAsync();
@@ -261,19 +278,38 @@ public class TagsApiController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Verifica se uma tag existe pelo seu ID.
+    /// </summary>
+    /// <param name="id">ID da tag.</param>
+    /// <returns>True se existir, false caso contrário.</returns>
     private bool TagExists(int id)
     {
         return _context.Tags.Any(t => t.TagId == id);
     }
 
+    /// <summary>
+    /// Obtém o ID do usuário atual autenticado.
+    /// </summary>
+    /// <returns>ID do usuário ou string vazia se não encontrado.</returns>
     private string GetCurrentUserId()
     {
         return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
     }
 }
 
+/// <summary>
+/// Modelo para requisições de associação/desassociação entre notas e tags.
+/// </summary>
 public class NoteTagRequest
 {
+    /// <summary>
+    /// ID da nota.
+    /// </summary>
     public int NoteId { get; set; }
+
+    /// <summary>
+    /// ID da tag.
+    /// </summary>
     public int TagId { get; set; }
 }
