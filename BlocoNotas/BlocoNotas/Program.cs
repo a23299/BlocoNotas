@@ -3,6 +3,7 @@ using BlocoNotas.Models;
 using BlocoNotas.ApiEmail.Entities;
 using BlocoNotas.ApiEmail.Services;
 using BlocoNotas.Services;
+using BlocoNotas.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSingleton<ISendEmail, SendEmail>();
 
-// MVC com Views
-builder.Services.AddControllersWithViews();
+// Razor Pages para Aplicação Web
+builder.Services.AddRazorPages();
+// Signal R para tempo real
+builder.Services.AddSignalR();
 
 // Configurar DbContext com SQLite
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -165,7 +168,7 @@ async Task CreateAdminUser(IServiceProvider serviceProvider)
 if (!app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 else
@@ -185,10 +188,7 @@ app.UseAuthorization();
 app.MapStaticAssets();
 
 app.MapControllers();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+app.MapRazorPages();
+app.MapHub<NoteHub>("/noteHub");
 
 app.Run();

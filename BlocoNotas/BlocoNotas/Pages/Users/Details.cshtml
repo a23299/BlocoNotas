@@ -1,0 +1,25 @@
+@page
+@model BlocoNotas.Pages.Users.DetailsModel
+@{
+    ViewData["Title"] = "Detalhes do Utilizador";
+}
+
+<div class="container py-4">
+    <h2 class="text-primary mb-4">Detalhes do Utilizador</h2>
+
+    <dl class="row bg-white p-4 rounded shadow-sm">
+        <dt class="col-sm-3 fw-semibold">Nome</dt>
+        <dd class="col-sm-9">@Model.AppUser.UserName</dd>
+
+        <dt class="col-sm-3 fw-semibold">Email</dt>
+        <dd class="col-sm-9">@Model.AppUser.Email</dd>
+
+        <dt class="col-sm-3 fw-semibold">Data de criação</dt>
+        <dd class="col-sm-9">@Model.AppUser.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+    </dl>
+
+    <div class="mt-4">
+        <a asp-page="Edit" asp-route-id="@Model.AppUser.Id" class="btn btn-outline-primary me-2">Editar</a>
+        <a asp-page="Index" class="btn btn-outline-secondary">Voltar à lista</a>
+    </div>
+</div>

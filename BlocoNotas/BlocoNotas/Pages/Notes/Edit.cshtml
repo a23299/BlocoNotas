@@ -1,0 +1,67 @@
+@page
+@model BlocoNotas.Pages.Notes.EditModel
+@{
+    ViewData["Title"] = "Editar Nota";
+}
+
+<div class="container py-5 d-flex justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="card-title text-primary mb-4 text-center">Editar Nota</h2>
+
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Note.NoteId" />
+
+                    <div class="mb-3">
+                        <label asp-for="Note.Title" class="form-label"></label>
+                        <input asp-for="Note.Title" class="form-control" required />
+                        <span asp-validation-for="Note.Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Note.Content" class="form-label"></label>
+                        <textarea asp-for="Note.Content" class="form-control" rows="6"></textarea>
+                        <span asp-validation-for="Note.Content" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tags</label>
+                        <div>
+                            @if (Model.AvailableTags.Count > 0)
+                            {
+                                @foreach (var tag in Model.AvailableTags)
+                                {
+                                    var isChecked = Model.SelectedTagIds.Contains(tag.TagId);
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input"
+                                               name="SelectedTagIds" value="@tag.TagId"
+                                               id="tag_@tag.TagId"
+                                               checked="@isChecked"
+                                               disabled />
+                                        <label class="form-check-label" for="tag_@tag.TagId">@tag.Name</label>
+                                    </div>
+                                }
+                                <small class="text-muted d-block">As tags são geridas na página de Tags.</small>
+                            }
+                            else
+                            {
+                                <p class="text-muted small">Nenhuma tag disponível. <a asp-page="/Tags/Create">Criar tags</a></p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-page="Index" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success">Guardar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
