@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using BlocoNotas.ApiEmail.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,15 +13,18 @@ namespace BlocoNotas.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
+        private readonly ISendEmail _sendEmail;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ILogger<RegisterModel> logger)
+            ILogger<RegisterModel> logger,
+            ISendEmail sendEmail)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _sendEmail = sendEmail;
         }
 
         [BindProperty]
@@ -79,6 +83,20 @@ namespace BlocoNotas.Areas.Identity.Pages.Account
                     _logger.LogInformation("User created a new account with password.");
 
                     await _userManager.AddToRoleAsync(user, "Utilizador");
+
+                    try
+                    {
+                        await _sendEmail.SendEmailAsync(
+                            user.Email,
+                            "Conta criada com sucesso",
+                            $"Olá {user.UserName}, a tua conta foi criada com sucesso no BlocoNotas."
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Erro ao enviar email de boas-vindas");
+                    }
+
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return LocalRedirect(returnUrl);
                 }
