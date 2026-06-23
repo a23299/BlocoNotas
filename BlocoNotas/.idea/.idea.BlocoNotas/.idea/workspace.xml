@@ -15,9 +15,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34c51b77-e315-4e17-8789-ff16993d1094" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.BlocoNotas/.idea/indexLayout.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.BlocoNotas/.idea/projectSettingsUpdater.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.BlocoNotas/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.BlocoNotas/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlocoNotas/Areas/Identity/Pages/Account/Register.cshtml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BlocoNotas/Areas/Identity/Pages/Account/Register.cshtml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlocoNotas/Pages/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/BlocoNotas/Pages/Index.cshtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlocoNotas/Pages/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/BlocoNotas/Pages/Shared/_Layout.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlocoNotas/bloconotas.db" beforeDir="false" afterPath="$PROJECT_DIR$/BlocoNotas/bloconotas.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,6 +113,7 @@
       <updated>1781466738867</updated>
       <workItem from="1781466740434" duration="2711000" />
       <workItem from="1782176183907" duration="1260000" />
+      <workItem from="1782177997487" duration="309000" />
     </task>
     <servers />
   </component>
