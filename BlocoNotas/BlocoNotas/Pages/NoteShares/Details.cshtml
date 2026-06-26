@@ -1,0 +1,39 @@
+@page
+@model BlocoNotas.Pages.NoteShares.DetailsModel
+@{
+    ViewData["Title"] = "Nota Partilhada";
+}
+
+<div class="container py-5 d-flex justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h2 class="card-title text-primary mb-0">@Model.Note.Title</h2>
+                    @if (Model.CanEdit)
+                    {
+                        <a asp-page="/Notes/Edit" asp-route-id="@Model.Note.NoteId"
+                           class="btn btn-sm btn-outline-primary">Editar</a>
+                    }
+                </div>
+
+                <p class="text-muted small">
+                    Partilhada por: <strong>@Model.SharedByUserName</strong>
+                </p>
+                <p class="text-muted small">
+                    Última atualização: @Model.Note.UpdatedAt.ToString("dd/MM/yyyy HH:mm")
+                </p>
+
+                <hr />
+
+                <div class="mt-3">
+                    <p class="card-text" style="white-space: pre-wrap;">@Model.Note.Content</p>
+                </div>
+
+                <div class="mt-4">
+                    <a asp-page="Index" class="btn btn-outline-secondary">Voltar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

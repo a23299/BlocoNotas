@@ -39,7 +39,8 @@ namespace BlocoNotas.Pages.Notes
         /// <summary>
         /// Lista de IDs das tags associadas à nota.
         /// </summary>
-        public IList<int> SelectedTagIds { get; set; } = new List<int>();
+        [BindProperty]
+        public List<int> SelectedTagIds { get; set; } = new();
 
         /// <summary>
         /// Endpoint GET. Obtém a nota e as tags disponíveis para edição.
@@ -56,19 +57,22 @@ namespace BlocoNotas.Pages.Notes
 
             if (Note == null) return NotFound();
 
-            AvailableTags = await _context.Tags.ToListAsync();
+            AvailableTags = await _context.Tags.OrderBy(t => t.Name).ToListAsync();
             SelectedTagIds = Note.NoteTags.Select(nt => nt.TagFK).ToList();
 
             return Page();
         }
 
         /// <summary>
-        /// Endpoint POST. Atualiza a nota e redireciona para a página inicial.
+        /// Endpoint POST. Atualiza a nota e as tags associadas, e redireciona para a página inicial.
         /// </summary>
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
+            {
+                AvailableTags = await _context.Tags.OrderBy(t => t.Name).ToListAsync();
                 return Page();
+            }
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var existingNote = await _context.Notes
@@ -81,9 +85,43 @@ namespace BlocoNotas.Pages.Notes
             existingNote.Content = Note.Content;
             existingNote.UpdatedAt = DateTime.Now;
 
+            SelectedTagIds ??= new List<int>();
+            var existingTagIds = existingNote.NoteTags.Select(nt => nt.TagFK).ToList();
+            var toRemove = existingNote.NoteTags.Where(nt => !SelectedTagIds.Contains(nt.TagFK)).ToList();
+            var toAdd = SelectedTagIds.Where(tid => !existingTagIds.Contains(tid)).ToList();
+
+            _context.NoteTags.RemoveRange(toRemove);
+            foreach (var tagId in toAdd)
+            {
+                _context.NoteTags.Add(new NoteTag { NoteTagFK = Note.NoteId, TagFK = tagId });
+            }
+
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
+        }
+
+        /// <summary>
+        /// Endpoint POST JSON para criar uma nova tag sem perder o estado do formulário.
+        /// </summary>
+        /// <param name="name">Nome da nova tag.</param>
+        public async Task<JsonResult> OnPostCreateTagJsonAsync(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return new JsonResult(new { error = "Nome obrigatório." }) { StatusCode = 400 };
+
+            var exists = await _context.Tags.AnyAsync(t => t.Name == name);
+            if (exists)
+            {
+                var existing = await _context.Tags.FirstAsync(t => t.Name == name);
+                return new JsonResult(new { id = existing.TagId, name = existing.Name });
+            }
+
+            var tag = new Tag { Name = name };
+            _context.Tags.Add(tag);
+            await _context.SaveChangesAsync();
+
+            return new JsonResult(new { id = tag.TagId, name = tag.Name });
         }
     }
 }

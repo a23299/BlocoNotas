@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using BlocoNotas.Data;
 using BlocoNotas.Models;
 
@@ -31,20 +32,35 @@ namespace BlocoNotas.Pages.Notes
         public Note Note { get; set; } = new();
 
         /// <summary>
+        /// Lista de todas as tags disponíveis para seleção.
+        /// </summary>
+        public IList<Tag> AvailableTags { get; set; } = new List<Tag>();
+
+        /// <summary>
+        /// IDs das tags selecionadas para associar à nota.
+        /// </summary>
+        [BindProperty]
+        public List<int> SelectedTagIds { get; set; } = new();
+
+        /// <summary>
         /// Endpoint GET. Apresenta a página de criação.
         /// </summary>
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet()
         {
+            AvailableTags = await _context.Tags.OrderBy(t => t.Name).ToListAsync();
             return Page();
         }
 
         /// <summary>
-        /// Endpoint POST. Cria uma nova nota e redireciona para a página inicial.
+        /// Endpoint POST. Cria uma nova nota e as associações de tags, e redireciona para a página inicial.
         /// </summary>
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
+            {
+                AvailableTags = await _context.Tags.OrderBy(t => t.Name).ToListAsync();
                 return Page();
+            }
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Note.UserFK = userId;
@@ -55,7 +71,36 @@ namespace BlocoNotas.Pages.Notes
             _context.Notes.Add(Note);
             await _context.SaveChangesAsync();
 
+            foreach (var tagId in SelectedTagIds)
+            {
+                _context.NoteTags.Add(new NoteTag { NoteTagFK = Note.NoteId, TagFK = tagId });
+            }
+            await _context.SaveChangesAsync();
+
             return RedirectToPage("./Index");
+        }
+
+        /// <summary>
+        /// Endpoint POST JSON para criar uma nova tag sem perder o estado do formulário.
+        /// </summary>
+        /// <param name="name">Nome da nova tag.</param>
+        public async Task<JsonResult> OnPostCreateTagJsonAsync(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return new JsonResult(new { error = "Nome obrigatório." }) { StatusCode = 400 };
+
+            var exists = await _context.Tags.AnyAsync(t => t.Name == name);
+            if (exists)
+            {
+                var existing = await _context.Tags.FirstAsync(t => t.Name == name);
+                return new JsonResult(new { id = existing.TagId, name = existing.Name });
+            }
+
+            var tag = new Tag { Name = name };
+            _context.Tags.Add(tag);
+            await _context.SaveChangesAsync();
+
+            return new JsonResult(new { id = tag.TagId, name = tag.Name });
         }
     }
 }

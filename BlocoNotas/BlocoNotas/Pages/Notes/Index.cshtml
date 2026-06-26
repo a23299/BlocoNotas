@@ -7,8 +7,17 @@
 <div class="container py-4">
     <h1 class="mb-4 text-primary">Notas</h1>
 
-    <div class="mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <a class="btn btn-success" asp-page="Create">+ Nova Nota</a>
+
+        <div class="d-flex align-items-center gap-2">
+            <label class="form-label mb-0 text-nowrap">Filtrar por tag:</label>
+            <select asp-for="SelectedTagId" asp-items="@(new SelectList(Model.AvailableTags, "TagId", "Name"))"
+                    class="form-select form-select-sm" style="width: auto;"
+                    onchange="window.location.href = '?SelectedTagId=' + (this.value || '')">
+                <option value="">Todas as tags</option>
+            </select>
+        </div>
     </div>
 
     <div class="row gy-4">
@@ -42,7 +51,32 @@
                             <a class="btn btn-sm btn-outline-primary" asp-page="Edit" asp-route-id="@note.NoteId">Editar</a>
                             <a class="btn btn-sm btn-outline-danger" asp-page="Delete" asp-route-id="@note.NoteId">Eliminar</a>
                             <a class="btn btn-sm btn-outline-info" asp-page="/NoteShares/Create" asp-route-noteId="@note.NoteId">Partilhar</a>
-                            <a class="btn btn-sm btn-outline-secondary" asp-page="/Tags/Index" asp-route-noteId="@note.NoteId">Tags</a>
+
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    Tag
+                                </button>
+                                <div class="dropdown-menu p-3" style="min-width: 200px;">
+                                    <form method="post" asp-page-handler="UpdateTags" asp-route-noteId="@note.NoteId"
+                                          class="tag-update-form">
+                                        @foreach (var tag in Model.AvailableTags)
+                                        {
+                                            var isChecked = note.NoteTags?.Any(nt => nt.TagFK == tag.TagId) ?? false;
+                                            <div class="form-check mb-1">
+                                                <input type="checkbox" class="form-check-input tag-checkbox"
+                                                       name="tagIds" value="@tag.TagId"
+                                                       id="tag_@(note.NoteId)_@tag.TagId"
+                                                       @(isChecked ? "checked" : "")
+                                                       onchange="this.form.submit()" />
+                                                <label class="form-check-label" for="tag_@(note.NoteId)_@tag.TagId">@tag.Name</label>
+                                            </div>
+                                        }
+                                        <hr class="my-2" />
+                                        <a asp-page="/Tags/Create" class="btn btn-sm btn-outline-success w-100">+ Criar tag</a>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

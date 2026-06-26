@@ -86,7 +86,7 @@
                                 </p>
                                 <p class="card-text flex-grow-1">@(note.Content?.Length > 100 ? note.Content[..100] + "..." : note.Content ?? "")</p>
                                 <div class="mt-auto">
-                                    <a asp-page="/Notes/Edit" asp-route-id="@note.NoteId" class="btn btn-sm btn-outline-primary me-1">Ver</a>
+                                    <a asp-page="/NoteShares/Details" asp-route-noteId="@note.NoteId" class="btn btn-sm btn-outline-primary me-1">Ver</a>
                                 </div>
                             </div>
                         </div>
