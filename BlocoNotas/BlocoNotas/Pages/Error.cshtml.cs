@@ -5,24 +5,24 @@ using System.Diagnostics;
 namespace BlocoNotas.Pages
 {
     /// <summary>
-    /// PageModel for displaying application errors.
+    /// PageModel para exibir erros da aplicação.
     /// </summary>
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     [IgnoreAntiforgeryToken]
     public class ErrorModel : PageModel
     {
         /// <summary>
-        /// Gets or sets the request ID for error tracking.
+        /// ID do pedido para rastreio de erros.
         /// </summary>
         public string? RequestId { get; set; }
 
         /// <summary>
-        /// Gets whether the request ID should be displayed.
+        /// Indica se o ID do pedido deve ser exibido.
         /// </summary>
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
         /// <summary>
-        /// Handles the GET request. Captures the current request trace identifier.
+        /// Endpoint GET. Captura o identificador do pedido atual.
         /// </summary>
         public void OnGet()
         {

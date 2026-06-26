@@ -8,7 +8,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Areas.Identity.Pages.Account
 {
     /// <summary>
-    /// PageModel for user login.
+    /// PageModel para autenticação de utilizadores.
     /// </summary>
     public class LoginModel : PageModel
     {
@@ -16,10 +16,10 @@ namespace BlocoNotas.Areas.Identity.Pages.Account
         private readonly ILogger<LoginModel> _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LoginModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="signInManager">The Identity sign-in manager.</param>
-        /// <param name="logger">The logger instance.</param>
+        /// <param name="signInManager">Gerenciador de autenticação.</param>
+        /// <param name="logger">Instância do logger.</param>
         public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger)
         {
             _signInManager = signInManager;
@@ -27,57 +27,57 @@ namespace BlocoNotas.Areas.Identity.Pages.Account
         }
 
         /// <summary>
-        /// Gets or sets the login input model.
+        /// Modelo de entrada do formulário de login.
         /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of external authentication schemes.
+        /// Lista de esquemas de autenticação externa.
         /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; } = new List<AuthenticationScheme>();
 
         /// <summary>
-        /// Gets or sets the return URL after login.
+        /// URL de retorno após o login.
         /// </summary>
         public string ReturnUrl { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the error message to display.
+        /// Mensagem de erro a exibir.
         /// </summary>
         [TempData]
         public string? ErrorMessage { get; set; }
 
         /// <summary>
-        /// Input model for the login form.
+        /// Modelo de entrada para o formulário de login.
         /// </summary>
         public class InputModel
         {
             /// <summary>
-            /// Gets or sets the email address.
+            /// Endereço de email.
             /// </summary>
             [Required(ErrorMessage = "O email é obrigatório.")]
             [EmailAddress(ErrorMessage = "Email inválido.")]
             public string Email { get; set; }
 
             /// <summary>
-            /// Gets or sets the password.
+            /// Password do utilizador.
             /// </summary>
             [Required(ErrorMessage = "A password é obrigatória.")]
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
             /// <summary>
-            /// Gets or sets whether to persist the login session.
+            /// Indica se a sessão deve ser persistida.
             /// </summary>
             [Display(Name = "Lembrar-me?")]
             public bool RememberMe { get; set; }
         }
 
         /// <summary>
-        /// Handles the GET request. Prepares the login page.
+        /// Endpoint GET. Prepara a página de login.
         /// </summary>
-        /// <param name="returnUrl">Optional return URL after login.</param>
+        /// <param name="returnUrl">URL opcional de retorno após o login.</param>
         public async Task OnGetAsync(string? returnUrl = null)
         {
             if (!string.IsNullOrEmpty(ErrorMessage))
@@ -95,9 +95,9 @@ namespace BlocoNotas.Areas.Identity.Pages.Account
         }
 
         /// <summary>
-        /// Handles the POST login request. Authenticates the user and redirects on success.
+        /// Endpoint POST de login. Autentica o utilizador e redireciona em caso de sucesso.
         /// </summary>
-        /// <param name="returnUrl">Optional return URL after login.</param>
+        /// <param name="returnUrl">URL opcional de retorno após o login.</param>
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");

@@ -8,7 +8,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.Notes
 {
     /// <summary>
-    /// PageModel for creating a new note.
+    /// PageModel para criar uma nova nota.
     /// </summary>
     [Authorize]
     public class CreateModel : PageModel
@@ -16,22 +16,22 @@ namespace BlocoNotas.Pages.Notes
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreateModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="context">The application database context.</param>
+        /// <param name="context">Contexto da base de dados.</param>
         public CreateModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Gets or sets the note being created.
+        /// Nota a ser criada.
         /// </summary>
         [BindProperty]
         public Note Note { get; set; } = new();
 
         /// <summary>
-        /// Handles the GET request. Returns the creation page.
+        /// Endpoint GET. Apresenta a página de criação.
         /// </summary>
         public IActionResult OnGet()
         {
@@ -39,7 +39,7 @@ namespace BlocoNotas.Pages.Notes
         }
 
         /// <summary>
-        /// Handles the POST request. Creates a new note and redirects to the index page.
+        /// Endpoint POST. Cria uma nova nota e redireciona para a página inicial.
         /// </summary>
         public async Task<IActionResult> OnPostAsync()
         {

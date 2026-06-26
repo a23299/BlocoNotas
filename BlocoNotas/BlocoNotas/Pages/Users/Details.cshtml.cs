@@ -8,7 +8,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.Users
 {
     /// <summary>
-    /// PageModel for viewing user details. Admin-only access.
+    /// PageModel para visualizar detalhes de um utilizador. Acesso apenas para administradores.
     /// </summary>
     [Authorize(Roles = "Admin")]
     public class DetailsModel : PageModel
@@ -16,23 +16,23 @@ namespace BlocoNotas.Pages.Users
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DetailsModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="context">The application database context.</param>
+        /// <param name="context">Contexto da base de dados.</param>
         public DetailsModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Gets or sets the user whose details are being viewed.
+        /// Utilizador cujos detalhes estão a ser visualizados.
         /// </summary>
         public ApplicationUser AppUser { get; set; } = new();
 
         /// <summary>
-        /// Handles the GET request. Loads the user details.
+        /// Endpoint GET. Obtém os detalhes do utilizador.
         /// </summary>
-        /// <param name="id">The ID of the user.</param>
+        /// <param name="id">ID do utilizador.</param>
         public async Task<IActionResult> OnGetAsync(string? id)
         {
             if (id == null) return NotFound();

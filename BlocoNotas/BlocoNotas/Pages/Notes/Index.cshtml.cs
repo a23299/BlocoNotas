@@ -9,7 +9,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.Notes
 {
     /// <summary>
-    /// PageModel for listing all notes belonging to the authenticated user.
+    /// PageModel para listar todas as notas do utilizador autenticado.
     /// </summary>
     [Authorize]
     public class IndexModel : PageModel
@@ -17,21 +17,21 @@ namespace BlocoNotas.Pages.Notes
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IndexModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="context">The application database context.</param>
+        /// <param name="context">Contexto da base de dados.</param>
         public IndexModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Gets or sets the list of notes for the current user.
+        /// Lista de notas do utilizador atual.
         /// </summary>
         public IList<Note> Notes { get; set; } = new List<Note>();
 
         /// <summary>
-        /// Handles the GET request. Loads all non-deleted notes for the current user.
+        /// Endpoint GET. Obtém todas as notas não eliminadas do utilizador atual.
         /// </summary>
         public async Task OnGetAsync()
         {

@@ -9,7 +9,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.Notes
 {
     /// <summary>
-    /// PageModel for deleting (soft delete) a note.
+    /// PageModel para eliminar (soft delete) uma nota.
     /// </summary>
     [Authorize]
     public class DeleteModel : PageModel
@@ -17,24 +17,24 @@ namespace BlocoNotas.Pages.Notes
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DeleteModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="context">The application database context.</param>
+        /// <param name="context">Contexto da base de dados.</param>
         public DeleteModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Gets or sets the note to be deleted.
+        /// Nota a ser eliminada.
         /// </summary>
         [BindProperty]
         public Note Note { get; set; } = new();
 
         /// <summary>
-        /// Handles the GET request. Loads the note data for deletion confirmation.
+        /// Endpoint GET. Obtém os dados da nota para confirmação de eliminação.
         /// </summary>
-        /// <param name="id">The ID of the note to delete.</param>
+        /// <param name="id">ID da nota a eliminar.</param>
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null) return NotFound();
@@ -50,9 +50,9 @@ namespace BlocoNotas.Pages.Notes
         }
 
         /// <summary>
-        /// Handles the POST request. Performs soft delete by setting IsDeleted flag.
+        /// Endpoint POST. Elimina logicamente a nota marcando o campo IsDeleted.
         /// </summary>
-        /// <param name="id">The ID of the note to delete.</param>
+        /// <param name="id">ID da nota a eliminar.</param>
         public async Task<IActionResult> OnPostAsync(int? id)
         {
             if (id == null) return NotFound();

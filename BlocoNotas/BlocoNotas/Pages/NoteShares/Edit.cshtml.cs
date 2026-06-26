@@ -9,7 +9,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.NoteShares
 {
     /// <summary>
-    /// PageModel for editing a note share's permissions.
+    /// PageModel para editar as permissões de uma partilha de nota.
     /// </summary>
     [Authorize]
     public class EditModel : PageModel
@@ -17,34 +17,34 @@ namespace BlocoNotas.Pages.NoteShares
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EditModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="context">The application database context.</param>
+        /// <param name="context">Contexto da base de dados.</param>
         public EditModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Gets or sets the note share being edited.
+        /// Partilha de nota a ser editada.
         /// </summary>
         [BindProperty]
         public NoteShare NoteShare { get; set; } = new();
 
         /// <summary>
-        /// Gets or sets the note title for display.
+        /// Título da nota para exibição.
         /// </summary>
         public string? NoteTitle { get; set; }
 
         /// <summary>
-        /// Gets or sets the shared-with user name for display.
+        /// Nome do utilizador com quem foi partilhado para exibição.
         /// </summary>
         public string? SharedWithUserName { get; set; }
 
         /// <summary>
-        /// Handles the GET request. Loads the share data for editing.
+        /// Endpoint GET. Obtém os dados da partilha para edição.
         /// </summary>
-        /// <param name="id">The ID of the share to edit.</param>
+        /// <param name="id">ID da partilha a editar.</param>
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null) return NotFound();
@@ -64,7 +64,7 @@ namespace BlocoNotas.Pages.NoteShares
         }
 
         /// <summary>
-        /// Handles the POST request. Updates the share's CanEdit permission.
+        /// Endpoint POST. Atualiza a permissão de edição da partilha.
         /// </summary>
         public async Task<IActionResult> OnPostAsync()
         {

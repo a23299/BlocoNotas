@@ -9,7 +9,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.NoteShares
 {
     /// <summary>
-    /// PageModel for viewing note shares (shared by me and shared with me).
+    /// PageModel para visualizar partilhas de notas (partilhadas por mim e comigo).
     /// </summary>
     [Authorize]
     public class IndexModel : PageModel
@@ -17,26 +17,26 @@ namespace BlocoNotas.Pages.NoteShares
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IndexModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="context">The application database context.</param>
+        /// <param name="context">Contexto da base de dados.</param>
         public IndexModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Gets or sets the list of notes shared by the current user.
+        /// Lista de notas partilhadas pelo utilizador atual.
         /// </summary>
         public IList<NoteShare> SharedByMe { get; set; } = new List<NoteShare>();
 
         /// <summary>
-        /// Gets or sets the list of notes shared with the current user.
+        /// Lista de notas partilhadas com o utilizador atual.
         /// </summary>
         public IList<Note> SharedWithMe { get; set; } = new List<Note>();
 
         /// <summary>
-        /// Handles the GET request. Loads shares by and with the current user.
+        /// Endpoint GET. Obtém as partilhas feitas e recebidas pelo utilizador atual.
         /// </summary>
         public async Task OnGetAsync()
         {
@@ -60,9 +60,9 @@ namespace BlocoNotas.Pages.NoteShares
         }
 
         /// <summary>
-        /// Handles POST delete request. Removes a share if the user is the owner or the recipient.
+        /// Endpoint POST de eliminação. Remove uma partilha se o utilizador for o proprietário ou o destinatário.
         /// </summary>
-        /// <param name="id">The ID of the share to delete.</param>
+        /// <param name="id">ID da partilha a eliminar.</param>
         public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

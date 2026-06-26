@@ -9,7 +9,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Areas.Identity.Pages.Account
 {
     /// <summary>
-    /// PageModel for user registration.
+    /// PageModel para registo de novos utilizadores.
     /// </summary>
     public class RegisterModel : PageModel
     {
@@ -19,12 +19,12 @@ namespace BlocoNotas.Areas.Identity.Pages.Account
         private readonly ISendEmail _sendEmail;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RegisterModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="userManager">The Identity user manager.</param>
-        /// <param name="signInManager">The Identity sign-in manager.</param>
-        /// <param name="logger">The logger instance.</param>
-        /// <param name="sendEmail">The email service for sending welcome emails.</param>
+        /// <param name="userManager">Gerenciador de utilizadores.</param>
+        /// <param name="signInManager">Gerenciador de autenticação.</param>
+        /// <param name="logger">Instância do logger.</param>
+        /// <param name="sendEmail">Serviço de email para envio de mensagens de boas-vindas.</param>
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
@@ -38,35 +38,35 @@ namespace BlocoNotas.Areas.Identity.Pages.Account
         }
 
         /// <summary>
-        /// Gets or sets the registration input model.
+        /// Modelo de entrada do formulário de registo.
         /// </summary>
         [BindProperty]
         public InputModel Input { get; set; } = new();
 
         /// <summary>
-        /// Gets or sets the return URL after registration.
+        /// URL de retorno após o registo.
         /// </summary>
         public string ReturnUrl { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the list of external authentication schemes.
+        /// Lista de esquemas de autenticação externa.
         /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; } = new List<AuthenticationScheme>();
 
         /// <summary>
-        /// Input model for the registration form.
+        /// Modelo de entrada para o formulário de registo.
         /// </summary>
         public class InputModel
         {
             /// <summary>
-            /// Gets or sets the username.
+            /// Nome de utilizador.
             /// </summary>
             [Required(ErrorMessage = "O nome de utilizador é obrigatório.")]
             [Display(Name = "Nome de Utilizador")]
             public string UserName { get; set; }
 
             /// <summary>
-            /// Gets or sets the email address.
+            /// Endereço de email.
             /// </summary>
             [Required(ErrorMessage = "O email é obrigatório.")]
             [EmailAddress(ErrorMessage = "Email inválido.")]
@@ -74,7 +74,7 @@ namespace BlocoNotas.Areas.Identity.Pages.Account
             public string Email { get; set; }
 
             /// <summary>
-            /// Gets or sets the password.
+            /// Password do utilizador.
             /// </summary>
             [Required(ErrorMessage = "A password é obrigatória.")]
             [StringLength(100, ErrorMessage = "A {0} deve ter pelo menos {2} e no máximo {1} caracteres.", MinimumLength = 6)]
@@ -83,7 +83,7 @@ namespace BlocoNotas.Areas.Identity.Pages.Account
             public string Password { get; set; }
 
             /// <summary>
-            /// Gets or sets the password confirmation.
+            /// Confirmação da password.
             /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirmar Password")]
@@ -92,9 +92,9 @@ namespace BlocoNotas.Areas.Identity.Pages.Account
         }
 
         /// <summary>
-        /// Handles the GET request. Prepares the registration page.
+        /// Endpoint GET. Prepara a página de registo.
         /// </summary>
-        /// <param name="returnUrl">Optional return URL after registration.</param>
+        /// <param name="returnUrl">URL opcional de retorno após o registo.</param>
         public async Task OnGetAsync(string? returnUrl = null)
         {
             ReturnUrl = returnUrl;
@@ -102,9 +102,9 @@ namespace BlocoNotas.Areas.Identity.Pages.Account
         }
 
         /// <summary>
-        /// Handles the POST registration request. Creates the user, sends a welcome email, and signs in.
+        /// Endpoint POST de registo. Cria o utilizador, envia email de boas-vindas e inicia sessão.
         /// </summary>
-        /// <param name="returnUrl">Optional return URL after registration.</param>
+        /// <param name="returnUrl">URL opcional de retorno após o registo.</param>
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");

@@ -7,7 +7,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.Users
 {
     /// <summary>
-    /// PageModel for editing a user's profile. Admin-only access.
+    /// PageModel para editar o perfil de um utilizador. Acesso apenas para administradores.
     /// </summary>
     [Authorize(Roles = "Admin")]
     public class EditModel : PageModel
@@ -15,50 +15,50 @@ namespace BlocoNotas.Pages.Users
         private readonly UserManager<ApplicationUser> _userManager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EditModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="userManager">The Identity user manager.</param>
+        /// <param name="userManager">Gerenciador de utilizadores.</param>
         public EditModel(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
         }
 
         /// <summary>
-        /// Gets or sets the input model for the edit form.
+        /// Modelo de entrada para o formulário de edição.
         /// </summary>
         [BindProperty]
         public InputModel Input { get; set; } = new();
 
         /// <summary>
-        /// Input model for the user edit form.
+        /// Modelo de entrada para o formulário de edição de utilizador.
         /// </summary>
         public class InputModel
         {
             /// <summary>
-            /// Gets or sets the user ID.
+            /// ID do utilizador.
             /// </summary>
             public string Id { get; set; } = string.Empty;
 
             /// <summary>
-            /// Gets or sets the username.
+            /// Nome de utilizador.
             /// </summary>
             public string UserName { get; set; } = string.Empty;
 
             /// <summary>
-            /// Gets or sets the email address.
+            /// Endereço de email.
             /// </summary>
             public string Email { get; set; } = string.Empty;
 
             /// <summary>
-            /// Gets or sets the optional new password.
+            /// Nova password opcional.
             /// </summary>
             public string? Password { get; set; }
         }
 
         /// <summary>
-        /// Handles the GET request. Loads the user data into the edit form.
+        /// Endpoint GET. Carrega os dados do utilizador no formulário de edição.
         /// </summary>
-        /// <param name="id">The ID of the user to edit.</param>
+        /// <param name="id">ID do utilizador a editar.</param>
         public async Task<IActionResult> OnGetAsync(string? id)
         {
             if (id == null) return NotFound();
@@ -77,7 +77,7 @@ namespace BlocoNotas.Pages.Users
         }
 
         /// <summary>
-        /// Handles the POST request. Updates the user's profile and optionally resets the password.
+        /// Endpoint POST. Atualiza o perfil do utilizador e opcionalmente redefine a password.
         /// </summary>
         public async Task<IActionResult> OnPostAsync()
         {

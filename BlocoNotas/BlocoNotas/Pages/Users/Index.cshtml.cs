@@ -9,7 +9,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.Users
 {
     /// <summary>
-    /// PageModel for listing, deleting, and promoting users. Admin-only access.
+    /// PageModel para listar, eliminar e promover utilizadores. Acesso apenas para administradores.
     /// </summary>
     [Authorize(Roles = "Admin")]
     public class IndexModel : PageModel
@@ -18,10 +18,10 @@ namespace BlocoNotas.Pages.Users
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IndexModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="userManager">The Identity user manager.</param>
-        /// <param name="context">The application database context.</param>
+        /// <param name="userManager">Gerenciador de utilizadores.</param>
+        /// <param name="context">Contexto da base de dados.</param>
         public IndexModel(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
@@ -29,17 +29,17 @@ namespace BlocoNotas.Pages.Users
         }
 
         /// <summary>
-        /// Gets or sets the list of users.
+        /// Lista de utilizadores.
         /// </summary>
         public IList<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
 
         /// <summary>
-        /// Gets or sets a dictionary mapping user IDs to admin status.
+        /// Dicionário que mapeia IDs de utilizadores ao seu estado de administrador.
         /// </summary>
         public Dictionary<string, bool> IsAdmin { get; set; } = new();
 
         /// <summary>
-        /// Handles the GET request. Loads all users and their admin status.
+        /// Endpoint GET. Obtém todos os utilizadores e o seu estado de administrador.
         /// </summary>
         public async Task OnGetAsync()
         {
@@ -52,9 +52,9 @@ namespace BlocoNotas.Pages.Users
         }
 
         /// <summary>
-        /// Handles POST delete request. Deletes a user, preventing self-deletion.
+        /// Endpoint POST de eliminação. Elimina um utilizador, impedindo auto-eliminação.
         /// </summary>
-        /// <param name="id">The ID of the user to delete.</param>
+        /// <param name="id">ID do utilizador a eliminar.</param>
         public async Task<IActionResult> OnPostDeleteAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -74,9 +74,9 @@ namespace BlocoNotas.Pages.Users
         }
 
         /// <summary>
-        /// Handles POST make-admin request. Promotes a user to the Admin role.
+        /// Endpoint POST para promover. Promove um utilizador ao cargo de administrador.
         /// </summary>
-        /// <param name="id">The ID of the user to promote.</param>
+        /// <param name="id">ID do utilizador a promover.</param>
         public async Task<IActionResult> OnPostMakeAdminAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);

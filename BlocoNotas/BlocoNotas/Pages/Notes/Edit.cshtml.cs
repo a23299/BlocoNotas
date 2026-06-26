@@ -9,7 +9,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.Notes
 {
     /// <summary>
-    /// PageModel for editing an existing note.
+    /// PageModel para editar uma nota existente.
     /// </summary>
     [Authorize]
     public class EditModel : PageModel
@@ -17,34 +17,34 @@ namespace BlocoNotas.Pages.Notes
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EditModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="context">The application database context.</param>
+        /// <param name="context">Contexto da base de dados.</param>
         public EditModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Gets or sets the note being edited.
+        /// Nota a ser editada.
         /// </summary>
         [BindProperty]
         public Note Note { get; set; } = new();
 
         /// <summary>
-        /// Gets or sets the list of available tags for display.
+        /// Lista de tags disponíveis para exibição.
         /// </summary>
         public IList<Tag> AvailableTags { get; set; } = new List<Tag>();
 
         /// <summary>
-        /// Gets or sets the list of tag IDs currently associated with the note.
+        /// Lista de IDs das tags associadas à nota.
         /// </summary>
         public IList<int> SelectedTagIds { get; set; } = new List<int>();
 
         /// <summary>
-        /// Handles the GET request. Loads the note and available tags for editing.
+        /// Endpoint GET. Obtém a nota e as tags disponíveis para edição.
         /// </summary>
-        /// <param name="id">The ID of the note to edit.</param>
+        /// <param name="id">ID da nota a editar.</param>
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null) return NotFound();
@@ -63,7 +63,7 @@ namespace BlocoNotas.Pages.Notes
         }
 
         /// <summary>
-        /// Handles the POST request. Updates the note and redirects to the index page.
+        /// Endpoint POST. Atualiza a nota e redireciona para a página inicial.
         /// </summary>
         public async Task<IActionResult> OnPostAsync()
         {

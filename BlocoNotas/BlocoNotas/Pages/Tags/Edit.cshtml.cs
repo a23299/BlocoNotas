@@ -8,7 +8,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.Tags
 {
     /// <summary>
-    /// PageModel for editing an existing tag.
+    /// PageModel para editar uma tag existente.
     /// </summary>
     [Authorize]
     public class EditModel : PageModel
@@ -16,24 +16,24 @@ namespace BlocoNotas.Pages.Tags
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EditModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="context">The application database context.</param>
+        /// <param name="context">Contexto da base de dados.</param>
         public EditModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Gets or sets the tag being edited.
+        /// Tag a ser editada.
         /// </summary>
         [BindProperty]
         public Tag Tag { get; set; } = new();
 
         /// <summary>
-        /// Handles the GET request. Loads the tag for editing.
+        /// Endpoint GET. Obtém a tag para edição.
         /// </summary>
-        /// <param name="id">The ID of the tag to edit.</param>
+        /// <param name="id">ID da tag a editar.</param>
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null) return NotFound();
@@ -45,7 +45,7 @@ namespace BlocoNotas.Pages.Tags
         }
 
         /// <summary>
-        /// Handles the POST request. Updates the tag after validating for duplicates.
+        /// Endpoint POST. Atualiza a tag após validação de duplicados.
         /// </summary>
         public async Task<IActionResult> OnPostAsync()
         {

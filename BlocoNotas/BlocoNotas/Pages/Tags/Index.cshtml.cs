@@ -8,7 +8,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.Tags
 {
     /// <summary>
-    /// PageModel for listing, creating, and deleting tags.
+    /// PageModel para listar, criar e eliminar tags.
     /// </summary>
     [Authorize]
     public class IndexModel : PageModel
@@ -16,21 +16,21 @@ namespace BlocoNotas.Pages.Tags
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IndexModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="context">The application database context.</param>
+        /// <param name="context">Contexto da base de dados.</param>
         public IndexModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Gets or sets the list of tags ordered by name.
+        /// Lista de tags ordenadas por nome.
         /// </summary>
         public IList<Tag> Tags { get; set; } = new List<Tag>();
 
         /// <summary>
-        /// Handles the GET request. Loads all tags.
+        /// Endpoint GET. Obtém todas as tags.
         /// </summary>
         public async Task OnGetAsync()
         {
@@ -38,9 +38,9 @@ namespace BlocoNotas.Pages.Tags
         }
 
         /// <summary>
-        /// Handles the POST delete request. Removes a tag and its associations.
+        /// Endpoint POST de eliminação. Remove uma tag e as suas associações.
         /// </summary>
-        /// <param name="id">The ID of the tag to delete.</param>
+        /// <param name="id">ID da tag a eliminar.</param>
         public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
             var tag = await _context.Tags.FindAsync(id);

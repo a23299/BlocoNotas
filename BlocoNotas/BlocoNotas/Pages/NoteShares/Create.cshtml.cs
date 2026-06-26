@@ -12,7 +12,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.NoteShares
 {
     /// <summary>
-    /// PageModel for sharing a note with another user.
+    /// PageModel para partilhar uma nota com outro utilizador.
     /// </summary>
     [Authorize]
     public class CreateModel : PageModel
@@ -21,10 +21,10 @@ namespace BlocoNotas.Pages.NoteShares
         private readonly IHubContext<NoteHub> _hubContext;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreateModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="context">The application database context.</param>
-        /// <param name="hubContext">The SignalR hub context for real-time notifications.</param>
+        /// <param name="context">Contexto da base de dados.</param>
+        /// <param name="hubContext">Contexto do hub SignalR para notificações em tempo real.</param>
         public CreateModel(ApplicationDbContext context, IHubContext<NoteHub> hubContext)
         {
             _context = context;
@@ -32,25 +32,25 @@ namespace BlocoNotas.Pages.NoteShares
         }
 
         /// <summary>
-        /// Gets or sets the note share being created.
+        /// Partilha de nota a ser criada.
         /// </summary>
         [BindProperty]
         public NoteShare NoteShare { get; set; } = new();
 
         /// <summary>
-        /// Gets or sets the select list of user's notes.
+        /// Lista de seleção das notas do utilizador.
         /// </summary>
         public SelectList? NoteList { get; set; }
 
         /// <summary>
-        /// Gets or sets the select list of available users.
+        /// Lista de seleção dos utilizadores disponíveis.
         /// </summary>
         public SelectList? UserList { get; set; }
 
         /// <summary>
-        /// Handles the GET request. Loads the note and user lists.
+        /// Endpoint GET. Obtém as listas de notas e utilizadores.
         /// </summary>
-        /// <param name="noteId">Optional pre-selected note ID.</param>
+        /// <param name="noteId">ID opcional da nota pré-selecionada.</param>
         public async Task OnGetAsync(int? noteId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -67,7 +67,7 @@ namespace BlocoNotas.Pages.NoteShares
         }
 
         /// <summary>
-        /// Handles the POST request. Creates the share and sends a SignalR notification.
+        /// Endpoint POST. Cria a partilha e envia uma notificação SignalR.
         /// </summary>
         public async Task<IActionResult> OnPostAsync()
         {
@@ -118,9 +118,9 @@ namespace BlocoNotas.Pages.NoteShares
         }
 
         /// <summary>
-        /// Reloads the view data for note and user select lists.
+        /// Recarrega os dados das listas de seleção de notas e utilizadores.
         /// </summary>
-        /// <param name="userId">The current user ID.</param>
+        /// <param name="userId">ID do utilizador atual.</param>
         private async Task SetupViewData(string userId)
         {
             var userNotes = await _context.Notes

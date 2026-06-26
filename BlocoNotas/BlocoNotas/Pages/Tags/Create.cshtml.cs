@@ -7,7 +7,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.Tags
 {
     /// <summary>
-    /// PageModel for creating a new tag.
+    /// PageModel para criar uma nova tag.
     /// </summary>
     [Authorize]
     public class CreateModel : PageModel
@@ -15,22 +15,22 @@ namespace BlocoNotas.Pages.Tags
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreateModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="context">The application database context.</param>
+        /// <param name="context">Contexto da base de dados.</param>
         public CreateModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Gets or sets the tag being created.
+        /// Tag a ser criada.
         /// </summary>
         [BindProperty]
         public Tag Tag { get; set; } = new();
 
         /// <summary>
-        /// Handles the GET request. Returns the creation page.
+        /// Endpoint GET. Apresenta a página de criação.
         /// </summary>
         public IActionResult OnGet()
         {
@@ -38,7 +38,7 @@ namespace BlocoNotas.Pages.Tags
         }
 
         /// <summary>
-        /// Handles the POST request. Creates the tag after validating for duplicates.
+        /// Endpoint POST. Cria a tag após validação de duplicados.
         /// </summary>
         public async Task<IActionResult> OnPostAsync()
         {

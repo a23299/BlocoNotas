@@ -6,7 +6,7 @@ using BlocoNotas.Models;
 namespace BlocoNotas.Pages.Account
 {
     /// <summary>
-    /// PageModel for logging out the current user.
+    /// PageModel para terminar a sessão do utilizador atual.
     /// </summary>
     public class LogoutModel : PageModel
     {
@@ -14,10 +14,10 @@ namespace BlocoNotas.Pages.Account
         private readonly ILogger<LogoutModel> _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LogoutModel"/> class.
+        /// Construtor para injeção de dependências.
         /// </summary>
-        /// <param name="signInManager">The Identity sign-in manager.</param>
-        /// <param name="logger">The logger instance.</param>
+        /// <param name="signInManager">Gerenciador de autenticação.</param>
+        /// <param name="logger">Instância do logger.</param>
         public LogoutModel(SignInManager<ApplicationUser> signInManager, ILogger<LogoutModel> logger)
         {
             _signInManager = signInManager;
@@ -25,9 +25,9 @@ namespace BlocoNotas.Pages.Account
         }
 
         /// <summary>
-        /// Handles POST logout request. Signs out the user and redirects to home.
+        /// Endpoint POST de logout. Termina a sessão do utilizador e redireciona para a página inicial.
         /// </summary>
-        /// <param name="returnUrl">Optional URL to redirect to after logout.</param>
+        /// <param name="returnUrl">URL opcional para redirecionar após o logout.</param>
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
