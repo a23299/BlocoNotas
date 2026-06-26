@@ -31,8 +31,9 @@
         @foreach (var note in Model.Notes)
         {
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm rounded">
-                    <div class="card-body">
+                <div class="card h-100 shadow-sm rounded card-clickable">
+                    <div class="card-body" style="cursor: pointer;"
+                         onclick="window.location.href='/Notes/Edit?id=@note.NoteId'">
                         <h5 class="card-title">@note.Title</h5>
                         <p class="card-text text-muted small">Última atualização: @note.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</p>
                         <p class="card-text">@(note.Content?.Length > 100 ? note.Content[..100] + "..." : note.Content ?? "")</p>
@@ -46,36 +47,37 @@
                                 }
                             }
                         </div>
+                    </div>
 
-                        <div class="mt-3 d-flex flex-wrap gap-1">
-                            <a class="btn btn-sm btn-outline-primary" asp-page="Edit" asp-route-id="@note.NoteId">Editar</a>
-                            <a class="btn btn-sm btn-outline-danger" asp-page="Delete" asp-route-id="@note.NoteId">Eliminar</a>
-                            <a class="btn btn-sm btn-outline-info" asp-page="/NoteShares/Create" asp-route-noteId="@note.NoteId">Partilhar</a>
+                    <div class="card-footer bg-transparent d-flex flex-wrap gap-1">
+                        <a class="btn btn-sm btn-outline-danger" asp-page="Delete" asp-route-id="@note.NoteId"
+                           onclick="event.stopPropagation()">Eliminar</a>
+                        <a class="btn btn-sm btn-outline-info" asp-page="/NoteShares/Create" asp-route-noteId="@note.NoteId"
+                           onclick="event.stopPropagation()">Partilhar</a>
 
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                    Tag
-                                </button>
-                                <div class="dropdown-menu p-3" style="min-width: 200px;">
-                                    <form method="post" asp-page-handler="UpdateTags" asp-route-noteId="@note.NoteId"
-                                          class="tag-update-form">
-                                        @foreach (var tag in Model.AvailableTags)
-                                        {
-                                            var isChecked = note.NoteTags?.Any(nt => nt.TagFK == tag.TagId) ?? false;
-                                            <div class="form-check mb-1">
-                                                <input type="checkbox" class="form-check-input tag-checkbox"
-                                                       name="tagIds" value="@tag.TagId"
-                                                       id="tag_@(note.NoteId)_@tag.TagId"
-                                                       @(isChecked ? "checked" : "")
-                                                       onchange="this.form.submit()" />
-                                                <label class="form-check-label" for="tag_@(note.NoteId)_@tag.TagId">@tag.Name</label>
-                                            </div>
-                                        }
-                                        <hr class="my-2" />
-                                        <a asp-page="/Tags/Create" class="btn btn-sm btn-outline-success w-100">+ Criar tag</a>
-                                    </form>
-                                </div>
+                        <div class="dropdown" onclick="event.stopPropagation()">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                Tag
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 200px;">
+                                <form method="post" asp-page-handler="UpdateTags" asp-route-noteId="@note.NoteId"
+                                      class="tag-update-form">
+                                    @foreach (var tag in Model.AvailableTags)
+                                    {
+                                        var isChecked = note.NoteTags?.Any(nt => nt.TagFK == tag.TagId) ?? false;
+                                        <div class="form-check mb-1">
+                                            <input type="checkbox" class="form-check-input tag-checkbox"
+                                                   name="tagIds" value="@tag.TagId"
+                                                   id="tag_@(note.NoteId)_@tag.TagId"
+                                                   @(isChecked ? "checked" : "")
+                                                   onchange="this.form.submit()" />
+                                            <label class="form-check-label" for="tag_@(note.NoteId)_@tag.TagId">@tag.Name</label>
+                                        </div>
+                                    }
+                                    <hr class="my-2" />
+                                    <a asp-page="/Tags/Create" class="btn btn-sm btn-outline-success w-100">+ Criar tag</a>
+                                </form>
                             </div>
                         </div>
                     </div>
