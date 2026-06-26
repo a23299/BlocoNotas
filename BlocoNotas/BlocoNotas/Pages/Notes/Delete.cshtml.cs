@@ -8,19 +8,33 @@ using BlocoNotas.Models;
 
 namespace BlocoNotas.Pages.Notes
 {
+    /// <summary>
+    /// PageModel for deleting (soft delete) a note.
+    /// </summary>
     [Authorize]
     public class DeleteModel : PageModel
     {
         private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeleteModel"/> class.
+        /// </summary>
+        /// <param name="context">The application database context.</param>
         public DeleteModel(ApplicationDbContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Gets or sets the note to be deleted.
+        /// </summary>
         [BindProperty]
         public Note Note { get; set; } = new();
 
+        /// <summary>
+        /// Handles the GET request. Loads the note data for deletion confirmation.
+        /// </summary>
+        /// <param name="id">The ID of the note to delete.</param>
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null) return NotFound();
@@ -35,6 +49,10 @@ namespace BlocoNotas.Pages.Notes
             return Page();
         }
 
+        /// <summary>
+        /// Handles the POST request. Performs soft delete by setting IsDeleted flag.
+        /// </summary>
+        /// <param name="id">The ID of the note to delete.</param>
         public async Task<IActionResult> OnPostAsync(int? id)
         {
             if (id == null) return NotFound();

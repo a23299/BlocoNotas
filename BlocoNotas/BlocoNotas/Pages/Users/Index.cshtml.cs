@@ -8,21 +8,39 @@ using BlocoNotas.Models;
 
 namespace BlocoNotas.Pages.Users
 {
+    /// <summary>
+    /// PageModel for listing, deleting, and promoting users. Admin-only access.
+    /// </summary>
     [Authorize(Roles = "Admin")]
     public class IndexModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IndexModel"/> class.
+        /// </summary>
+        /// <param name="userManager">The Identity user manager.</param>
+        /// <param name="context">The application database context.</param>
         public IndexModel(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _context = context;
         }
 
+        /// <summary>
+        /// Gets or sets the list of users.
+        /// </summary>
         public IList<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
+
+        /// <summary>
+        /// Gets or sets a dictionary mapping user IDs to admin status.
+        /// </summary>
         public Dictionary<string, bool> IsAdmin { get; set; } = new();
 
+        /// <summary>
+        /// Handles the GET request. Loads all users and their admin status.
+        /// </summary>
         public async Task OnGetAsync()
         {
             Users = await _context.Users.OrderBy(u => u.UserName).ToListAsync();
@@ -33,6 +51,10 @@ namespace BlocoNotas.Pages.Users
             }
         }
 
+        /// <summary>
+        /// Handles POST delete request. Deletes a user, preventing self-deletion.
+        /// </summary>
+        /// <param name="id">The ID of the user to delete.</param>
         public async Task<IActionResult> OnPostDeleteAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -51,6 +73,10 @@ namespace BlocoNotas.Pages.Users
             return RedirectToPage();
         }
 
+        /// <summary>
+        /// Handles POST make-admin request. Promotes a user to the Admin role.
+        /// </summary>
+        /// <param name="id">The ID of the user to promote.</param>
         public async Task<IActionResult> OnPostMakeAdminAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);

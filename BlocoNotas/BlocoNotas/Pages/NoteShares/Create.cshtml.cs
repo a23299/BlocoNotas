@@ -11,24 +11,46 @@ using BlocoNotas.Models;
 
 namespace BlocoNotas.Pages.NoteShares
 {
+    /// <summary>
+    /// PageModel for sharing a note with another user.
+    /// </summary>
     [Authorize]
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<NoteHub> _hubContext;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateModel"/> class.
+        /// </summary>
+        /// <param name="context">The application database context.</param>
+        /// <param name="hubContext">The SignalR hub context for real-time notifications.</param>
         public CreateModel(ApplicationDbContext context, IHubContext<NoteHub> hubContext)
         {
             _context = context;
             _hubContext = hubContext;
         }
 
+        /// <summary>
+        /// Gets or sets the note share being created.
+        /// </summary>
         [BindProperty]
         public NoteShare NoteShare { get; set; } = new();
 
+        /// <summary>
+        /// Gets or sets the select list of user's notes.
+        /// </summary>
         public SelectList? NoteList { get; set; }
+
+        /// <summary>
+        /// Gets or sets the select list of available users.
+        /// </summary>
         public SelectList? UserList { get; set; }
 
+        /// <summary>
+        /// Handles the GET request. Loads the note and user lists.
+        /// </summary>
+        /// <param name="noteId">Optional pre-selected note ID.</param>
         public async Task OnGetAsync(int? noteId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -44,6 +66,9 @@ namespace BlocoNotas.Pages.NoteShares
                 NoteShare.NoteId = noteId.Value;
         }
 
+        /// <summary>
+        /// Handles the POST request. Creates the share and sends a SignalR notification.
+        /// </summary>
         public async Task<IActionResult> OnPostAsync()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -92,6 +117,10 @@ namespace BlocoNotas.Pages.NoteShares
             return RedirectToPage("./Index");
         }
 
+        /// <summary>
+        /// Reloads the view data for note and user select lists.
+        /// </summary>
+        /// <param name="userId">The current user ID.</param>
         private async Task SetupViewData(string userId)
         {
             var userNotes = await _context.Notes

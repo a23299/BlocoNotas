@@ -1,9 +1,9 @@
-using BlocoNotas.Data;
-using BlocoNotas.Models;
 using BlocoNotas.ApiEmail.Entities;
 using BlocoNotas.ApiEmail.Services;
-using BlocoNotas.Services;
+using BlocoNotas.Data;
 using BlocoNotas.Hubs;
+using BlocoNotas.Models;
+using BlocoNotas.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,24 +12,18 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurações do SMTP para envio de emails
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSingleton<ISendEmail, SendEmail>();
 
-// Razor Pages para Aplicação Web
 builder.Services.AddRazorPages();
-// Signal R para tempo real
 builder.Services.AddSignalR();
 
-// Configurar DbContext com SQLite
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"), sqliteOptions =>
     {
         sqliteOptions.MigrationsAssembly("BlocoNotas");
-        // Não usar UseForeignKeys() pois não existe nesse contexto
     }));
 
-// Identity com roles
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
@@ -37,7 +31,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// Configuração de autenticação JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -58,7 +51,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnRedirectToLogin = context =>
     {
-        if (context.Request.Path.StartsWithSegments("/api") && 
+        if (context.Request.Path.StartsWithSegments("/api") &&
             context.Response.StatusCode == 200)
         {
             context.Response.StatusCode = 401;
@@ -70,7 +63,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
     options.Events.OnRedirectToAccessDenied = context =>
     {
-        if (context.Request.Path.StartsWithSegments("/api") && 
+        if (context.Request.Path.StartsWithSegments("/api") &&
             context.Response.StatusCode == 200)
         {
             context.Response.StatusCode = 403;
@@ -81,17 +74,13 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-
-// Autorização
 builder.Services.AddAuthorization();
 
-// Serviço de Tokens
 builder.Services.AddScoped<TokenService>();
 
-// Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddOpenApi(); // Se estiveres a usar algum pacote OpenAPI extra
+builder.Services.AddOpenApi();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -100,10 +89,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
     });
 
-// Build da app
 var app = builder.Build();
 
-// Escopo para DB (testar conexão)
 using var scope = app.Services.CreateScope();
 
 var services = scope.ServiceProvider;
@@ -116,7 +103,6 @@ if (await context.Database.CanConnectAsync())
 else
 {
     Console.WriteLine("❌ Falha na conexão à base SQLite");
-    
 }
 await SeedRoles.CreateRolesAsync(services);
 
@@ -129,11 +115,9 @@ async Task CreateAdminUser(IServiceProvider serviceProvider)
     string adminUserName = "admin";
     string adminPassword = "Admin123!";
 
-    // Criar role Admin se não existir
     if (!await roleManager.RoleExistsAsync("Admin"))
         await roleManager.CreateAsync(new IdentityRole("Admin"));
 
-    // Verificar se o admin já existe
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
     {
@@ -162,9 +146,6 @@ async Task CreateAdminUser(IServiceProvider serviceProvider)
     }
 }
 
-
-
-// Pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

@@ -18,6 +18,10 @@ public class NoteSharesApiController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NoteSharesApiController"/> class.
+    /// </summary>
+    /// <param name="context">The application database context.</param>
     public NoteSharesApiController(ApplicationDbContext context)
     {
         _context = context;
@@ -286,8 +290,19 @@ public class NoteSharesApiController : ControllerBase
 /// </summary>
 public class ShareNoteRequest
 {
+    /// <summary>
+    /// Gets or sets the ID of the note to share.
+    /// </summary>
     public int NoteId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the username of the user to share with.
+    /// </summary>
     public string ShareWithUsername { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the shared user can edit the note.
+    /// </summary>
     public bool CanEdit { get; set; } = false;
 }
 
@@ -296,6 +311,9 @@ public class ShareNoteRequest
 /// </summary>
 public class UpdateShareRequest
 {
+    /// <summary>
+    /// Gets or sets whether the shared user can edit the note.
+    /// </summary>
     public bool CanEdit { get; set; }
 }
 
@@ -304,6 +322,13 @@ public class UpdateShareRequest
 /// </summary>
 public class NoteEditRequest
 {
+    /// <summary>
+    /// Gets or sets the updated title of the note.
+    /// </summary>
     public string Title { get; set; }
+
+    /// <summary>
+    /// Gets or sets the updated content of the note.
+    /// </summary>
     public string Content { get; set; }
 }
