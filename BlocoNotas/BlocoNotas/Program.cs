@@ -125,7 +125,7 @@ async Task CreateInitialUsers(IServiceProvider serviceProvider)
 
     foreach (var (userName, email, password, role) in users)
     {
-        var existing = await userManager.FindByNameAsync(userName);
+        var existing = await userManager.FindByEmailAsync(email);
         if (existing != null)
         {
             Console.WriteLine($"Utilizador '{userName}' já existe.");
