@@ -1,4 +1,4 @@
-using BlocoNotas.ApiEmail.Entities;
+﻿using BlocoNotas.ApiEmail.Entities;
 using BlocoNotas.ApiEmail.Services;
 using BlocoNotas.Data;
 using BlocoNotas.Hubs;
@@ -105,44 +105,52 @@ else
     Console.WriteLine("❌ Falha na conexão à base SQLite");
 }
 await SeedRoles.CreateRolesAsync(services);
-
-async Task CreateAdminUser(IServiceProvider serviceProvider)
+async Task CreateInitialUsers(IServiceProvider serviceProvider)
 {
     var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-    string adminEmail = "admin@admin.com";
-    string adminUserName = "admin";
-    string adminPassword = "Admin123!";
-
     if (!await roleManager.RoleExistsAsync("Admin"))
         await roleManager.CreateAsync(new IdentityRole("Admin"));
+    if (!await roleManager.RoleExistsAsync("Utilizador"))
+        await roleManager.CreateAsync(new IdentityRole("Utilizador"));
 
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-    if (adminUser == null)
+    var users = new (string UserName, string Email, string Password, string Role)[]
     {
-        adminUser = new ApplicationUser
+        ("admin", "admin@admin.com", "Admin123!", "Admin"),
+        ("aluno23299", "aluno23299@ipt.pt", "Aluno23299!", "Utilizador"),
+        ("aluno23037", "aluno23037@ipt.pt", "Aluno23037!", "Utilizador"),
+        ("teste", "teste@teste.com", "Teste123!", "Utilizador")
+    };
+
+    foreach (var (userName, email, password, role) in users)
+    {
+        var existing = await userManager.FindByNameAsync(userName);
+        if (existing != null)
         {
-            UserName = adminUserName,
-            Email = adminEmail,
+            Console.WriteLine($"Utilizador '{userName}' já existe.");
+            continue;
+        }
+
+        var user = new ApplicationUser
+        {
+            UserName = userName,
+            Email = email,
             EmailConfirmed = true
         };
-        var result = await userManager.CreateAsync(adminUser, adminPassword);
+
+        var result = await userManager.CreateAsync(user, password);
         if (result.Succeeded)
         {
-            await userManager.AddToRoleAsync(adminUser, "Admin");
-            Console.WriteLine("Admin criado com sucesso.");
+            await userManager.AddToRoleAsync(user, role);
+            Console.WriteLine($"Utilizador '{userName}' criado com sucesso (role: {role}).");
         }
         else
         {
-            Console.WriteLine("Falha ao criar admin:");
+            Console.WriteLine($"Falha ao criar '{userName}':");
             foreach (var error in result.Errors)
                 Console.WriteLine($" - {error.Description}");
         }
-    }
-    else
-    {
-        Console.WriteLine("Admin já existe.");
     }
 }
 
@@ -158,7 +166,7 @@ else
     app.UseSwaggerUI();
 }
 
-await CreateAdminUser(services);
+await CreateInitialUsers(services);
 
 app.UseHttpsRedirection();
 app.UseRouting();
