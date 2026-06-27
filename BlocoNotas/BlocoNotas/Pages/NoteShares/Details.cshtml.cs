@@ -59,7 +59,7 @@ namespace BlocoNotas.Pages.NoteShares
 
             if (share == null) return NotFound();
 
-            Note = share.Note;
+            Note = share.Note!;
             CanEdit = share.CanEdit;
             SharedByUserName = share.Note?.User?.UserName ?? "Desconhecido";
 

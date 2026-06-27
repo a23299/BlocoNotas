@@ -43,20 +43,20 @@ namespace BlocoNotas.Pages.NoteShares
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             SharedByMe = await _context.NoteShares
-                .Where(ns => ns.Note.UserFK == userId && !ns.Note.IsDeleted)
+                .Where(ns => ns.Note!.UserFK == userId && !ns.Note!.IsDeleted)
                 .Include(ns => ns.Note)
                 .Include(ns => ns.SharedWithUser)
                 .OrderByDescending(ns => ns.SharedAt)
                 .ToListAsync();
 
             var sharedWithMeShares = await _context.NoteShares
-                .Where(ns => ns.UserShareFK == userId && !ns.Note.IsDeleted)
+                .Where(ns => ns.UserShareFK == userId && !ns.Note!.IsDeleted)
                 .Include(ns => ns.Note)
                     .ThenInclude(n => n.User)
                 .OrderByDescending(ns => ns.SharedAt)
                 .ToListAsync();
 
-            SharedWithMe = sharedWithMeShares.Select(ns => ns.Note).DistinctBy(n => n.NoteId).ToList();
+            SharedWithMe = sharedWithMeShares.Select(ns => ns.Note).Where(n => n != null).Select(n => n!).DistinctBy(n => n.NoteId).ToList();
         }
 
         /// <summary>
