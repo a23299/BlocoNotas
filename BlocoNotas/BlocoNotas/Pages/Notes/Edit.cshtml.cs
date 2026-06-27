@@ -117,7 +117,8 @@ namespace BlocoNotas.Pages.Notes
         /// Endpoint POST JSON para criar uma nova tag sem perder o estado do formulário.
         /// </summary>
         /// <param name="name">Nome da nova tag.</param>
-        public async Task<JsonResult> OnPostCreateTagJsonAsync(string name)
+        /// <param name="color">Cor hexadecimal da nova tag.</param>
+        public async Task<JsonResult> OnPostCreateTagJsonAsync(string name, string color)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return new JsonResult(new { error = "Nome obrigatório." }) { StatusCode = 400 };
@@ -126,14 +127,14 @@ namespace BlocoNotas.Pages.Notes
             if (exists)
             {
                 var existing = await _context.Tags.FirstAsync(t => t.Name == name);
-                return new JsonResult(new { id = existing.TagId, name = existing.Name });
+                return new JsonResult(new { id = existing.TagId, name = existing.Name, color = existing.Color });
             }
 
-            var tag = new Tag { Name = name };
+            var tag = new Tag { Name = name, Color = color ?? "#0d6efd" };
             _context.Tags.Add(tag);
             await _context.SaveChangesAsync();
 
-            return new JsonResult(new { id = tag.TagId, name = tag.Name });
+            return new JsonResult(new { id = tag.TagId, name = tag.Name, color = tag.Color });
         }
     }
 }
