@@ -20,45 +20,45 @@
 
                 <h6 class="fw-semibold mt-3">2. Notas (NotesApiController)</h6>
                 <div class="table-responsive"><table class="table table-sm table-bordered mb-3"><thead class="table-light"><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead><tbody>
-                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/notes</code></td><td>Lista notas do utilizador (admin vê todas)</td></tr>
-                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/notes/{id}</code></td><td>Obtém nota específica</td></tr>
-                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/notes</code></td><td>Cria nota</td></tr>
-                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/notes/{id}</code></td><td>Atualiza título e conteúdo</td></tr>
-                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/notes/{id}</code></td><td>Soft delete</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/NotesApi</code></td><td>Lista notas do utilizador (admin vê todas)</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/NotesApi/{id}</code></td><td>Obtém nota específica</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/NotesApi</code></td><td>Cria nota</td></tr>
+                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/NotesApi/{id}</code></td><td>Atualiza título e conteúdo</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/NotesApi/{id}</code></td><td>Soft delete</td></tr>
                 </tbody></table></div>
 
                 <h6 class="fw-semibold mt-3">3. Partilhas (NoteSharesApiController)</h6>
                 <div class="table-responsive"><table class="table table-sm table-bordered mb-3"><thead class="table-light"><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead><tbody>
-                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/NoteShares/shared-with-me</code></td><td>Notas partilhadas comigo</td></tr>
-                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/NoteShares/shared-by-me</code></td><td>Partilhas feitas por mim</td></tr>
-                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/NoteShares</code></td><td>Partilha nota com utilizador</td></tr>
-                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/NoteShares/shared-note-edit/{noteId}</code></td><td>Edita nota partilhada</td></tr>
-                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/NoteShares/{id}</code></td><td>Atualiza permissões</td></tr>
-                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/NoteShares/{id}</code></td><td>Remove partilha</td></tr>
-                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/NoteShares/remove-my-access/{noteId}</code></td><td>Remove meu acesso</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/NoteSharesApi/shared-with-me</code></td><td>Notas partilhadas comigo</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/NoteSharesApi/shared-by-me</code></td><td>Partilhas feitas por mim</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/NoteSharesApi</code></td><td>Partilha nota com utilizador</td></tr>
+                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/NoteSharesApi/shared-note-edit/{noteId}</code></td><td>Edita nota partilhada</td></tr>
+                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/NoteSharesApi/{id}</code></td><td>Atualiza permissões</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/NoteSharesApi/{id}</code></td><td>Remove partilha</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/NoteSharesApi/remove-my-access/{noteId}</code></td><td>Remove meu acesso</td></tr>
                 </tbody></table></div>
 
                 <h6 class="fw-semibold mt-3">4. Tags (TagsApiController)</h6>
                 <div class="table-responsive"><table class="table table-sm table-bordered mb-3"><thead class="table-light"><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead><tbody>
-                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/tags</code></td><td>Tags do utilizador</td></tr>
-                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/tags/all</code></td><td>Todas as tags</td></tr>
-                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/tags/{id}</code></td><td>Tag específica</td></tr>
-                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/tags/{id}/notes</code></td><td>Notas de uma tag</td></tr>
-                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/tags</code></td><td>Cria tag</td></tr>
-                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/tags/{id}</code></td><td>Atualiza nome</td></tr>
-                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/tags/{id}</code></td><td>Elimina tag</td></tr>
-                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/tags/notes</code></td><td>Associa tag a nota</td></tr>
-                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/tags/notes</code></td><td>Remove associação</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/TagsApi</code></td><td>Tags do utilizador</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/TagsApi/all</code></td><td>Todas as tags</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/TagsApi/{id}</code></td><td>Tag específica</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/TagsApi/{id}/notes</code></td><td>Notas de uma tag</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/TagsApi</code></td><td>Cria tag</td></tr>
+                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/TagsApi/{id}</code></td><td>Atualiza nome</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/TagsApi/{id}</code></td><td>Elimina tag</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/TagsApi/notes</code></td><td>Associa tag a nota</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/TagsApi/notes</code></td><td>Remove associação</td></tr>
                 </tbody></table></div>
 
                 <h6 class="fw-semibold mt-3">5. Utilizadores (UsersApiController)</h6>
                 <div class="table-responsive"><table class="table table-sm table-bordered mb-3"><thead class="table-light"><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead><tbody>
-                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/Users</code></td><td>Lista utilizadores</td></tr>
-                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/Users/{id}</code></td><td>Detalhes de utilizador</td></tr>
-                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/Users</code></td><td>Cria utilizador (admin)</td></tr>
-                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/Users/{id}</code></td><td>Atualiza utilizador</td></tr>
-                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/Users/{id}</code></td><td>Elimina utilizador (admin)</td></tr>
-                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/Users/MakeAdmin/{id}</code></td><td>Promove a admin</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/UsersApi</code></td><td>Lista utilizadores</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/UsersApi/{id}</code></td><td>Detalhes de utilizador</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/UsersApi</code></td><td>Cria utilizador (admin)</td></tr>
+                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/UsersApi/{id}</code></td><td>Atualiza utilizador</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/UsersApi/{id}</code></td><td>Elimina utilizador (admin)</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/UsersApi/MakeAdmin/{id}</code></td><td>Promove a admin</td></tr>
                 </tbody></table></div>
 
                 <h6 class="fw-semibold mt-3">6. Email (EmailsController)</h6>

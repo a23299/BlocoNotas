@@ -151,6 +151,8 @@ public class TagsApiController : ControllerBase
         }
 
         existingTag.Name = tag.Name;
+        if (!string.IsNullOrEmpty(tag.Color))
+            existingTag.Color = tag.Color;
 
         try
         {
