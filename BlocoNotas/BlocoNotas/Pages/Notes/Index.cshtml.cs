@@ -2,8 +2,10 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using BlocoNotas.Data;
+using BlocoNotas.Hubs;
 using BlocoNotas.Models;
 
 namespace BlocoNotas.Pages.Notes
@@ -15,14 +17,17 @@ namespace BlocoNotas.Pages.Notes
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<NoteHub> _hubContext;
 
         /// <summary>
         /// Construtor para injeção de dependências.
         /// </summary>
         /// <param name="context">Contexto da base de dados.</param>
-        public IndexModel(ApplicationDbContext context)
+        /// <param name="hubContext">Contexto do hub SignalR para notificações em tempo real.</param>
+        public IndexModel(ApplicationDbContext context, IHubContext<NoteHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         /// <summary>
@@ -92,6 +97,11 @@ namespace BlocoNotas.Pages.Notes
             }
 
             await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.User(userId)
+                .SendAsync("ReceiveNotification", $"Tags atualizadas na nota '{note.Title}'.");
+
+            TempData["Notification"] = $"Tags atualizadas na nota '{note.Title}'.";
 
             return RedirectToPage(new { SelectedTagId });
         }
