@@ -1,7 +1,7 @@
 ﻿@page
 @model LoginModel
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Iniciar sessão";
 }
 
 <div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: 85vh;">
@@ -21,7 +21,7 @@
 
                     <div class="form-group mb-4">
                         <label asp-for="Input.Password" class="form-label">Password</label>
-                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="A sua password" />
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="A sua palavra-passe" />
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
 

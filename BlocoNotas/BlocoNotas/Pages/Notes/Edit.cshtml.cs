@@ -53,7 +53,8 @@ namespace BlocoNotas.Pages.Notes
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Note = await _context.Notes
                 .Include(n => n.NoteTags)
-                .FirstOrDefaultAsync(n => n.NoteId == id && n.UserFK == userId && !n.IsDeleted);
+                .FirstOrDefaultAsync(n => n.NoteId == id && !n.IsDeleted &&
+                    (n.UserFK == userId || n.SharedWith.Any(s => s.UserShareFK == userId && s.CanEdit)));
 
             if (Note == null) return NotFound();
 
@@ -77,7 +78,8 @@ namespace BlocoNotas.Pages.Notes
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var existingNote = await _context.Notes
                 .Include(n => n.NoteTags)
-                .FirstOrDefaultAsync(n => n.NoteId == Note.NoteId && n.UserFK == userId && !n.IsDeleted);
+                .FirstOrDefaultAsync(n => n.NoteId == Note.NoteId && !n.IsDeleted &&
+                    (n.UserFK == userId || n.SharedWith.Any(s => s.UserShareFK == userId && s.CanEdit)));
 
             if (existingNote == null) return NotFound();
 

@@ -21,19 +21,19 @@
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <a class="btn btn-outline-success btn-lg" asp-page="/Notes/Index">
-                                📝 As Minhas Notas
+                                📝 As minhas notas
                             </a>
                             <a class="btn btn-success btn-lg" asp-page="/Notes/Create">
-                                ➕ Criar Nota
+                                ➕ Criar nota
                             </a>
                         }
                         else
                         {
                             <a class="btn btn-outline-success btn-lg" asp-area="Identity" asp-page="/Account/Login">
-                                Iniciar Sessão
+                                Iniciar sessão
                             </a>
                             <a class="btn btn-success btn-lg" asp-area="Identity" asp-page="/Account/Register">
-                                Criar Conta
+                                Criar conta
                             </a>
                         }
                     </div>
@@ -50,10 +50,10 @@
                             📝 Notas
                         </a>
                         <a class="btn btn-outline-primary btn-lg" asp-page="/NoteShares/Index">
-                            🤝 Notas Partilhadas
+                            🤝 Notas partilhadas
                         </a>
                         <a class="btn btn-outline-primary btn-lg" asp-page="/Users/Index">
-                            ⚙️ Gerir Utilizadores
+                            ⚙️ Gerir utilizadores
                         </a>
                     </div>
                 </div>
