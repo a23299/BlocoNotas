@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BlocoNotas.Controllers.Api;
 
 /// <summary>
-/// Controller API para gerenciar operações relacionadas a Tags.
+/// Controller API para gerir operações relacionadas com Tags.
 /// </summary>
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
@@ -28,9 +28,9 @@ public class TagsApiController : ControllerBase
     }
 
     /// <summary>
-    /// Obtém todas as tags associadas a pelo menos uma nota do usuário atual.
+    /// Obtém todas as tags associadas a pelo menos uma nota do utilizador atual.
     /// </summary>
-    /// <returns>Lista de tags do usuário.</returns>
+    /// <returns>Lista de tags do utilizador.</returns>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Tag>>> GetTags()
     {
@@ -78,7 +78,7 @@ public class TagsApiController : ControllerBase
     }
 
     /// <summary>
-    /// Obtém as notas associadas a uma tag específica para o usuário atual.
+    /// Obtém as notas associadas a uma tag específica para o utilizador atual.
     /// </summary>
     /// <param name="id">ID da tag.</param>
     /// <returns>Lista de notas associadas.</returns>
@@ -196,7 +196,7 @@ public class TagsApiController : ControllerBase
     }
 
     /// <summary>
-    /// Associa uma tag a uma nota, se o usuário tiver permissão.
+    /// Associa uma tag a uma nota, se o utilizador tiver permissão.
     /// </summary>
     /// <param name="request">Objeto contendo NoteId e TagId para associação.</param>
     /// <returns>Status da operação.</returns>

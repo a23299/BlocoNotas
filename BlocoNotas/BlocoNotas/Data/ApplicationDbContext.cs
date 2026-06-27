@@ -34,7 +34,7 @@ namespace BlocoNotas.Data
         public DbSet<NoteTag> NoteTags { get; set; }
 
         /// <summary>
-        /// DbSet para a entidade NoteShare (compartilhamento de notas).
+        /// DbSet para a entidade NoteShare (partilha de notas).
         /// </summary>
         public DbSet<NoteShare> NoteShares { get; set; }
 

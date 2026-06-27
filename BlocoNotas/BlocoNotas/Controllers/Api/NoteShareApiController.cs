@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BlocoNotas.Controllers.Api;
 
 /// <summary>
-/// Controlador da API responsável por gerenciar as partilhas de notas.
+/// Controlador da API responsável por gerir as partilhas de notas.
 /// </summary>
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
@@ -95,7 +95,7 @@ public class NoteSharesApiController : ControllerBase
 
         if (string.IsNullOrWhiteSpace(request.ShareWithUsername))
         {
-            return BadRequest(new { message = "Nome de usuário é obrigatório" });
+            return BadRequest(new { message = "Nome de utilizador é obrigatório" });
         }
 
         var note = await _context.Notes
@@ -111,12 +111,12 @@ public class NoteSharesApiController : ControllerBase
 
         if (shareWithUser == null)
         {
-            return BadRequest(new { message = "Usuário não encontrado" });
+            return BadRequest(new { message = "Utilizador não encontrado" });
         }
 
         if (shareWithUser.Id == currentUserId)
         {
-            return BadRequest(new { message = "Não é possível compartilhar uma nota consigo mesmo" });
+            return BadRequest(new { message = "Não é possível partilhar uma nota consigo mesmo" });
         }
 
         var existingShare = await _context.NoteShares
@@ -124,7 +124,7 @@ public class NoteSharesApiController : ControllerBase
 
         if (existingShare != null)
         {
-            return BadRequest(new { message = "Esta nota já está compartilhada com este usuário" });
+            return BadRequest(new { message = "Esta nota já está partilhada com este utilizador" });
         }
 
         var noteShare = new NoteShare

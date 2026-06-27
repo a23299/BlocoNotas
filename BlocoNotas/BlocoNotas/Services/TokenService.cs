@@ -19,7 +19,7 @@ namespace BlocoNotas.Services
         /// Inicializa uma nova instância do serviço de token.
         /// </summary>
         /// <param name="configuration">Configurações da aplicação para obter parâmetros JWT.</param>
-        /// <param name="userManager">Gerenciador de usuários do Identity.</param>
+        /// <param name="userManager">Gestor de utilizadores do Identity.</param>
         public TokenService(IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
             _configuration = configuration;
