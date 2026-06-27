@@ -1,0 +1,63 @@
+@page
+@{
+    ViewData["Title"] = "Página Inicial";
+}
+
+<div class="container py-5 d-flex flex-column justify-content-center align-items-center" style="min-height: 85vh;">
+    <h1 class="display-4 fw-bold text-primary text-center mb-3">
+        Bem-vindo ao <span class="text-dark">BlocoNotas</span>
+    </h1>
+
+    <p class="lead text-secondary text-center mb-5">
+        Organize as suas ideias, tarefas e notas com simplicidade e segurança.
+    </p>
+
+    <div class="row w-100 justify-content-center g-4">
+        <div class="col-md-5">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-4">Acesso</h5>
+                    <div class="d-grid gap-3">
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <a class="btn btn-outline-success btn-lg" asp-page="/Notes/Index">
+                                📝 As minhas notas
+                            </a>
+                            <a class="btn btn-success btn-lg" asp-page="/Notes/Create">
+                                ➕ Criar nota
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-outline-success btn-lg" asp-area="Identity" asp-page="/Account/Login">
+                                Iniciar sessão
+                            </a>
+                            <a class="btn btn-success btn-lg" asp-area="Identity" asp-page="/Account/Register">
+                                Criar conta
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-4">Funcionalidades</h5>
+                    <div class="d-grid gap-3">
+                        <a class="btn btn-outline-primary btn-lg" asp-page="/Notes/Index">
+                            📝 Notas
+                        </a>
+                        <a class="btn btn-outline-primary btn-lg" asp-page="/NoteShares/Index">
+                            🤝 Notas partilhadas
+                        </a>
+                        <a class="btn btn-outline-primary btn-lg" asp-page="/Users/Index">
+                            ⚙️ Gerir utilizadores
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

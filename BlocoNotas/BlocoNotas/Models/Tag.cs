@@ -9,7 +9,7 @@ namespace BlocoNotas.Models
     public class Tag
     {
         /// <summary>
-        /// ID Ãºnico da Tag.
+        /// ID único da Tag.
         /// </summary>
         public int TagId { get; set; }
         
@@ -21,7 +21,13 @@ namespace BlocoNotas.Models
         public string Name { get; set; }
         
         /// <summary>
-        /// ColeÃ§Ã£o de associaÃ§Ãµes entre esta Tag e as Notas que a possuem.
+        /// Cor da tag em formato hexadecimal (#RRGGBB).
+        /// </summary>
+        [StringLength(7)]
+        public string Color { get; set; } = "#0d6efd";
+        
+        /// <summary>
+        /// Coleção de associações entre esta Tag e as Notas que a possuem.
         /// </summary>
         [JsonIgnore]
         public ICollection<NoteTag> NoteTags { get; set; } = new List<NoteTag>();

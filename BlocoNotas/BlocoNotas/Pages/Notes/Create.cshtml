@@ -1,0 +1,145 @@
+@page
+@model BlocoNotas.Pages.Notes.CreateModel
+@{
+    ViewData["Title"] = "Criar Nota";
+}
+
+<div class="container py-4 d-flex justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow border-0">
+            <div class="card-body">
+                <h2 class="card-title mb-4 text-primary text-center">Criar Nova Nota</h2>
+
+                <form method="post" id="noteForm">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Note.Title" class="form-label"></label>
+                        <input asp-for="Note.Title" class="form-control" required />
+                        <span asp-validation-for="Note.Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Note.Content" class="form-label"></label>
+                        <textarea asp-for="Note.Content" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="Note.Content" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tags</label>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                Gerir Tags
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 220px;">
+                                @foreach (var tag in Model.AvailableTags)
+                                {
+                                    <div class="form-check mb-1">
+                                        <input type="checkbox" class="form-check-input"
+                                               name="SelectedTagIds" value="@tag.TagId"
+                                               id="tag_@tag.TagId" />
+                                        <label class="form-check-label" for="tag_@tag.TagId">@tag.Name</label>
+                                    </div>
+                                }
+                                <hr class="my-2" />
+                                <button type="button" class="btn btn-sm btn-outline-success w-100"
+                                        data-bs-toggle="modal" data-bs-target="#createTagModal">
+                                    + Criar tag
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-page="Index" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success">Guardar Nota</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createTagModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Criar Nova Tag</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="createTagForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="newTagColor" class="form-label">Cor</label>
+                        <input type="color" id="newTagColor" name="color" class="form-control form-control-color" value="#0d6efd" style="width: 60px;" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="newTagName" class="form-label">Nome</label>
+                        <input type="text" id="newTagName" name="name" class="form-control" required maxlength="50" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success" id="createTagSubmit">Criar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('createTagForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const name = document.getElementById('newTagName').value.trim();
+            const color = document.getElementById('newTagColor').value;
+            if (!name) return;
+
+            const btn = document.getElementById('createTagSubmit');
+            btn.disabled = true;
+            btn.textContent = 'A criar...';
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+            try {
+                const formData = new FormData();
+                formData.append('name', name);
+                formData.append('color', color);
+
+                const response = await fetch('?handler=CreateTagJson', {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const tag = await response.json();
+                    const menu = document.querySelector('.dropdown-menu');
+                    const hr = menu.querySelector('hr');
+                    const div = document.createElement('div');
+                    div.className = 'form-check mb-1';
+                    div.innerHTML = '<input type="checkbox" class="form-check-input" ' +
+                        'name="SelectedTagIds" value="' + tag.id + '" ' +
+                        'id="tag_' + tag.id + '" checked /> ' +
+                        '<label class="form-check-label" for="tag_' + tag.id + '">' + tag.name + '</label>';
+                    menu.insertBefore(div, hr);
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('createTagModal'));
+                    modal.hide();
+                    document.getElementById('newTagName').value = '';
+                } else {
+                    alert('Erro ao criar tag.');
+                }
+            } catch (err) {
+                alert('Erro ao criar tag: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Criar';
+            }
+        });
+    </script>
+}

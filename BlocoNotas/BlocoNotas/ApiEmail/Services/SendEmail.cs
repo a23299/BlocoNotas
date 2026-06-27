@@ -13,6 +13,11 @@ public class SendEmail : ISendEmail
     private readonly SmtpSettings _smtpSettings;
     private readonly IWebHostEnvironment _env;
 
+    /// <summary>
+    /// Construtor para injeção de dependências.
+    /// </summary>
+    /// <param name="smtpSettings">Configurações SMTP.</param>
+    /// <param name="env">Ambiente de alojamento web.</param>
     public SendEmail(IOptions<SmtpSettings> smtpSettings, IWebHostEnvironment env)
     {
         _smtpSettings = smtpSettings.Value;

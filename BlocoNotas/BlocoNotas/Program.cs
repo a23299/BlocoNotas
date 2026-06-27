@@ -1,7 +1,8 @@
-using BlocoNotas.Data;
-using BlocoNotas.Models;
-using BlocoNotas.ApiEmail.Entities;
+﻿using BlocoNotas.ApiEmail.Entities;
 using BlocoNotas.ApiEmail.Services;
+using BlocoNotas.Data;
+using BlocoNotas.Hubs;
+using BlocoNotas.Models;
 using BlocoNotas.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -11,22 +12,18 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurações do SMTP para envio de emails
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSingleton<ISendEmail, SendEmail>();
 
-// MVC com Views
-builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
 
-// Configurar DbContext com SQLite
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"), sqliteOptions =>
     {
         sqliteOptions.MigrationsAssembly("BlocoNotas");
-        // Não usar UseForeignKeys() pois não existe nesse contexto
     }));
 
-// Identity com roles
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
@@ -34,7 +31,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// Configuração de autenticação JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -55,7 +51,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnRedirectToLogin = context =>
     {
-        if (context.Request.Path.StartsWithSegments("/api") && 
+        if (context.Request.Path.StartsWithSegments("/api") &&
             context.Response.StatusCode == 200)
         {
             context.Response.StatusCode = 401;
@@ -67,7 +63,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
     options.Events.OnRedirectToAccessDenied = context =>
     {
-        if (context.Request.Path.StartsWithSegments("/api") && 
+        if (context.Request.Path.StartsWithSegments("/api") &&
             context.Response.StatusCode == 200)
         {
             context.Response.StatusCode = 403;
@@ -78,17 +74,13 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-
-// Autorização
 builder.Services.AddAuthorization();
 
-// Serviço de Tokens
 builder.Services.AddScoped<TokenService>();
 
-// Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddOpenApi(); // Se estiveres a usar algum pacote OpenAPI extra
+builder.Services.AddOpenApi();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -97,10 +89,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
     });
 
-// Build da app
 var app = builder.Build();
 
-// Escopo para DB (testar conexão)
 using var scope = app.Services.CreateScope();
 
 var services = scope.ServiceProvider;
@@ -113,59 +103,61 @@ if (await context.Database.CanConnectAsync())
 else
 {
     Console.WriteLine("❌ Falha na conexão à base SQLite");
-    
 }
 await SeedRoles.CreateRolesAsync(services);
-
-async Task CreateAdminUser(IServiceProvider serviceProvider)
+async Task CreateInitialUsers(IServiceProvider serviceProvider)
 {
     var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-    string adminEmail = "admin@admin.com";
-    string adminUserName = "admin";
-    string adminPassword = "Admin123!";
-
-    // Criar role Admin se não existir
     if (!await roleManager.RoleExistsAsync("Admin"))
         await roleManager.CreateAsync(new IdentityRole("Admin"));
+    if (!await roleManager.RoleExistsAsync("Utilizador"))
+        await roleManager.CreateAsync(new IdentityRole("Utilizador"));
 
-    // Verificar se o admin já existe
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-    if (adminUser == null)
+    var users = new (string UserName, string Email, string Password, string Role)[]
     {
-        adminUser = new ApplicationUser
+        ("admin", "admin@admin.com", "Admin123!", "Admin"),
+        ("aluno23299", "aluno23299@ipt.pt", "Aluno23299!", "Utilizador"),
+        ("aluno23037", "aluno23037@ipt.pt", "Aluno23037!", "Utilizador"),
+        ("teste", "teste@teste.com", "Teste123!", "Utilizador")
+    };
+
+    foreach (var (userName, email, password, role) in users)
+    {
+        var existing = await userManager.FindByEmailAsync(email);
+        if (existing != null)
         {
-            UserName = adminUserName,
-            Email = adminEmail,
+            Console.WriteLine($"Utilizador '{userName}' já existe.");
+            continue;
+        }
+
+        var user = new ApplicationUser
+        {
+            UserName = userName,
+            Email = email,
             EmailConfirmed = true
         };
-        var result = await userManager.CreateAsync(adminUser, adminPassword);
+
+        var result = await userManager.CreateAsync(user, password);
         if (result.Succeeded)
         {
-            await userManager.AddToRoleAsync(adminUser, "Admin");
-            Console.WriteLine("Admin criado com sucesso.");
+            await userManager.AddToRoleAsync(user, role);
+            Console.WriteLine($"Utilizador '{userName}' criado com sucesso (role: {role}).");
         }
         else
         {
-            Console.WriteLine("Falha ao criar admin:");
+            Console.WriteLine($"Falha ao criar '{userName}':");
             foreach (var error in result.Errors)
                 Console.WriteLine($" - {error.Description}");
         }
     }
-    else
-    {
-        Console.WriteLine("Admin já existe.");
-    }
 }
 
-
-
-// Pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 else
@@ -174,7 +166,7 @@ else
     app.UseSwaggerUI();
 }
 
-await CreateAdminUser(services);
+await CreateInitialUsers(services);
 
 app.UseHttpsRedirection();
 app.UseRouting();
@@ -185,10 +177,7 @@ app.UseAuthorization();
 app.MapStaticAssets();
 
 app.MapControllers();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+app.MapRazorPages();
+app.MapHub<NoteHub>("/noteHub");
 
 app.Run();

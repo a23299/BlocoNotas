@@ -1,0 +1,148 @@
+﻿@{
+    var pageTitle = ViewData["Title"]?.ToString() ?? "BlocoNotas";
+    var metaDescription = ViewData["MetaDescription"]?.ToString() ?? "Organize as suas notas, ideias e tarefas com o BlocoNotas, em português de Portugal.";
+    var metaKeywords = ViewData["MetaKeywords"]?.ToString() ?? "bloconotas, notas, partilhas, organização, português, pt-pt";
+}
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="@metaDescription" />
+    <meta name="keywords" content="@metaKeywords" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="@pageTitle - BlocoNotas" />
+    <meta property="og:description" content="@metaDescription" />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <title>@pageTitle - BlocoNotas</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="" asp-page="/Index">📝 BlocoNotas</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-page="/Index">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-page="/Info">Informação</a>
+                    </li>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-page="/Users/Index">Utilizadores</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-page="/Api/Index">API</a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-page="/Notes/Index">Notas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-page="/NoteShares/Index">Notas partilhadas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-page="/Tags/Index">Tags</a>
+                        </li>
+                    }
+                </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Olá, @User.Identity?.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-page="/Notes/Index">As minhas notas</a></li>
+                                <li><a class="dropdown-item" asp-page="/NoteShares/Index">Notas partilhadas</a></li>
+                                <li>
+                                    <form asp-area="" asp-page="/Account/Logout" method="post" class="d-inline">
+                                        <button type="submit" class="dropdown-item">Terminar sessão</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="Identity" asp-page="/Account/Login">Iniciar sessão</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="Identity" asp-page="/Account/Register">Criar conta</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="container">
+    <main role="main" class="pb-3">
+        @if (TempData["Notification"] is string notification)
+        {
+            <div class="alert alert-info alert-dismissible fade show position-fixed top-0 end-0 m-3" style="z-index: 9999;" role="alert">
+                @notification
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <script>
+                setTimeout(() => {
+                    const el = document.querySelector('.alert.position-fixed');
+                    if (el) { el.remove(); }
+                }, 8000);
+            </script>
+        }
+        @RenderBody()
+    </main>
+</div>
+
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2025 - BlocoNotas de Jorge Lavado (a23037) e Pedro Martinho (a23299) -
+        <a asp-area="" asp-page="/Info">Informação</a>
+    </div>
+</footer>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.7/dist/browser/signalr.min.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/noteHub", { withCredentials: true })
+        .withAutomaticReconnect()
+        .build();
+
+    connection.on("ReceiveNotification", function (message) {
+        const alertDiv = document.createElement("div");
+        alertDiv.className = "alert alert-info alert-dismissible fade show position-fixed top-0 end-0 m-3";
+        alertDiv.style.zIndex = "9999";
+        alertDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 5000);
+    });
+
+    connection.start().catch(function (err) {
+        console.error("SignalR connection error:", err.toString());
+    });
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

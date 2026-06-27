@@ -27,7 +27,7 @@ namespace BlocoNotas.Models
         public ICollection<Note> Notes { get; set; } = new List<Note>();
 
         /// <summary>
-        /// Coleção de partilhas de notas que foram compartilhadas com este utilizador.
+        /// Coleção de partilhas de notas que foram partilhadas com este utilizador.
         /// Relação um-para-muitos.
         /// </summary>
         public ICollection<NoteShare> SharedWithMe { get; set; } = new List<NoteShare>();

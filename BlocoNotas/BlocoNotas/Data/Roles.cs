@@ -3,7 +3,7 @@
 namespace BlocoNotas.Data
 {
     /// <summary>
-    /// Classe estática responsável por inicializar os papéis (roles) de usuário no sistema.
+    /// Classe estática responsável por inicializar os papéis (roles) de utilizador no sistema.
     /// </summary>
     public static class SeedRoles
     {

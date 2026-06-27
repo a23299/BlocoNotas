@@ -1,0 +1,101 @@
+@page
+@model BlocoNotas.Pages.NoteShares.IndexModel
+@{
+    ViewData["Title"] = "Notas Partilhadas";
+}
+
+<div class="container py-4">
+    <h1 class="mb-4 text-primary">Notas Partilhadas</h1>
+
+    <div class="mb-3">
+        <a asp-page="Create" class="btn btn-success">+ Nova Partilha</a>
+    </div>
+
+    <ul class="nav nav-tabs mb-4" id="sharesTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="shared-by-me-tab" data-bs-toggle="tab"
+                    data-bs-target="#sharedByMe" type="button" role="tab">
+                Partilhadas por mim
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="shared-with-me-tab" data-bs-toggle="tab"
+                    data-bs-target="#sharedWithMe" type="button" role="tab">
+                Partilhadas comigo
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="sharedByMe" role="tabpanel">
+            <div class="row gy-4">
+                @if (Model.SharedByMe.Count == 0)
+                {
+                    <div class="col-12">
+                        <p class="text-muted fst-italic">Nenhuma nota partilhada por si.</p>
+                    </div>
+                }
+
+                @foreach (var share in Model.SharedByMe)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm rounded">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">@share.Note.Title</h5>
+                                <p class="card-text text-muted small">
+                                    Partilhada com: <strong>@share.SharedWithUser?.UserName</strong>
+                                </p>
+                                <p class="card-text text-muted small">
+                                    @(share.CanEdit ? "Pode editar" : "Apenas leitura")
+                                </p>
+                                <p class="card-text flex-grow-1">@(share.Note.Content?.Length > 100 ? share.Note.Content[..100] + "..." : share.Note.Content ?? "")</p>
+                                <div class="mt-auto">
+                                    <a asp-page="Edit" asp-route-id="@share.NoteShareId" class="btn btn-sm btn-outline-primary me-1">Editar</a>
+                                    <form method="post" asp-page-handler="Delete" asp-route-id="@share.NoteShareId" class="d-inline"
+                                          onsubmit="return confirm('Remover esta partilha?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Remover</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="sharedWithMe" role="tabpanel">
+            <div class="row gy-4">
+                @if (Model.SharedWithMe.Count == 0)
+                {
+                    <div class="col-12">
+                        <p class="text-muted fst-italic">Nenhuma nota foi partilhada consigo.</p>
+                    </div>
+                }
+
+                @foreach (var note in Model.SharedWithMe)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm rounded">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">@note.Title</h5>
+                                <p class="card-text text-muted small">
+                                    De: <strong>@note.User?.UserName</strong>
+                                </p>
+                                <p class="card-text text-muted small">
+                                    Atualizada em: @note.UpdatedAt.ToString("dd/MM/yyyy HH:mm")
+                                </p>
+                                <p class="card-text flex-grow-1">@(note.Content?.Length > 100 ? note.Content[..100] + "..." : note.Content ?? "")</p>
+                                <div class="mt-auto">
+                                    <a asp-page="/NoteShares/Details" asp-route-noteId="@note.NoteId" class="btn btn-sm btn-outline-primary me-1">Ver</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+}

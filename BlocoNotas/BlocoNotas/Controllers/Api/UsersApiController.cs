@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 namespace BlocoNotas.Controllers.Api
 {
     /// <summary>
-    /// Controller para gerenciar operações relacionadas aos usuários via API.
+    /// Controller para gerir operações relacionadas com os utilizadores via API.
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
@@ -24,7 +24,7 @@ namespace BlocoNotas.Controllers.Api
         /// Construtor da controller que injeta o contexto do banco e o UserManager.
         /// </summary>
         /// <param name="context">Contexto da aplicação para acesso ao banco.</param>
-        /// <param name="userManager">Gerenciador de usuários do Identity.</param>
+        /// <param name="userManager">Gestor de utilizadores do Identity.</param>
         public UsersApiController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
@@ -32,11 +32,11 @@ namespace BlocoNotas.Controllers.Api
         }
 
         /// <summary>
-        /// Obtém a lista de usuários.
-        /// - Admins recebem todos os usuários com seus papéis.
-        /// - Usuários normais recebem apenas seus próprios dados com papéis.
+        /// Obtém a lista de utilizadores.
+        /// - Admins recebem todos os utilizadores com os seus papéis.
+        /// - Utilizadores normais recebem apenas os seus próprios dados com papéis.
         /// </summary>
-        /// <returns>Lista de usuários com seus papéis.</returns>
+        /// <returns>Lista de utilizadores com os seus papéis.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetUsers()
         {
@@ -86,11 +86,11 @@ namespace BlocoNotas.Controllers.Api
         }
 
         /// <summary>
-        /// Obtém os detalhes de um usuário específico pelo seu ID.
-        /// Apenas admins ou o próprio usuário podem acessar.
+        /// Obtém os detalhes de um utilizador específico pelo seu ID.
+        /// Apenas admins ou o próprio utilizador podem aceder.
         /// </summary>
-        /// <param name="id">ID do usuário a ser obtido.</param>
-        /// <returns>Dados do usuário solicitado.</returns>
+        /// <param name="id">ID do utilizador a ser obtido.</param>
+        /// <returns>Dados do utilizador solicitado.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<ApplicationUser>> GetUser(string id)
         {
@@ -110,11 +110,11 @@ namespace BlocoNotas.Controllers.Api
         }
 
         /// <summary>
-        /// Cria um novo usuário.
-        /// Apenas admins podem criar novos usuários.
+        /// Cria um novo utilizador.
+        /// Apenas admins podem criar novos utilizadores.
         /// </summary>
-        /// <param name="applicationUser">Objeto do usuário a ser criado.</param>
-        /// <returns>Usuário criado.</returns>
+        /// <param name="applicationUser">Objeto do utilizador a ser criado.</param>
+        /// <returns>Utilizador criado.</returns>
         [HttpPost]
         public async Task<ActionResult<ApplicationUser>> PostUser(ApplicationUser applicationUser)
         {
@@ -128,12 +128,12 @@ namespace BlocoNotas.Controllers.Api
         }
 
         /// <summary>
-        /// Atualiza um usuário existente.
-        /// Apenas admins ou o próprio usuário podem atualizar.
+        /// Atualiza um utilizador existente.
+        /// Apenas admins ou o próprio utilizador podem atualizar.
         /// Permite alteração de dados e senha.
         /// </summary>
-        /// <param name="id">ID do usuário a ser atualizado.</param>
-        /// <param name="applicationUser">Objeto com dados atualizados do usuário.</param>
+        /// <param name="id">ID do utilizador a ser atualizado.</param>
+        /// <param name="applicationUser">Objeto com dados atualizados do utilizador.</param>
         /// <returns>Resultado da operação.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(string id, ApplicationUser applicationUser)
@@ -167,11 +167,11 @@ namespace BlocoNotas.Controllers.Api
         }
 
         /// <summary>
-        /// Remove um usuário específico.
-        /// Apenas admins podem deletar usuários.
-        /// Apaga também notas e compartilhamentos associados ao usuário.
+        /// Remove um utilizador específico.
+        /// Apenas admins podem eliminar utilizadores.
+        /// Apaga também notas e partilhas associadas ao utilizador.
         /// </summary>
-        /// <param name="id">ID do usuário a ser deletado.</param>
+        /// <param name="id">ID do utilizador a ser eliminado.</param>
         /// <returns>Resultado da operação.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
@@ -190,13 +190,13 @@ namespace BlocoNotas.Controllers.Api
                 return NotFound();
             }
 
-            // Apagar compartilhamentos recebidos pelo usuário
+            // Apagar partilhas recebidas pelo utilizador
             if (user.SharedWithMe != null && user.SharedWithMe.Any())
             {
                 _context.NoteShares.RemoveRange(user.SharedWithMe);
             }
 
-            // Apagar compartilhamentos feitos nas notas do usuário
+            // Apagar partilhas feitas nas notas do utilizador
             if (user.Notes != null)
             {
                 foreach (var note in user.Notes)
@@ -208,7 +208,7 @@ namespace BlocoNotas.Controllers.Api
                 }
             }
 
-            // Apagar notas do usuário
+            // Apagar notas do utilizador
             if (user.Notes != null && user.Notes.Any())
             {
                 _context.Notes.RemoveRange(user.Notes);
@@ -228,10 +228,10 @@ namespace BlocoNotas.Controllers.Api
         }
 
         /// <summary>
-        /// Promove um usuário para o papel de Admin.
+        /// Promove um utilizador para o papel de Admin.
         /// Apenas admins podem promover.
         /// </summary>
-        /// <param name="id">ID do usuário a ser promovido.</param>
+        /// <param name="id">ID do utilizador a ser promovido.</param>
         /// <returns>Resultado da operação.</returns>
         [HttpPost("MakeAdmin/{id}")]
         public async Task<IActionResult> MakeAdmin(string id)
@@ -254,9 +254,9 @@ namespace BlocoNotas.Controllers.Api
         }
 
         /// <summary>
-        /// Verifica se um usuário existe no banco.
+        /// Verifica se um utilizador existe no banco.
         /// </summary>
-        /// <param name="id">ID do usuário a verificar.</param>
+        /// <param name="id">ID do utilizador a verificar.</param>
         /// <returns>True se existir, false caso contrário.</returns>
         private bool UserExists(string id)
         {

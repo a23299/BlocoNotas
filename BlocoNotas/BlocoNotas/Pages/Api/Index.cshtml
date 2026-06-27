@@ -1,0 +1,77 @@
+﻿@page
+@{
+    ViewData["Title"] = "Documentação da API";
+}
+
+<div class="container py-4 d-flex justify-content-center" style="min-height: 85vh;">
+    <div class="col-md-10 col-lg-9">
+        <h1 class="mb-4 text-primary text-center">Documentação da API</h1>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h5 class="card-title text-uppercase text-secondary mb-4 fw-semibold">API REST - Endpoints Disponíveis</h5>
+                <p class="text-muted small mb-4">A API utiliza autenticação JWT (Bearer Token). Endpoints (exceto login/registo) requerem <code>Authorization: Bearer {token}</code>.</p>
+
+                <h6 class="fw-semibold mt-3">1. Autenticação (AuthController)</h6>
+                <div class="table-responsive"><table class="table table-sm table-bordered mb-3"><thead class="table-light"><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead><tbody>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/auth/login</code></td><td>Autentica e retorna token JWT</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/auth/register</code></td><td>Regista e retorna token JWT</td></tr>
+                </tbody></table></div>
+
+                <h6 class="fw-semibold mt-3">2. Notas (NotesApiController)</h6>
+                <div class="table-responsive"><table class="table table-sm table-bordered mb-3"><thead class="table-light"><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead><tbody>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/notes</code></td><td>Lista notas do utilizador (admin vê todas)</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/notes/{id}</code></td><td>Obtém nota específica</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/notes</code></td><td>Cria nota</td></tr>
+                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/notes/{id}</code></td><td>Atualiza título e conteúdo</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/notes/{id}</code></td><td>Soft delete</td></tr>
+                </tbody></table></div>
+
+                <h6 class="fw-semibold mt-3">3. Partilhas (NoteSharesApiController)</h6>
+                <div class="table-responsive"><table class="table table-sm table-bordered mb-3"><thead class="table-light"><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead><tbody>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/NoteShares/shared-with-me</code></td><td>Notas partilhadas comigo</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/NoteShares/shared-by-me</code></td><td>Partilhas feitas por mim</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/NoteShares</code></td><td>Partilha nota com utilizador</td></tr>
+                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/NoteShares/shared-note-edit/{noteId}</code></td><td>Edita nota partilhada</td></tr>
+                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/NoteShares/{id}</code></td><td>Atualiza permissões</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/NoteShares/{id}</code></td><td>Remove partilha</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/NoteShares/remove-my-access/{noteId}</code></td><td>Remove meu acesso</td></tr>
+                </tbody></table></div>
+
+                <h6 class="fw-semibold mt-3">4. Tags (TagsApiController)</h6>
+                <div class="table-responsive"><table class="table table-sm table-bordered mb-3"><thead class="table-light"><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead><tbody>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/tags</code></td><td>Tags do utilizador</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/tags/all</code></td><td>Todas as tags</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/tags/{id}</code></td><td>Tag específica</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/tags/{id}/notes</code></td><td>Notas de uma tag</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/tags</code></td><td>Cria tag</td></tr>
+                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/tags/{id}</code></td><td>Atualiza nome</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/tags/{id}</code></td><td>Elimina tag</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/tags/notes</code></td><td>Associa tag a nota</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/tags/notes</code></td><td>Remove associação</td></tr>
+                </tbody></table></div>
+
+                <h6 class="fw-semibold mt-3">5. Utilizadores (UsersApiController)</h6>
+                <div class="table-responsive"><table class="table table-sm table-bordered mb-3"><thead class="table-light"><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead><tbody>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/Users</code></td><td>Lista utilizadores</td></tr>
+                    <tr><td><span class="badge bg-primary">GET</span></td><td><code>/api/Users/{id}</code></td><td>Detalhes de utilizador</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/Users</code></td><td>Cria utilizador (admin)</td></tr>
+                    <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/Users/{id}</code></td><td>Atualiza utilizador</td></tr>
+                    <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/Users/{id}</code></td><td>Elimina utilizador (admin)</td></tr>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/api/Users/MakeAdmin/{id}</code></td><td>Promove a admin</td></tr>
+                </tbody></table></div>
+
+                <h6 class="fw-semibold mt-3">6. Email (EmailsController)</h6>
+                <div class="table-responsive"><table class="table table-sm table-bordered mb-0"><thead class="table-light"><tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr></thead><tbody>
+                    <tr><td><span class="badge bg-success">POST</span></td><td><code>/emails/sendemail</code></td><td>Envia email transacional</td></tr>
+                </tbody></table></div>
+
+                <div class="mt-4 p-3 bg-light rounded">
+                    <small class="text-muted">
+                        <strong>Nota:</strong> A API está documentada também via Swagger UI em <code>/swagger</code> (desenvolvimento). Autenticação via JWT com duração de 24h.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+@page
+@model BlocoNotas.Pages.Users.EditModel
+@{
+    ViewData["Title"] = "Editar Utilizador";
+}
+
+<div class="container py-5 d-flex justify-content-center">
+    <div class="card shadow-sm border-0" style="max-width: 480px; width: 100%;">
+        <div class="card-body">
+            <h2 class="card-title text-center mb-4 text-primary fw-bold">@ViewData["Title"]</h2>
+
+            <form method="post" class="needs-validation" novalidate>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="Input.Id" />
+
+                <div class="mb-3">
+                    <label asp-for="Input.UserName" class="form-label fw-semibold">Nome</label>
+                    <input asp-for="Input.UserName" class="form-control" required />
+                    <span asp-validation-for="Input.UserName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Email" class="form-label fw-semibold">Email</label>
+                    <input asp-for="Input.Email" class="form-control" required />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Input.Password" class="form-label fw-semibold">Password</label>
+                    <input asp-for="Input.Password" class="form-control" />
+                    <small class="form-text text-muted">Deixe em branco para manter a password atual.</small>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-page="Index" class="btn btn-outline-secondary px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-success px-4">Guardar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

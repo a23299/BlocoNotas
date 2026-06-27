@@ -1,0 +1,46 @@
+@page
+@model BlocoNotas.Pages.NoteShares.EditModel
+@{
+    ViewData["Title"] = "Editar Partilha";
+}
+
+<div class="container py-5 d-flex justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4 text-primary fw-bold">Editar Partilha</h2>
+
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="NoteShare.NoteShareId" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nota</label>
+                        <p class="form-control-plaintext">@Model.NoteTitle</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Partilhada com</label>
+                        <p class="form-control-plaintext">@Model.SharedWithUserName</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input asp-for="NoteShare.CanEdit" class="form-check-input" />
+                            <label asp-for="NoteShare.CanEdit" class="form-check-label">Pode editar?</label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-page="Index" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

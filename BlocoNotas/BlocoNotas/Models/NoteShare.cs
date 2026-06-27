@@ -23,7 +23,7 @@ namespace BlocoNotas.Models
         /// <summary>
         /// Referência à nota que está a ser partilhada.
         /// </summary>
-        public Note Note { get; set; }
+        public Note? Note { get; set; }
         
         /// <summary>
         /// Identificador do utilizador com quem a nota foi partilhada.
@@ -35,7 +35,7 @@ namespace BlocoNotas.Models
         /// <summary>
         /// Referência ao utilizador com quem a nota foi partilhada.
         /// </summary>
-        public ApplicationUser SharedWithUser { get; set; }
+        public ApplicationUser? SharedWithUser { get; set; }
         
         /// <summary>
         /// Data e hora em que a nota foi partilhada.
