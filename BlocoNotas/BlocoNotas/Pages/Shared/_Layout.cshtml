@@ -91,6 +91,19 @@
 
 <div class="container">
     <main role="main" class="pb-3">
+        @if (TempData["Notification"] is string notification)
+        {
+            <div class="alert alert-info alert-dismissible fade show position-fixed top-0 end-0 m-3" style="z-index: 9999;" role="alert">
+                @notification
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <script>
+                setTimeout(() => {
+                    const el = document.querySelector('.alert.position-fixed');
+                    if (el) { el.remove(); }
+                }, 8000);
+            </script>
+        }
         @RenderBody()
     </main>
 </div>
