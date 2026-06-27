@@ -4,7 +4,7 @@
     ViewData["Title"] = "Criar Tag";
 }
 
-<div class="container py-5 d-flex justify-content-center">
+<div class="container py-4 d-flex justify-content-center">
     <div class="col-md-6">
         <div class="card shadow border-0">
             <div class="card-body">
@@ -12,6 +12,12 @@
 
                 <form method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Tag.Color" class="form-label">Cor da Tag</label>
+                        <input asp-for="Tag.Color" type="color" class="form-control form-control-color" style="width: 60px;" />
+                        <span asp-validation-for="Tag.Color" class="text-danger"></span>
+                    </div>
 
                     <div class="mb-3">
                         <label asp-for="Tag.Name" class="form-label">Nome da Tag</label>

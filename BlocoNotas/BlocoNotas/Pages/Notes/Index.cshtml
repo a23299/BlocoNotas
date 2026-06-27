@@ -32,8 +32,7 @@
         {
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 shadow-sm rounded card-clickable">
-                    <div class="card-body" style="cursor: pointer;"
-                         onclick="window.location.href='/Notes/Edit?id=@note.NoteId'">
+                    <div class="card-body" onclick="window.location.href='/Notes/Edit?id=@note.NoteId'">
                         <h5 class="card-title">@note.Title</h5>
                         <p class="card-text text-muted small">Última atualização: @note.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</p>
                         <p class="card-text">@(note.Content?.Length > 100 ? note.Content[..100] + "..." : note.Content ?? "")</p>
@@ -43,13 +42,13 @@
                             {
                                 foreach (var nt in note.NoteTags)
                                 {
-                                    <span class="badge bg-info text-dark me-1">@nt.Tag.Name</span>
+                                    <span class="badge me-1" style="background-color: @nt.Tag.Color; color: #fff;">@nt.Tag.Name</span>
                                 }
                             }
                         </div>
                     </div>
 
-                    <div class="card-footer bg-transparent d-flex flex-wrap gap-1">
+                    <div class="card-footer bg-transparent border-top d-flex flex-wrap gap-1">
                         <a class="btn btn-sm btn-outline-danger" asp-page="Delete" asp-route-id="@note.NoteId"
                            onclick="event.stopPropagation()">Eliminar</a>
                         <a class="btn btn-sm btn-outline-info" asp-page="/NoteShares/Create" asp-route-noteId="@note.NoteId"
@@ -58,7 +57,7 @@
                         <div class="dropdown" onclick="event.stopPropagation()">
                             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                Tag
+                                Gerir Tags
                             </button>
                             <div class="dropdown-menu p-3" style="min-width: 200px;">
                                 <form method="post" asp-page-handler="UpdateTags" asp-route-noteId="@note.NoteId"

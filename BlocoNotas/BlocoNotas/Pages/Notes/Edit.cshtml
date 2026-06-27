@@ -4,7 +4,7 @@
     ViewData["Title"] = "Editar Nota";
 }
 
-<div class="container py-5 d-flex justify-content-center">
+<div class="container py-4 d-flex justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-sm border-0">
             <div class="card-body">
@@ -31,7 +31,7 @@
                         <div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button"
                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                Tag
+                                Gerir Tags
                             </button>
                             <div class="dropdown-menu p-3" style="min-width: 220px;">
                                 @foreach (var tag in Model.AvailableTags)
@@ -74,6 +74,10 @@
             <form id="createTagForm">
                 <div class="modal-body">
                     <div class="mb-3">
+                        <label for="newTagColor" class="form-label">Cor</label>
+                        <input type="color" id="newTagColor" name="color" class="form-control form-control-color" value="#0d6efd" style="width: 60px;" />
+                    </div>
+                    <div class="mb-3">
                         <label for="newTagName" class="form-label">Nome</label>
                         <input type="text" id="newTagName" name="name" class="form-control" required maxlength="50" />
                     </div>
@@ -93,6 +97,7 @@
         document.getElementById('createTagForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             const name = document.getElementById('newTagName').value.trim();
+            const color = document.getElementById('newTagColor').value;
             if (!name) return;
 
             const btn = document.getElementById('createTagSubmit');
@@ -102,16 +107,16 @@
             const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
 
             try {
-                const params = new URLSearchParams();
-                params.append('name', name);
+                const formData = new FormData();
+                formData.append('name', name);
+                formData.append('color', color);
 
                 const response = await fetch('?handler=CreateTagJson', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
                         'RequestVerificationToken': token
                     },
-                    body: params.toString()
+                    body: formData
                 });
 
                 if (response.ok) {
