@@ -72,20 +72,4 @@ namespace BlocoNotas.Models
         /// </summary>
         public ICollection<NoteShare> SharedWith { get; set; } =  new List<NoteShare>();
     }
-
-    /// <summary>
-    /// DTO simples para representar um utilizador com ID e nome de utilizador.
-    /// </summary>
-    public class UserDto
-    {
-        /// <summary>
-        /// Identificador do utilizador.
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
-        /// Nome do utilizador.
-        /// </summary>
-        public string UserName { get; set; }
-    }
 }
